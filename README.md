@@ -22,56 +22,144 @@ Trước làn sóng số hóa ngành thuế tại Việt Nam, doanh nghiệp ph�
 
 ---
 
-## 2. KIẾN TRÚC ĐỘT PHÁ: DUAL-ENGINE AI + ZERO-DOWNTIME FALLBACK
+## 2. SƠ ĐỒ WORKFLOW CHUẨN TOÀN DIỆN CỦA HỆ THỐNG (END-TO-END WORKFLOW ARCHITECTURE)
 
-Tax Referee vận hành trên kiến trúc kết hợp đa tầng bảo vệ tối cao:
+Hệ thống **Tax Referee** vận hành trên một quy trình khép kín, đa tầng chốt chặn từ lúc tiếp nhận hóa đơn đầu vào cho đến khi ra quyết định và lập hồ sơ phòng vệ thuế:
 
-```text
-                                [ HÓA ĐƠN ĐẦU VÀO ]
-                                         │
-                                         ▼
-                 ┌────────────────────────────────────────────────┐
-                 │          TypeSafe Zod Ingestion Guard          │
-                 └───────────────────────┬────────────────────────┘
-                                         │
-                                         ▼
-                 ┌────────────────────────────────────────────────┐
-                 │       Deterministic SOP Rule Engine (Local)    │
-                 │   - Mốc thời gian đóng MST Trước / Sau         │
-                 │   - Ma trận thuế suất 8% vs 10% (NĐ 72/2024)   │
-                 │   - Bẫy tiền mặt ≥ 20M (TT 219/2013)           │
-                 │   - Giám sát biến động Hệ số K (CV 2392)       │
-                 └───────────────────────┬────────────────────────┘
-                                         │
-                ┌────────────────────────┴────────────────────────┐
-                ▼                                                 ▼
-      [ HỢP LỆ 100% (ROUTINE) ]                     [ PHÁT HIỆN DẤU HIỆU RỦI RO ]
-                │                                                 │
-                ▼                                                 ▼
-     ┌──────────────────────┐                     ┌───────────────────────────────┐
-     │ Tự động duyệt ngầm   │                     │      DUAL-ENGINE AI TẦNG CAO  │
-     │ + Cộng Tờ khai 01    │                     │  1. TypeSafe AI Jev System One│
-     │ + Ghi Audit Trail    │                     │     (Xác suất & Risk Score)   │
-     └──────────────────────┘                     │  2. Google Gemini Flash Q-Gen │
-                                                  │     (Sinh động câu hỏi A/B)   │
-                                                  └───────────────┬───────────────┘
-                                                                  │
-                                                                  ▼
-                                                  ┌───────────────────────────────┐
-                                                  │    Escalation Card (3 Giây)   │
-                                                  │    Nút A vs Nút B cho KTT/CFO │
-                                                  └───────────────────────────────┘
+```mermaid
+flowchart TD
+    %% TẦNG 1: TIẾP NHẬN DỮ LIỆU
+    subgraph S1 ["TẦNG 1: TIẾP NHẬN DỮ LIỆU & TYPE-SAFE INGESTION"]
+        IN1["Hóa đơn từ Verify Harness 90s (5 ca chuẩn)"]
+        IN2["Hóa đơn Tùy biến từ Form Giám khảo"]
+        IN3["Hóa đơn qua REST API POST /api/evaluate"]
+        IN1 --> VAL["Zod Ingestion Guard (InvoiceInputSchema)"]
+        IN2 --> VAL
+        IN3 --> VAL
+    end
+
+    %% TẦNG 2: TIỀN KIỂM GROUND TRUTH & HỆ SỐ K
+    subgraph S2 ["TẦNG 2: TIỀN KIỂM PHÁP LÝ & GIÁM SÁT RỦI RO TOÀN CỤC"]
+        VAL --> PRE["Deterministic Policy Engine (Ground Truth Tax-SOP-2026)"]
+        PRE --> CHK1{"Kiểm tra Mốc thời gian đóng MST (Điều 2.2)"}
+        PRE --> CHK2{"Kiểm tra Mã HĐ gốc NĐ 123 (Điều 1.4)"}
+        PRE --> CHK3{"Bẫy Ma trận Thuế suất 8% vs 10% (Điều 1.3)"}
+        PRE --> CHK4{"Bẫy Tiền mặt ≥ 20M & Bảng kê (Điều 1.2)"}
+        PRE --> CHK5{"Mặt hàng cấm khấu trừ Rượu bia (Điều 2.1)"}
+        PRE --> CHK6{"Đo lường biến động Hệ số K (Công văn 2392)"}
+        PRE --> CHK7{"Hạn mức phê duyệt KTT vs CFO (Điều 3.3)"}
+    end
+
+    %% TẦNG 3: PHÁN QUYẾT PHÂN LUỒNG REFEREE
+    subgraph S3 ["TẦNG 3: CHỐT CHẶN PHÂN LUỒNG (THE REFEREE DECISION SPLIT)"]
+        CHK1 & CHK2 & CHK3 & CHK4 & CHK5 & CHK6 & CHK7 --> EVAL{"Dữ liệu có dấu hiệu rủi ro?"}
+        
+        %% Nhánh Hợp lệ
+        EVAL -- "KHÔNG (Hợp lệ 100%)" --> ROUTINE["TRẠNG THÁI: ROUTINE (Thường quy)<br/>Straight-Through Processing"]
+        
+        %% Nhánh Rủi ro
+        EVAL -- "CÓ (Phát hiện rủi ro)" --> GUARD["ZERO-HALLUCINATION GUARDRAIL<br/>Cưỡng chế dừng tự động hóa ngay lập tức<br/>Tuyệt đối KHÔNG có approvedTaxAmount"]
+    end
+
+    %% NHÁNH ROUTINE XỬ LÝ NGẦM
+    subgraph S4_A ["NHÁNH DUYỆT THÔNG SUỐT TỰ ĐỘNG (< 15ms)"]
+        ROUTINE --> APPR_TAX["Tính số thuế GTGT được khấu trừ"]
+        APPR_TAX --> ADD_VAT["Cộng dồn vào Tờ khai 01/GTGT"]
+        ADD_VAT --> LOG_ROUTINE["Ghi Audit Trail (Actor: SYSTEM_REFEREE)"]
+        LOG_ROUTINE --> UPDATE_K1["Cập nhật Hệ số K (Vùng Xanh)"]
+    end
+
+    %% NHÁNH ESCALATED: DUAL-ENGINE AI
+    subgraph S4_B ["TẦNG 4: DUAL-ENGINE AI PHÂN LOẠI & SINH CÂU HỎI HÀNH ĐỘNG"]
+        GUARD --> SPLIT_RISK{"Phân loại 3 Nhóm Rủi ro Đề bài A"}
+        SPLIT_RISK --> G1["NHÓM 1: UNCERTAIN_INFO<br/>(Chưa xác định thông tin)"]
+        SPLIT_RISK --> G2["NHÓM 2: OUT_OF_POLICY<br/>(Ngoài phạm vi quy định)"]
+        SPLIT_RISK --> G3["NHÓM 3: EXCEED_AUTHORITY<br/>(Vượt thẩm quyền phê duyệt)"]
+
+        G1 & G2 & G3 --> AI_CORE["DUAL-ENGINE AI ORCHESTRATION"]
+        
+        %% Engine 1: Jev AI
+        AI_CORE --> JEV["Engine 1: TypeSafe AI Jev System One<br/>• decision_type (Choice Primitive)<br/>• should_escalate (Noul Primitive)<br/>• risk_level (Score Primitive: 1 - 5)"]
+        
+        %% Engine 2: Gemini Flash Q-Gen
+        AI_CORE --> GEMINI["Engine 2: Google Gemini Flash-Lite Q-Gen<br/>• responseSchema cưỡng chế cấu trúc JSON<br/>• Sinh câu hỏi ĐÓNG kèm Bill ID, Số tiền, SOP<br/>• Tạo 2 Phương án Đối ứng Cụ thể A vs B"]
+        
+        %% Fallback Engine
+        AI_CORE -. "Mất mạng / Timeout > 2.5s" .-> FALLBACK["Zero-Downtime Local Fallback Engine<br/>(< 50ms, EngineUsed: LOCAL_FALLBACK)"]
+    end
+
+    %% TẦNG 5: HITL ESCALATION CARD
+    subgraph S5 ["TẦNG 5: TƯƠNG TÁC CON NGƯỜI TRONG VÒNG LẶP (HITL - 3 GIÂY)"]
+        JEV & GEMINI & FALLBACK --> CARD["Escalation Card (Thẻ Phán quyết A/B)<br/>• Badge Cấp duyệt: KTT (Tím) vs CFO (Đỏ)<br/>• Badge Minh bạch: Gemini + Jev (Confidence %)<br/>• Câu hỏi hành động in đậm cỡ chữ lớn"]
+
+        CARD --> ACT_A["PHƯƠNG ÁN A<br/>(Chấp nhận kèm hồ sơ / Phê duyệt điều chỉnh / Bổ sung UNC)"]
+        CARD --> ACT_B["PHƯƠNG ÁN B<br/>(Yêu cầu xuất lại HĐ 10% / Loại thuế khỏi khấu trừ)"]
+    end
+
+    %% TẦNG 6: HẬU KIỂM, PHÒNG VỆ THUẾ & GOVERNANCE
+    subgraph S6 ["TẦNG 6: SỔ SÁCH KIỂM TOÁN, HỒ SƠ PHÒNG VỆ THUẾ & GOVERNANCE"]
+        ACT_A --> MUT_A["Cộng số thuế được duyệt vào Tờ khai 01/GTGT<br/>Điều chỉnh Hệ số K"]
+        ACT_B --> MUT_B["Khấu trừ thuế = 0 VNĐ<br/>Giữ an toàn số liệu"]
+        
+        MUT_A & MUT_B --> CLOSE_CARD["Đóng Thẻ Ngoại lệ & Đồng bộ State Form"]
+        CLOSE_CARD --> AUDIT_LOG["Bảng Nhật ký Kiểm toán (Audit Trail Table)<br/>Lưu vết 100%: Dấu thời gian, Actor, SOP, Căn cứ pháp lý"]
+
+        AUDIT_LOG --> UNDO_BTN["Cơ chế Hoàn tác (Undo): Rút lại quyết định & Hoàn nguyên K/Thuế"]
+        AUDIT_LOG --> OVERRIDE_BTN["Cơ chế Ghi đè (Override): Quyền can thiệp tối cao của Con người"]
+        AUDIT_LOG --> DOSSIER_BTN["Hồ sơ Phòng vệ Thuế 1-Click (Tax Defense Dossier)<br/>• Biên bản giải trình tuân thủ<br/>• Trích dẫn NĐ 123, NĐ 72, TT 219, Tax-SOP<br/>• Mã băm chữ ký số nội bộ SHA-256<br/>• In / Xuất PDF Giải trình"]
+    end
 ```
 
-### Chi tiết các tầng công nghệ:
-1. **Engine 1 - TypeSafe AI Jev System One (`https://api.typesafe.ai/v1/systemone`):**
-   - Đóng vai trò Decision Primitive tính toán xác suất phân loại (`decision_type`), quyết định chuyển tiếp (`should_escalate`) và đánh giá điểm rủi ro (`risk_level`).
-2. **Engine 2 - Actionable Question Generator (Google Gemini Flash-Lite):**
-   - Áp dụng `responseSchema` của REST API để sinh động câu hỏi hành động ĐÓNG, NGẮN GỌN, CHÍNH XÁC kèm 2 phương án đối ứng A/B dựa trên ngữ cảnh thực tế của hóa đơn.
-3. **Cơ chế Fallback Siêu tốc (< 50ms):**
-   - Nếu kết nối mạng gián đoạn hoặc API bên ngoài quá tải, hệ thống tự động kích hoạt Local Deterministic Engine trong 0ms - 1ms, gắn nhãn `LOCAL_FALLBACK`, bảo đảm phiên thuyết trình chấm thi 90 giây không bao giờ bị gián đoạn.
-4. **Zod Discriminated Unions Guardrail:**
-   - Cưỡng chế luồng ở mức Type System. Khi trạng thái là `ESCALATED`, schema tuyệt đối không cho phép tồn tại trường `approvedTaxAmount`.
+---
+
+### 2.1 Sơ đồ Cây Phán Quyết Nghiệp Vụ (Decision Logic Tree)
+
+```text
+[HÓA ĐƠN ĐẦU VÀO]
+  │
+  ├── 1. Kiểm tra Mua vào đẩy Hệ số K vào Vùng Đỏ (< 0.95 hoặc > 1.35)?
+  │     └── ĐÚNG ──> ESCALATED | EXCEED_AUTHORITY | Cấp duyệt: CFO (Đỏ)
+  │
+  ├── 2. HĐ điều chỉnh giảm hoặc bồi thường vi phạm ≥ 200.000.000 VNĐ?
+  │     └── ĐÚNG ──> ESCALATED | EXCEED_AUTHORITY | Cấp duyệt: CFO (Đỏ)
+  │
+  ├── 3. HĐ xuất SAU ngày bên bán đóng MST?
+  │     └── ĐÚNG ──> ESCALATED | OUT_OF_POLICY | Cấm hạch toán 100% | Cấp duyệt: KTT
+  │
+  ├── 4. HĐ từ 20 triệu VNĐ thanh toán TIỀN MẶT (thiếu UNC ngân hàng)?
+  │     └── ĐÚNG ──> ESCALATED | OUT_OF_POLICY | Vi phạm TT 219 | Cấp duyệt: KTT
+  │
+  ├── 5. Dịch vụ viễn thông / CNTT áp nhầm thuế suất 8% (thay vì 10%)?
+  │     └── ĐÚNG ──> ESCALATED | OUT_OF_POLICY | Vi phạm NĐ 72/2024 | Cấp duyệt: KTT
+  │
+  ├── 6. Chi phí tiệc tùng chứa Rượu bia / Đồ uống có cồn cấm khấu trừ?
+  │     └── ĐÚNG ──> ESCALATED | OUT_OF_POLICY | Vi phạm Điều 2.1 SOP | Cấp duyệt: KTT
+  │
+  ├── 7. HĐ xuất TRƯỚC ngày bên bán đóng MST (cần xác minh hồ sơ thực tế)?
+  │     └── ĐÚNG ──> ESCALATED | UNCERTAIN_INFO | Tạm dừng đối soát | Cấp duyệt: KTT
+  │
+  ├── 8. HĐ điều chỉnh nhưng KHÔNG có mã HĐ gốc trong CSDL nội bộ?
+  │     └── ĐÚNG ──> ESCALATED | UNCERTAIN_INFO | Vi phạm NĐ 123/2020 | Cấp duyệt: KTT
+  │
+  ├── 9. Ảnh hóa đơn bị lóa mờ dòng tổng tiền, OCR không chắc chắn?
+  │     └── ĐÚNG ──> ESCALATED | UNCERTAIN_INFO | Cần xác minh số tiền | Cấp duyệt: KTT
+  │
+  └── 10. Hóa đơn thỏa mãn 100% căn cứ pháp lý & quy chế nội bộ?
+        └── ĐÚNG ──> ROUTINE | Straight-Through Processing | Tự động duyệt ngầm (< 15ms)
+```
+
+---
+
+### 2.2 Quy Trình 6 Bước Vận Hành Chuẩn Mực Trong Ứng Dụng
+
+| Bước | Phân Tầng | Hành Vi Hệ Thống & Tác Nhân | Thời Gian Phản Hồi |
+| :---: | :--- | :--- | :---: |
+| **B1** | **Ingestion Guard** | Tiếp nhận hóa đơn từ Verify Harness 90s, Form tùy biến Giám khảo hoặc API. Ép kiểu cấu trúc chặt chẽ qua Zod `InvoiceInputSchema`. | < 2ms |
+| **B2** | **Ground Truth SOP Pre-check** | Đối soát tức thì với Quy chế `Tax-SOP-2026`, kiểm tra mốc thời gian đóng MST, truy vết hóa đơn gốc NĐ 123, ma trận thuế suất 8%/10% và tính toán Hệ số K. | < 5ms |
+| **B3** | **Referee Split** | • **Hóa đơn hợp lệ 100%:** Trả về `ROUTINE`, tính `approvedTaxAmount`, tự động cộng Tờ khai 01/GTGT và ghi Audit Trail.<br/>• **Hóa đơn có rủi ro:** Kích hoạt Zero-Hallucination Guardrail, tuyệt đối cấm tạo số thuế khấu trừ. | < 15ms |
+| **B4** | **Dual-Engine AI Processing** | • **TypeSafe AI Jev System One:** Tính toán xác suất, độ tin cậy và điểm rủi ro.<br/>• **Google Gemini Flash-Lite Q-Gen:** Sinh câu hỏi ĐÓNG chứa số HĐ, tên NCC, số tiền, điều khoản SOP và 2 lựa chọn A/B.<br/>• **Zero-Downtime Fallback:** Tự động kích hoạt khi mất mạng (< 50ms). | 600ms - 1.200ms<br/>*(Fallback: 0ms)* |
+| **B5** | **HITL Escalation Card** | Hiển thị thẻ phán quyết ngoại lệ. Kế toán trưởng hoặc Giám đốc Tài chính đọc câu hỏi và bấm chọn **Phương án A** hoặc **Phương án B** trong 3 giây. | 3 giây |
+| **B6** | **Post-Audit & Tax Defense** | Đóng thẻ ngoại lệ, đồng bộ state, cập nhật sổ cái kiểm toán. Người dùng có toàn quyền **Hoàn tác (Undo)**, **Ghi đè (Override)** hoặc mở **Hồ sơ Phòng vệ Thuế 1-Click (Dossier)** xuất PDF. | Tức thì |
 
 ---
 
