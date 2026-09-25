@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SInvoice>
+    <InvoiceNo>0000002</InvoiceNo>
+    <InvoiceSeries>VN23</InvoiceSeries>
+    <InvoiceDate>2026-01-16</InvoiceDate>
+    <InvoiceType>Normal</InvoiceType>
+    <Currency>VND</Currency>
+    <ExchangeRate>1</ExchangeRate>
+    <Seller>
+        <SellerName>VNPT Software Company</SellerName>
+        <SellerTaxCode>0111222333</SellerTaxCode>
+        <SellerAddress>789 Tran Hung Dao, Hanoi</SellerAddress>
+        <SellerPhone>024-9999-8888</SellerPhone>
+        <SellerEmail>sales@vnpt.vn</SellerEmail>
+        <SellerBankAcc>1111222233334444</SellerBankAcc>
+        <SellerBankName>BIDV</SellerBankName>
+    </Seller>
+    <Buyer>
+        <BuyerName>DEF Trading Ltd</BuyerName>
+        <BuyerTaxCode>0444555666</BuyerTaxCode>
+        <BuyerAddress>321 Hai Ba Trung, HCMC</BuyerAddress>
+        <BuyerPhone>028-7777-6666</BuyerPhone>
+        <BuyerEmail>accounting@def.vn</BuyerEmail>
+        <BuyerBankAcc>5555666677778888</BuyerBankAcc>
+        <BuyerBankName>ACB</BuyerBankName>
+    </Buyer>
+    <Products>
+        <Product>
+            <LineNo>1</LineNo>
+            <ProdCode>HW001</ProdCode>
+            <ProdName>Server Hardware</ProdName>
+            <ProdUnit>Unit</ProdUnit>
+            <ProdQuantity>1</ProdQuantity>
+            <ProdPrice>50000000</ProdPrice>
+            <Discount>5</Discount>
+            <DiscountAmt>2500000</DiscountAmt>
+            <Amount>47500000</Amount>
+            <VATRate>10</VATRate>
+            <VATAmount>4750000</VATAmount>
+            <Total>52250000</Total>
+        </Product>
+    </Products>
+    <Summary>
+        <TotalAmount>47500000</TotalAmount>
+        <TotalDiscount>2500000</TotalDiscount>
+        <TotalVATAmount>4750000</TotalVATAmount>
+        <TotalPayment>52250000</TotalPayment>
+        <AmountInWords>Fifty-two million two hundred fifty thousand dong</AmountInWords>
+    </Summary>
+    <PaymentMethod>Bank Transfer</PaymentMethod>
+    <PaymentTerms>Net 15</PaymentTerms>
+    <Note>Delivery included</Note>
+    <SignInfo>
+        <SignatureValue>VNPT-SIG-001</SignatureValue>
+        <SignedDate>2026-01-16</SignedDate>
+        <SignerName>Tran Van B</SignerName>
+        <SignerTitle>CFO</SignerTitle>
+        <CertSerial>VNPT-CERT-2026</CertSerial>
+    </SignInfo>
+</SInvoice>

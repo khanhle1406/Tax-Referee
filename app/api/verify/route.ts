@@ -1,55 +1,71 @@
 import { NextResponse } from 'next/server';
-import { VERIFY_90S_CASES } from '@/data/mockInvoices';
+import { InvoiceInputSchema, RefereeDecisionSchema } from '@/lib/schemas';
 import { evaluateInvoiceLocally } from '@/services/policyEngine';
+import { getActivePolicy, getDatabase, getMacroState } from '@/lib/server/db';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const startTime = Date.now();
+  const activePolicy = getActivePolicy();
+  const macroState = getMacroState();
+  const rows = getDatabase().prepare(`
+    SELECT id, payload_json
+    FROM invoices
+    ORDER BY datetime(updated_at) DESC
+    LIMIT 200
+  `).all() as Array<{ id: string; payload_json: string }>;
 
-  const results = VERIFY_90S_CASES.map((invoice, index) => {
+  const results = rows.map((row) => {
     const caseStartTime = Date.now();
-    const decision = evaluateInvoiceLocally(invoice);
-    const executionTimeMs = Math.max(12, Date.now() - caseStartTime + (index * 8));
-
-    // Xác định kết quả kỳ vọng
-    let expectedStatus: 'ROUTINE' | 'ESCALATED' = 'ROUTINE';
-    if (invoice.id === 'TC-07' || invoice.id === 'TC-13') {
-      expectedStatus = 'ESCALATED';
+    try {
+      const invoice = InvoiceInputSchema.parse(JSON.parse(row.payload_json));
+      const decision = evaluateInvoiceLocally(invoice, activePolicy.config, activePolicy.version, macroState);
+      return {
+        testId: row.id,
+        invoiceNumber: invoice.invoiceNumber,
+        supplierName: invoice.supplierName,
+        totalAmount: invoice.totalAmount,
+        actualStatus: decision.status,
+        riskGroup: decision.status === 'ESCALATED' ? decision.riskGroup : undefined,
+        schemaValid: RefereeDecisionSchema.safeParse(decision).success,
+        executionTimeMs: Date.now() - caseStartTime,
+        actionableQuestion: decision.status === 'ESCALATED' ? decision.actionableQuestion : undefined,
+        options: decision.status === 'ESCALATED' ? decision.options : undefined,
+        plainExplanation: decision.plainExplanation
+      };
+    } catch (error) {
+      return {
+        testId: row.id,
+        invoiceNumber: row.id,
+        supplierName: 'Không đọc được hóa đơn',
+        totalAmount: 0,
+        actualStatus: 'ESCALATED' as const,
+        riskGroup: 'UNCERTAIN_INFO' as const,
+        schemaValid: false,
+        executionTimeMs: Date.now() - caseStartTime,
+        plainExplanation: error instanceof Error ? error.message : 'Dữ liệu hóa đơn không hợp lệ'
+      };
     }
-
-    const passed = decision.status === expectedStatus;
-
-    return {
-      testId: invoice.id,
-      invoiceNumber: invoice.invoiceNumber,
-      supplierName: invoice.supplierName,
-      totalAmount: invoice.totalAmount,
-      expectedStatus,
-      actualStatus: decision.status,
-      riskGroup: decision.status === 'ESCALATED' ? decision.riskGroup : undefined,
-      passed,
-      executionTimeMs,
-      actionableQuestion: decision.status === 'ESCALATED' ? decision.actionableQuestion : undefined,
-      options: decision.status === 'ESCALATED' ? decision.options : undefined,
-      plainExplanation: decision.plainExplanation
-    };
   });
 
   const totalTimeMs = Date.now() - startTime;
-  const allPassed = results.every(r => r.passed);
+  const allSchemaValid = results.length > 0 && results.every(r => r.schemaValid);
   const routineCount = results.filter(r => r.actualStatus === 'ROUTINE').length;
   const escalatedCount = results.filter(r => r.actualStatus === 'ESCALATED').length;
 
   return NextResponse.json({
     summary: {
       totalCases: results.length,
-      passedCases: results.filter(r => r.passed).length,
+      schemaValidCases: results.filter(r => r.schemaValid).length,
       routineCases: routineCount,
       escalatedCases: escalatedCount,
-      allPassed,
+      allSchemaValid,
+      verificationScope: 'SCHEMA_AND_PROVENANCE_ONLY',
       totalTimeMs,
-      timestamp: new Date().toISOString()
+      source: 'SQLite invoices uploaded or ingested by the application',
+      timestamp: new Date().toISOString(),
+      policyVersion: activePolicy.version
     },
     results
   });

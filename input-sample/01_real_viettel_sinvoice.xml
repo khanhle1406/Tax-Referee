@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HDon>
+    <TTChung>
+        <KHMSHDon>VT23</KHMSHDon>
+        <SHDon>0000004</SHDon>
+        <NLap>2026-01-18</NLap>
+        <LHDon>Normal</LHDon>
+        <DVTTe>VND</DVTTe>
+        <TGia>1</TGia>
+        <HTTToan>Transfer</HTTToan>
+        <THDon>Signed</THDon>
+        <GChu>Telecom services</GChu>
+    </TTChung>
+    <NBan>
+        <MST>0100100100</MST>
+        <Ten>Viettel Telecom Corporation</Ten>
+        <DChi>1 Tran Huu Duc, My Dinh, Hanoi</DChi>
+        <SDThoai>1800-8098</SDThoai>
+        <DCTDTu>support@viettel.vn</DCTDTu>
+        <STKNHang>0011223344556677</STKNHang>
+        <TNHang>Viettel Pay</TNHang>
+    </NBan>
+    <NMua>
+        <MST>0200200200</MST>
+        <Ten>JKL Tech Startup</Ten>
+        <DChi>15 Duy Tan, Cau Giay, Hanoi</DChi>
+        <SDThoai>024-1111-2222</SDThoai>
+        <DCTDTu>billing@jkl.tech</DCTDTu>
+        <STKNHang>7788990011223344</STKNHang>
+        <TNHang>VPBank</TNHang>
+    </NMua>
+    <DSHHDVu>
+        <HHDVu>
+            <STT>1</STT>
+            <MHHDVu>FIBER100</MHHDVu>
+            <THHDVu>Fiber Internet 100Mbps</THHDVu>
+            <DVTinh>Month</DVTinh>
+            <SLuong>1</SLuong>
+            <DGia>500000</DGia>
+            <TLCKhau>0</TLCKhau>
+            <STCKhau>0</STCKhau>
+            <ThTien>500000</ThTien>
+            <TSuat>10</TSuat>
+            <TThue>50000</TThue>
+            <TgTToan>550000</TgTToan>
+        </HHDVu>
+        <HHDVu>
+            <STT>2</STT>
+            <MHHDVu>CLOUD-S</MHHDVu>
+            <THHDVu>Cloud Server - Small</THHDVu>
+            <DVTinh>Month</DVTinh>
+            <SLuong>2</SLuong>
+            <DGia>2000000</DGia>
+            <TLCKhau>10</TLCKhau>
+            <STCKhau>400000</STCKhau>
+            <ThTien>3600000</ThTien>
+            <TSuat>10</TSuat>
+            <TThue>360000</TThue>
+            <TgTToan>3960000</TgTToan>
+        </HHDVu>
+    </DSHHDVu>
+    <TToan>
+        <TgTCThue>4100000</TgTCThue>
+        <TgTThue>410000</TgTThue>
+        <TgTTTBSo>4510000</TgTTTBSo>
+        <TgTTTBChu>Four million five hundred ten thousand dong</TgTTTBChu>
+    </TToan>
+    <DSCKS>
+        <CKS>
+            <GTCKy>VIETTEL-SIG-004</GTCKy>
+            <NKy>2026-01-18</NKy>
+            <TNguoiKy>Pham Van D</TNguoiKy>
+            <CDanhKy>Account Manager</CDanhKy>
+            <SHCThu>VT-CERT-2026-004</SHCThu>
+        </CKS>
+    </DSCKS>
+</HDon>

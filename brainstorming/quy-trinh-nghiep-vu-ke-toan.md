@@ -1,54 +1,113 @@
 # QUY TRÌNH KÊ KHAI THUẾ CHUẨN & NGHIỆP VỤ KẾ TOÁN DOANH NGHIỆP TOÀN DIỆN
 > **Tài liệu Cẩm nang Nghiệp vụ Kế toán Thuế, Kiểm soát Rủi ro Hóa đơn & Quản trị Tuân thủ Doanh nghiệp**  
-> **Áp dụng theo hệ thống pháp luật thuế Việt Nam hiện hành:**  
-> - Luật Quản lý thuế số 38/2019/QH14 & Luật Kế toán số 88/2015/QH13  
-> - Nghị định 126/2020/NĐ-CP (Quy định chi tiết một số điều của Luật Quản lý thuế)  
-> - Nghị định 123/2020/NĐ-CP & Thông tư 78/2021/TT-BTC (Hóa đơn, chứng từ điện tử)  
-> - Thông tư 80/2021/TT-BTC (Hướng dẫn thi hành Luật Quản lý thuế & mẫu biểu kê khai)  
-> - Thông tư 219/2013/TT-BTC & Thông tư 26/2015/TT-BTC (Thuế Giá trị gia tăng)  
-> - Nghị định 72/2024/NĐ-CP & Nghị quyết 142/2024/QH15 (Chính sách giảm thuế GTGT 8%)  
-> - Công văn 2392/TCT-QLRR (Quy trình giám sát Hệ số rủi ro hóa đơn K của Tổng cục Thuế)
+> **Phiên bản:** Cập nhật Đồng bộ Khung Pháp lý Thuế Hiện hành (Niên độ 2025 - 2026)  
+> **Căn cứ hệ thống văn bản quy phạm pháp luật đang có hiệu lực:**  
+> - Luật Quản lý thuế số 108/2025/QH15 & Luật Quản lý thuế số 38/2019/QH14  
+> - Luật Thuế Giá trị gia tăng số 48/2024/QH15 (Hiệu lực từ 01/07/2025)  
+> - Nghị quyết số 204/2025/QH15 & Nghị định 174/2025/NĐ-CP (Chính sách giảm thuế GTGT 8% áp dụng đến hết 31/12/2026)  
+> - Luật Thuế Thu nhập doanh nghiệp số 67/2025/QH15 & Nghị định 320/2025/NĐ-CP (Thuế suất phân tầng 15% - 17% - 20%)  
+> - Luật Thuế Thu nhập cá nhân số 109/2025/QH15, Nghị quyết 110/2025/UBTVQH15, Nghị định 253/2026/NĐ-CP & Thông tư 87/2026/TT-BTC  
+> - Nghị định 254/2026/NĐ-CP, Nghị định 70/2025/NĐ-CP & Thông tư 91/2026/TT-BTC (Hóa đơn, chứng từ điện tử)  
+> - Thông tư 89/2026/TT-BTC (Mẫu biểu Tờ khai thuế GTGT 01/GTGT mới) & Thông tư 80/2021/TT-BTC  
+> - Thông tư 94/2026/TT-BTC (Quản lý tuân thủ, quản lý rủi ro trong quản lý thuế) & Công văn 2392/TCT-QLRR (Thuật toán tham số K)  
+> - Nghị định 255/2026/NĐ-CP (Quản lý thuế đối với doanh nghiệp có giao dịch liên kết - Khống chế trần lãi vay 30% EBITDA)  
+> - Thông tư 99/2025/TT-BTC (Chế độ kế toán doanh nghiệp hiện hành, thay thế Thông tư 200/2014/TT-BTC)
 
 ---
 
 ## MỤC LỤC CHI TIẾT
-1. [TỔNG QUAN HỆ THỐNG QUẢN LÝ THUẾ THỜI KỲ SỐ HÓA & AI](#1-tổng-quan-hệ-thống-quản-lý-thuế-thời-kỳ-số-hóa--ai)
-2. [QUY TRÌNH KÊ KHAI THUẾ CHUẨN THEO TỪNG SẮC THUẾ TRỌNG YẾU](#2-quy-trình-kê-khai-thuế-chuẩn-theo-từng-sắc-thuế-trọng-yếu)
-   - [2.1 Thuế Giá trị gia tăng (GTGT - VAT)](#21-thuế-giá-trị-gia-tăng-gtgt---vat)
-   - [2.2 Thuế Thu nhập doanh nghiệp (TNDN - CIT)](#22-thuế-thu-nhập-doanh-nghiệp-tndn---cit)
-   - [2.3 Thuế Thu nhập cá nhân (TNCN - PIT)](#23-thuế-thu-nhập-cá-nhân-tncn---pit)
-3. [QUY TRÌNH 5 BƯỚC KIỂM SOÁT HÓA ĐƠN ĐẦU VÀO (NGUYÊN TẮC 3H: HỢP PHÁP - HỢP LỆ - HỢP LÝ)](#3-quy-trình-5-bước-kiểm-soát-hóa-đơn-đầu-vào-nguyên-tắc-3h-hợp-pháp---hợp-lệ---hợp-lý)
-4. [CƠ CHẾ GIÁM SÁT RỦI RO HÓA ĐƠN & HỆ SỐ K CỦA TỔNG CỤC THUẾ (CV 2392/TCT-QLRR)](#4-cơ-chế-giám-sát-rủi-ro-hóa-đơn--hệ-số-k-của-tổng-cục-thuế-cv-2392tct-qlrr)
-5. [BẢN ĐỒ PHÂN CÔNG CÔNG VIỆC & MA TRẬN THẨM QUYỀN TRONG PHÒNG KẾ TOÁN (RACI MATRIX)](#5-bản-đồ-phân-công-công-việc--ma-trận-thẩm-quyền-trong-phòng-kế-toán-raci-matrix)
-6. [CHU KỲ CÔNG VIỆC CỦA KẾ TOÁN TRONG MỘT NĂM TÀI CHÍNH](#6-chu-kỳ-công-việc-của-kế-toán-trong-một-năm-tài-chính)
-7. [QUY TRÌNH KHI BỊ CƠ QUAN THUẾ KIỂM TRA, THANH TRA & HỒ SƠ PHÒNG VỆ THUẾ](#7-quy-trình-khi-bị-cơ-quan-thuế-kiểm-tra-thanh-tra--hồ-sơ-phòng-vệ-thuế)
-8. [ĐỐI CHIẾU THỰC TIỄN VỚI THIẾT KẾ HỆ THỐNG TAX REFEREE](#8-đối-chiếu-thực-tiễn-với-thiết-kế-hệ-thống-tax-referee)
+1. [MÔ HÌNH QUẢN TRỊ THUẾ 3 TẦNG: LUẬT PHÁP - QUY TRÌNH NỘI BỘ - MÔ HÌNH AI](#1-mô-hình-quản-trị-thuế-3-tầng-luật-pháp---quy-trình-nội-bộ---mô-hình-ai)
+   - [1.1 Khung Phân Tách Quyền Lực & Trách Nhiệm](#11-khung-phân-tách-quyền-lực--trách-nhiệm)
+   - [1.2 Bảng Mốc Thời Gian Hiệu Lực Pháp Luật (Temporal Legal Registry)](#12-bảng-mốc-thời-gian-hiệu-lực-pháp-luật-temporal-legal-registry)
+2. [TỔNG QUAN HỆ THỐNG QUẢN LÝ THUẾ THỜI KỲ DỮ LIỆU LỚN & AI CỦA NGÀNH THUẾ](#2-tổng-quan-hệ-thống-quản-lý-thuế-thời-kỳ-dữ-liệu-lớn--ai-của-ngành-thuế)
+   - [2.1 Cơ Chế Giám Sát Dữ Liệu Thời Gian Thực Của Cơ Quan Thuế](#21-cơ-chế-giám-sát-dữ-liệu-thời-gian-thực-của-cơ-quan-thuế)
+   - [2.2 Trách Nhiệm Pháp Lý & Rủi Ro Chế Tài Của Doanh Nghiệp](#22-trách-nhiệm-pháp-lý--rủi-ro-chế-tài-của-doanh-nghiệp)
+3. [QUY TRÌNH KÊ KHAI THUẾ CHUẨN 3 SẮC THUẾ TRỌNG YẾU (GTGT - TNDN - TNCN)](#3-quy-trình-kê-khai-thuế-chuẩn-3-sắc-thuế-trọng-yếu-gtgt---tndn---tncn)
+   - [3.1 Thuế Giá Trị Gia Tăng (GTGT - VAT): Biểu Mẫu Mới & Ngưỡng Thanh Toán Không Dùng Tiền Mặt](#31-thuế-giá-trị-gia-tăng-gtgt---vat)
+   - [3.2 Thuế Thu Nhập Doanh Nghiệp (TNDN - CIT): Thuế Suất Phân Tầng 15% - 17% - 20%](#32-thuế-thu-nhập-doanh-nghiệp-tndn---cit)
+   - [3.3 Thuế Thu Nhập Cá Nhân (TNCN - PIT): Giảm Trừ 15,5M / 6,2M & Biểu Thuế 5 Bậc](#33-thuế-thu-nhập-cá-nhân-tncn---pit)
+4. [QUY TRÌNH 5 BƯỚC KIỂM SOÁT HÓA ĐƠN ĐẦU VÀO (KHUNG NGHIỆP VỤ 3H)](#4-quy-trình-5-bước-kiểm-soát-hóa-đơn-đầu-vào-khung-nghiệp-vụ-3h)
+5. [HỆ THỐNG GIÁM SÁT RỦI RO & THAM SỐ NGUỒN HÀNG K (CV 2392/TCT-QLRR & TT 94/2026/TT-BTC)](#5-hệ-thống-giám-sát-rủi-ro--tham-số-nguồn-hàng-k-cv-2392tct-qlrr--tt-942026tt-btc)
+6. [BẢN ĐỒ PHÂN CÔNG CÔNG VIỆC & MA TRẬN THẨM QUYỀN TRONG PHÒNG KẾ TOÁN (RACI)](#6-bản-đồ-phân-công-công-việc--ma-trận-thẩm-quyền-trong-phòng-kế-toán-raci)
+7. [CHU KỲ CÔNG VIỆC CỦA KẾ TOÁN TRONG MỘT NĂM TÀI CHÍNH](#7-chu-kỳ-công-việc-của-kế-toán-trong-một-năm-tài-chính)
+8. [QUY TRÌNH GIẢI TRÌNH KHI THANH TRA THUẾ & BỘ CHỨNG CỨ PHÒNG VỆ 4 LỚP](#8-quy-trình-giải-trình-khi-thanh-tra-thuế--bộ-chứng-cứ-phòng-vệ-4-lớp)
+9. [ĐỐI CHIẾU THỰC TIỄN VỚI THIẾT KẾ CỦA HỆ THỐNG TAX REFEREE](#9-đối-chiếu-thực-tiễn-với-thiết-kế-của-hệ-thống-tax-referee)
+10. [LỜI KẾT: TƯ DUY NỀN TẢNG CỦA TAX REFEREE](#10-lời-kết-tư-duy-nền-tảng-của-tax-referee)
 
 ---
 
-## 1. TỔNG QUAN HỆ THỐNG QUẢN LÝ THUẾ THỜI KỲ SỐ HÓA & AI
+## 1. MÔ HÌNH QUẢN TRỊ THUẾ 3 TẦNG: LUẬT PHÁP - QUY TRÌNH NỘI BỘ - MÔ HÌNH AI
 
-### 1.1 Bối Cảnh Bước Ngoặt Của Ngành Thuế Việt Nam
-Từ ngày 01/07/2022, Việt Nam chính thức phủ sóng 100% hóa đơn điện tử theo **Nghị định 123/2020/NĐ-CP**. Tổng cục Thuế (TCT) đã đưa vào vận hành:
-- **Cơ sở dữ liệu Hóa đơn điện tử tập trung (Big Data):** Mỗi ngày tiếp nhận và xử lý hàng chục triệu hóa đơn từ toàn bộ các doanh nghiệp, hộ kinh doanh trên toàn quốc.
-- **Hệ thống phân tích rủi ro tự động (F-Invoice & AI Machine Learning):** Tự động đối soát chéo chuỗi mua - bán giữa các doanh nghiệp (C1 - C2 - C3 - F0).
-- **Bộ chỉ số tiêu chí đánh giá rủi ro người nộp thuế:** Dựa trên Quyết định 1388/QĐ-TCT và Công văn 2392/TCT-QLRR nhằm phát hiện tức thì các dấu hiệu:
-  + Doanh nghiệp có doanh số bán ra tăng đột biến nhưng không có kho bãi, nhân công.
-  + Doanh nghiệp xuất hóa đơn vượt quá năng lực nguồn hàng đầu vào (Hệ số K bất thường).
-  + Doanh nghiệp mua hóa đơn từ các pháp nhân "ma", tạm dừng hoạt động hoặc chủ doanh nghiệp bỏ trốn.
+### 1.1 Khung Phân Tách Quyền Lực & Trách Nhiệm
+Để xây dựng một hệ thống Tác tử Điều phối Chuyển tiếp (The Escalation Referee) chuẩn xác, tránh nhầm lẫn giữa quy định pháp luật cưỡng chế và quy trình quản trị nội bộ của doanh nghiệp, kiến trúc tri thức của Tax Referee được phân định rạch ròi thành 3 tầng độc lập:
 
-### 1.2 Sự Thay Đổi Căn Bản Trong Cách Làm Việc Của Kế Toán
-- **Trước đây (Kỷ nguyên hóa đơn giấy):** Cơ quan thuế chỉ kiểm tra khi có đoàn thanh tra hậu kiểm tại trụ sở doanh nghiệp (3-5 năm/lần). Kế toán có thời gian hợp thức hóa chứng từ, bổ sung hợp đồng, phiếu kho.
-- **Hiện nay (Kỷ nguyên dữ liệu thời gian thực):** Bất kỳ sai lệch nào giữa dữ liệu hóa đơn điện tử và Tờ khai thuế GTGT đều bị phần mềm của Tổng cục Thuế phát hiện ngay trong kỳ. Doanh nghiệp lập tức nhận được "Thông báo giải trình, bổ sung thông tin tài liệu" qua cổng điện tử trong vòng vài ngày sau hạn nộp tờ khai.
-- **Hệ quả pháp lý:** 
-  + Sai sót vô ý: Bị loại thuế khấu trừ, truy thu thuế GTGT, phạt 20% trên số thuế khai sai và phạt chậm nộp 0.03%/ngày (tương đương 10.95%/năm).
-  + Sai phạm cố ý (hóa đơn từ công ty đóng MST, mua bán hóa đơn khống): Bị chuyển hồ sơ sang cơ quan Cảnh sát điều tra (C03) theo Điều 200 Bộ luật Hình sự về tội trốn thuế.
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│             MÔ HÌNH QUẢN TRỊ THUẾ 3 TẦNG (THREE-TIER TAX GOVERNANCE)         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   [TẦNG 1] LUẬT PHÁP NHÀ NƯỚC (STATUTORY LAW / HARD CONSTRAINTS)           │
+│   • Luật Quản lý thuế, Luật Thuế GTGT, Luật Thuế TNDN, TNCN, Nghị định HĐĐT │
+│   • Tính chất: BẮT BUỘC TUÂN THỦ 100%, không tổ chức/cá nhân nào được làm trái│
+│   • AI và Con người tuyệt đối KHÔNG ĐƯỢC TỰ Ý SUY DIỄN HOẶC BỎ QUA           │
+│   • Ví dụ: Ngưỡng không tiền mặt ≥ 5M, biểu thuế TNDN, hạn nộp tờ khai       │
+│                                  ▲                                          │
+│                                  │ (Tuân thủ nền tảng)                      │
+│   [TẦNG 2] QUY TRÌNH NỘI BỘ DOANH NGHIỆP (COMPANY SOP / CONFIGURATIONS)     │
+│   • Quy chế Tài chính - Kế toán do HĐQT / Ban Giám đốc phê duyệt ban hành   │
+│   • Tính chất: CÓ THỂ CẤU HÌNH (Configurable) tùy theo quy mô và mô hình DN │
+│   • Ví dụ: KTT duyệt chi phí < 200M, CFO duyệt ≥ 200M; quy trình 4 bước duyệt│
+│                                  ▲                                          │
+│                                  │ (Thực thi và giám sát)                   │
+│   [TẦNG 3] MÔ HÌNH RỦI RO & HEURISTIC AI (AI RISK SIGNALS & CO-PILOT)       │
+│   • Thuật toán đánh giá rủi ro (Tham số nguồn hàng K, OCR lóa mờ, tần suất)  │
+│   • Tính chất: TÍN HIỆU CẢNH BÁO THAM KHẢO (Heuristic / Decision Support)   │
+│   • KHÔNG PHẢI QUY ĐỊNH PHÁP LUẬT CỨNG                                      │
+│   • Vai trò: Phát hiện bất thường, dừng tự động hóa, sinh câu hỏi Đóng A/B  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1.2 Bảng Mốc Thời Gian Hiệu Lực Pháp Luật (Temporal Legal Registry)
+Trong công tác kế toán và kiểm soát hóa đơn, một hóa đơn phát sinh tại thời điểm nào phải áp dụng đúng văn bản quy phạm pháp luật có hiệu lực tại thời điểm đó. Bảng sau tổng hợp các mốc thời gian pháp lý then chốt áp dụng cho niên độ 2025 - 2026:
+
+| Mốc Thời Gian | Văn Bản Ban Hành | Lĩnh Vực Điều Chỉnh | Nội Dung Thay Đổi Trọng Yếu |
+| :--- | :--- | :--- | :--- |
+| **01/06/2025** | Nghị định 70/2025/NĐ-CP & Thông tư 32/2025/TT-BTC | Hóa đơn điện tử | Quy định cơ chế xử lý hóa đơn sai tên/địa chỉ nhưng đúng MST (gửi Mẫu 04/SS-HĐĐT, không hủy hóa đơn); chuẩn hóa thời điểm ký số. |
+| **01/07/2025** | Luật Thuế GTGT số 48/2024/QH15 | Thuế GTGT | Bãi bỏ quy định cũ; xác lập nguyên tắc thanh toán không dùng tiền mặt bắt buộc đối với hàng hóa, dịch vụ mua vào từ **5.000.000 VNĐ** trở lên (bao gồm cả VAT). |
+| **01/07/2025** | Nghị quyết số 204/2025/QH15 & Nghị định 174/2025/NĐ-CP | Thuế GTGT 8% | Tiếp tục giảm 2% thuế suất GTGT (xuống 8%) đến hết **31/12/2026**; quy định danh mục loại trừ không được giảm 8%. |
+| **01/01/2026** | Thông tư 99/2025/TT-BTC | Chế độ Kế toán | Ban hành Chế độ Kế toán doanh nghiệp mới, cập nhật hệ thống tài khoản và biểu mẫu BCTC thay thế Thông tư 200/2014/TT-BTC. |
+| **01/01/2026** | Nghị quyết 110/2025/UBTVQH15 | Thuế TNCN | Nâng mức giảm trừ gia cảnh: Bản thân lên **15,5 triệu đồng/tháng**; Người phụ thuộc lên **6,2 triệu đồng/tháng/người**. |
+| **01/01/2026** | Luật Thuế TNDN số 67/2025/QH15 & Nghị định 320/2025/NĐ-CP | Thuế TNDN | Áp dụng biểu thuế suất phân tầng: **15%** (doanh thu ≤ 3 tỷ), **17%** (doanh thu 3 - 50 tỷ), **20%** (doanh thu > 50 tỷ). Ngưỡng chi phí không tiền mặt 5M. |
+| **01/07/2026** | Luật Quản lý thuế số 108/2025/QH15 | Quản lý thuế | Hiện đại hóa quản lý thuế trên nền tảng dữ liệu lớn; cơ chế kết nối thời gian thực giữa người nộp thuế và cơ quan thuế. |
+| **01/07/2026** | Nghị định 254/2026/NĐ-CP & Thông tư 91/2026/TT-BTC | Hóa đơn, chứng từ | Hướng dẫn thi hành Luật QLT 108/2025/QH15 về hóa đơn điện tử; kiểm soát luồng dữ liệu XML và chuẩn kết nối tự động. |
+| **01/07/2026** | Thông tư 89/2026/TT-BTC | Biểu mẫu kê khai GTGT | Cập nhật hệ thống chỉ tiêu Tờ khai 01/GTGT mới: Chỉ tiêu [21] dùng cho trường hợp không phát sinh mua bán, Chỉ tiêu [22] nhận số thuế kỳ trước chuyển sang. |
+| **01/07/2026** | Thông tư 94/2026/TT-BTC | Quản lý rủi ro thuế | Ban hành bộ tiêu chí phân loại tuân thủ và quy trình giám sát rủi ro tự động hóa của Cơ quan Thuế. |
+| **01/07/2026** | Luật Thuế TNCN số 109/2025/QH15 & Thông tư 87/2026/TT-BTC | Thuế TNCN | Áp dụng Biểu thuế lũy tiến từng phần rút gọn **5 bậc**; nâng ngưỡng khấu trừ thuế vãng lai lên từ **5.000.000 VNĐ/lần chi trả**. |
+| **01/07/2026** | Nghị định 255/2026/NĐ-CP | Giao dịch liên kết | Quy định quản lý thuế với doanh nghiệp có giao dịch liên kết; duy trì trần chi phí lãi vay được trừ ở mức **30% EBITDA**. |
 
 ---
 
-## 2. QUY TRÌNH KÊ KHAI THUẾ CHUẨN THEO TỪNG SẮC THUẾ TRỌNG YẾU
+## 2. TỔNG QUAN HỆ THỐNG QUẢN LÝ THUẾ THỜI KỲ DỮ LIỆU LỚN & AI CỦA NGÀNH THUẾ
 
-Trong một doanh nghiệp hoạt động sản xuất kinh doanh thông thường tại Việt Nam, kế toán thuế có trách nhiệm quản lý 3 sắc thuế cốt lõi: Thuế Giá trị gia tăng (GTGT), Thuế Thu nhập doanh nghiệp (TNDN) và Thuế Thu nhập cá nhân (TNCN).
+### 2.1 Cơ Chế Giám Sát Dữ Liệu Thời Gian Thực Của Cơ Quan Thuế
+Cơ quan Thuế tại Việt Nam đã chuyển đổi toàn diện phương thức quản lý từ "tiền kiểm sang hậu kiểm" kết hợp "giám sát rủi ro tự động theo thời gian thực":
+- **Cơ sở dữ liệu Hóa đơn điện tử tập trung:** Tiếp nhận và xử lý hóa đơn điện tử theo Nghị định 254/2026/NĐ-CP (và Nghị định 70/2025/NĐ-CP, Nghị định 123/2020/NĐ-CP). Hệ thống tự động đối chiếu hóa đơn đầu ra của bên bán và hóa đơn đầu vào của bên mua ngay khi hóa đơn được cấp mã hoặc chuyển dữ liệu về Cục Thuế.
+- **Hệ thống AI & Phân tích chuỗi giao dịch:** Ứng dụng công nghệ xử lý đồ thị (Graph Analytics) và máy học để truy vết dòng hóa đơn qua nhiều cấp trung gian (F1, F2, F3,...), tự động gắn cờ các doanh nghiệp có dấu hiệu mua bán hóa đơn bất hợp pháp hoặc xuất khống vượt quá năng lực kho bãi.
+- **Hệ thống Quản lý rủi ro tích hợp (Thông tư 94/2026/TT-BTC):** Phân loại người nộp thuế thành các nhóm mức độ tuân thủ (Rất cao, Cao, Trung bình, Thấp, Rất thấp) để áp dụng biện pháp giám sát tương ứng.
+
+### 2.2 Trách Nhiệm Pháp Lý & Rủi Ro Chế Tài Của Doanh Nghiệp
+- **Rủi ro xử phạt hành chính (Nghị định 125/2020/NĐ-CP):** 
+  + Hành vi khai sai không dẫn đến thiếu số thuế phải nộp: Phạt tiền từ **5.000.000 đến 8.000.000 VNĐ**.
+  + Hành vi khai sai dẫn đến thiếu số thuế phải nộp hoặc tăng số thuế được khấu trừ/hoàn: Phạt **20%** trên số tiền thuế khai thiếu hoặc số tiền thuế được khấu trừ, hoàn cao hơn.
+  + Tiền chậm nộp tiền thuế: Tính mức **0.03%/ngày** trên số tiền thuế chậm nộp.
+- **Rủi ro hình sự (Điều 200 Bộ luật Hình sự về Tội trốn thuế):** Kê khai khấu trừ hóa đơn từ doanh nghiệp ngừng hoạt động, doanh nghiệp bỏ trốn hoặc hóa đơn mua bán khống không có giao dịch kinh tế thực tế có thể bị truy cứu trách nhiệm hình sự đối với cá nhân người đại diện theo pháp luật, Giám đốc Tài chính và Kế toán trưởng.
+
+---
+
+## 3. QUY TRÌNH KÊ KHAI THUẾ CHUẨN 3 SẮC THUẾ TRỌNG YẾU
+
+Trong hoạt động thường nhật, kế toán thuế có trách nhiệm quản trị 3 sắc thuế chủ lực:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -57,122 +116,157 @@ Trong một doanh nghiệp hoạt động sản xuất kinh doanh thông thườ
 │    THUẾ GTGT (VAT)    │       THUẾ TNDN (CIT)       │    THUẾ TNCN (PIT)    │
 ├───────────────────────┼─────────────────────────────┼───────────────────────┤
 │ • Kỳ: Tháng hoặc Quý  │ • Kỳ: Tạm nộp theo Quý      │ • Kỳ: Tháng hoặc Quý  │
-│ • Mẫu: 01/GTGT        │ • Mẫu: Tạm tính nội bộ      │ • Mẫu: 05/KK-TNCN     │
-│ • Hạn: Ngày 20 / Ngày │ • Quyết toán năm: 03/TNDN   │ • Quyết toán: 05/QTT  │
-│   cuối tháng đầu quý  │ • Hạn: 31/03 năm sau        │ • Hạn: 31/03 năm sau  │
-│ • Bản chất: Thuế gián │ • Bản chất: Thuế trực thu   │ • Bản chất: Khấu trừ  │
-│   thu, quản lý theo   │   trên lợi nhuận ròng tính  │   tại nguồn thu nhập  │
-│   dòng hóa đơn        │   thuế                      │   của người lao động  │
+│ • Mẫu: 01/GTGT        │ • Quyết toán năm: 03/TNDN   │ • Mẫu: 05/KK-TNCN     │
+│   (TT 89/2026/TT-BTC) │   (NĐ 320/2025/NĐ-CP)       │ • Quyết toán: 05/QTT  │
+│ • Hạn: Ngày 20 / Ngày │ • Hạn nộp BCTC & QTT:       │   (TT 87/2026/TT-BTC) │
+│   cuối tháng đầu quý  │   Ngày cuối tháng thứ 3 năm │ • Hạn: Ngày 20 / Ngày │
+│ • Ngưỡng không tiền   │   sau (31/03 nếu năm DL)    │   cuối tháng đầu quý  │
+│   mặt: ≥ 5 triệu đồng │ • Thuế suất phân tầng:      │ • Giảm trừ gia cảnh:  │
+│ • Bản chất: Thuế gián │   15% - 17% - 20%           │   15,5M / 6,2M/tháng  │
+│   thu theo dòng HĐ    │ • Bản chất: Thuế trực thu   │ • Biểu lũy tiến 5 bậc │
 └───────────────────────┴─────────────────────────────┴───────────────────────┘
 ```
 
 ---
 
-### 2.1 Thuế Giá Trị Gia Tăng (GTGT - VAT)
+### 3.1 Thuế Giá Trị Gia Tăng (GTGT - VAT)
 
-#### A. Xác Định Kỳ Kê Khai (Tháng hay Quý)
-Căn cứ theo Điều 9 Nghị định 126/2020/NĐ-CP:
-1. **Kê khai theo tháng:** Áp dụng cho doanh nghiệp có tổng doanh thu bán hàng hóa, cung ứng dịch vụ của năm trước liền kề **trên 50 tỷ đồng**.
-2. **Kê khai theo quý:** Áp dụng cho:
-   - Doanh nghiệp có tổng doanh thu của năm trước liền kề **từ 50 tỷ đồng trở xuống**.
-   - Doanh nghiệp mới bắt đầu hoạt động sản xuất kinh doanh (được khai theo quý trong trọn năm đầu tiên; sau đó xét doanh thu năm trọn vẹn đầu tiên để quyết định).
-3. **Thời hạn nộp hồ sơ khai thuế và nộp tiền thuế GTGT:**
-   - **Theo tháng:** Chậm nhất là ngày thứ 20 của tháng tiếp theo tháng phát sinh nghĩa vụ thuế.
-   - **Theo quý:** Chậm nhất là ngày cuối cùng của tháng đầu tiên của quý tiếp theo (Ví dụ: Quý 1 hạn 30/04; Quý 2 hạn 31/07; Quý 3 hạn 31/10; Quý 4 hạn 31/01 năm sau).
+#### A. Xác Định Kỳ Kê Khai & Thời Hạn Nộp Tờ Khai
+Căn cứ theo Điều 9 Nghị định 126/2020/NĐ-CP và Luật Quản lý thuế số 108/2025/QH15:
+1. **Kê khai theo tháng:** Áp dụng cho doanh nghiệp có tổng doanh thu bán hàng hóa, cung ứng dịch vụ của năm trước liền kề **trên 50 tỷ đồng**. Hạn nộp tờ khai và tiền thuế: Chậm nhất là **ngày thứ 20** của tháng tiếp theo.
+2. **Kê khai theo quý:** Áp dụng cho doanh nghiệp có tổng doanh thu năm trước liền kề **từ 50 tỷ đồng trở xuống** hoặc doanh nghiệp mới bắt đầu hoạt động sản xuất kinh doanh. Hạn nộp: Chậm nhất là **ngày cuối cùng của tháng đầu tiên của quý tiếp theo** (Quý 1 hạn 30/04; Quý 2 hạn 31/07; Quý 3 hạn 31/10; Quý 4 hạn 31/01 năm sau).
 
-#### B. Quy Trình Kỹ Thuật 6 Bước Lập Tờ Khai 01/GTGT
-1. **Bước 1: Thu thập và đồng bộ hóa đơn:**
-   - Hóa đơn đầu ra: Xuất từ phần mềm hóa đơn điện tử của DN (VNPT-Invoice, MISA meInvoice, Viettel S-Invoice,...).
-   - Hóa đơn đầu vào: Tải file XML/PDF gốc từ Cổng thông tin hóa đơn điện tử của TCT (`hoadondientu.gdt.gov.vn`) và email nhà cung cấp gửi đến.
-2. **Bước 2: Kiểm tra tính hợp lệ & lập Bảng kê đối soát:**
-   - Bảng kê hóa đơn hàng hóa, dịch vụ bán ra (phân loại thuế suất 0%, 5%, 8%, 10%, không chịu thuế).
-   - Bảng kê hóa đơn hàng hóa, dịch vụ mua vào (kiểm tra điều kiện khấu trừ: hóa đơn hợp pháp, đúng thuế suất, có UNC ngân hàng nếu ≥ 20 triệu VNĐ).
-3. **Bước 3: Nhập liệu lên phần mềm Hỗ trợ Kê khai (HTKK):**
-   - Mở phần mềm HTKK (phiên bản mới nhất của Tổng cục Thuế). Chọn `Thuế Giá Trị Gia Tăng` -> `Tờ khai thuế GTGT khấu trừ (01/GTGT)` (Thông tư 80/2021/TT-BTC).
-   - **Các chỉ tiêu cốt tử trên Tờ khai 01/GTGT:**
-     + **Chỉ tiêu [21]:** Thuế GTGT chưa được khấu trừ hết kỳ trước chuyển sang (hệ thống tự lấy từ Chỉ tiêu [43] của kỳ trước; kế toán bắt buộc đối chiếu khớp 100%).
-     + **Chỉ tiêu [22]:** Tổng số thuế GTGT chưa được khấu trừ kỳ trước chuyển sang.
-     + **Chỉ tiêu [23]:** Giá trị hàng hóa, dịch vụ mua vào trong kỳ (chưa gồm thuế).
-     + **Chỉ tiêu [24]:** Tổng số thuế GTGT của hàng hóa, dịch vụ mua vào.
-     + **Chỉ tiêu [25]:** **Tổng số thuế GTGT đầu vào ĐƯỢC KHẤU TRỪ toàn bộ** (Đây là chỉ tiêu sống còn! Chỉ những hóa đơn đủ điều kiện pháp lý mới được đưa vào [25]. Nếu đưa hóa đơn sai phạm vào [25] sẽ bị truy thu và phạt nặng).
-     + **Chỉ tiêu [26] đến [32a]:** Hàng hóa dịch vụ bán ra theo từng mức thuế suất (Chỉ tiêu [32a] dành riêng cho hàng hóa áp dụng thuế 8% theo NĐ 72/2024).
-     + **Chỉ tiêu [36]:** Thuế GTGT phát sinh trong kỳ (= Thuế bán ra - Thuế mua vào được khấu trừ).
-     + **Chỉ tiêu [40]:** Thuế GTGT còn phải nộp trong kỳ (Nếu [36] > 0).
-     + **Chỉ tiêu [43]:** Thuế GTGT chưa khấu trừ hết chuyển kỳ sau (Nếu [36] < 0).
-4. **Bước 4: Kiểm tra tính logic và kết xuất tệp XML:**
-   - Nhấn nút `Ghi` trên HTKK để kiểm tra lỗi logic dữ liệu.
-   - Nhấn `Kết xuất XML` để chuẩn bị nộp tờ khai.
-5. **Bước 5: Ký số và Nộp tờ khai điện tử:**
-   - Truy cập hệ thống Thuế điện tử (`thuedientu.gdt.gov.vn`) bằng tài khoản chữ ký số (Token USB hoặc Chữ ký số HSM/Cloud) của doanh nghiệp.
-   - Chọn menu `Khai Thuế` -> `Nộp tờ khai XML` -> Chọn file XML vừa kết xuất -> Ký điện tử -> Gửi tờ khai.
-   - Nhận 2 thông báo từ cơ quan thuế:
-     + *Thông báo 1 (trong 15 phút):* Thông báo tiếp nhận hồ sơ khai thuế điện tử.
-     + *Thông báo 2 (trong vòng 1 ngày làm việc):* Thông báo chấp nhận hồ sơ khai thuế điện tử. Tờ khai chỉ được xem là hợp lệ khi đã có Thông báo chấp nhận.
-6. **Bước 6: Nộp tiền thuế (nếu phát sinh Chỉ tiêu [40] > 0):**
-   - Lập giấy nộp tiền vào Ngân sách Nhà nước (tiểu mục 1701 - Thuế GTGT hàng sản xuất kinh doanh trong nước) qua dịch vụ nộp thuế điện tử của ngân hàng liên kết, chậm nhất vào ngày hết hạn nộp tờ khai.
+#### B. Ngưỡng Thanh Toán Không Dùng Tiền Mặt (5 Triệu Đồng)
+Căn cứ Luật Thuế Giá trị gia tăng số 48/2024/QH15 (có hiệu lực từ 01/07/2025) và các văn bản hướng dẫn:
+- **Ngưỡng bắt buộc:** Hàng hóa, dịch vụ mua vào từng lần theo hóa đơn có giá trị **từ 5.000.000 VNĐ trở lên (giá đã bao gồm thuế GTGT)** bắt buộc phải có **chứng từ thanh toán không dùng tiền mặt** thì mới đủ điều kiện khấu trừ thuế GTGT đầu vào.
+- **Chứng từ thanh toán không dùng tiền mặt hợp lệ bao gồm:**
+  + Ủy nhiệm chi (UNC), lệnh chuyển tiền từ tài khoản ngân hàng của Bên Mua sang Bên Bán.
+  + Chứng từ thanh toán qua các phương tiện điện tử khác (thẻ tín dụng/thẻ ghi nợ doanh nghiệp, ví điện tử của doanh nghiệp).
+  + **Trường hợp thanh toán bù trừ công nợ:** Bù trừ giữa hàng mua vào và hàng bán ra phải được quy định cụ thể trong Hợp đồng kinh tế và có Biên bản đối chiếu công nợ có chữ ký xác nhận của hai bên.
+  + **Trường hợp thanh toán qua bên thứ ba:** Phải có văn bản thỏa thuận/chỉ định ba bên rõ ràng trước khi thực hiện thanh toán.
+  + **Trường hợp nhân viên được ủy quyền:** Cán bộ công nhân viên sử dụng thẻ/tài khoản cá nhân để thanh toán giao dịch phục vụ sản xuất kinh doanh của công ty theo Quy chế tài chính nội bộ, sau đó công ty thực hiện lệnh chuyển khoản hoàn ứng từ tài khoản ngân hàng của công ty vào tài khoản của nhân viên thì vẫn được xem xét chấp nhận nếu lưu trữ đầy đủ bộ chứng từ ủy quyền, hóa đơn mang tên công ty và UNC hoàn ứng.
+- **Bẫy chia nhỏ hóa đơn nhiều lần trong ngày:** Trường hợp mua hàng hóa, dịch vụ của cùng một nhà cung cấp có giá trị dưới 5 triệu đồng nhưng mua nhiều lần trong cùng một ngày có tổng giá trị từ 5 triệu đồng trở lên thì chỉ được khấu trừ thuế đối với trường hợp có chứng từ thanh toán không dùng tiền mặt.
 
----
+#### C. Chính Sách Thuế Suất Giảm 8% Theo Nghị Quyết 204/2025/QH15
+- **Hiệu lực thi hành:** Tiếp tục giảm 2% thuế suất thuế GTGT (từ 10% xuống 8%) đến hết ngày **31/12/2026** theo Nghị quyết số 204/2025/QH15 và Nghị định số 174/2025/NĐ-CP.
+- **Nguyên tắc phân loại danh mục loại trừ:**
+  + Nhóm hàng hóa, dịch vụ **KHÔNG ĐƯỢC GIẢM 8%** (bắt buộc áp dụng 10%): Viễn thông, hoạt động tài chính, ngân hàng, chứng khoán, bảo hiểm, kinh doanh bất động sản, kim loại, sản phẩm khai khoáng, than cốc, dầu mỏ tinh chế, sản phẩm hóa chất, hàng hóa dịch vụ chịu thuế tiêu thụ đặc biệt.
+  + **Quy tắc phân loại cho Hệ thống AI & Kế toán:** Tuyệt đối không cào bằng toàn bộ nhóm ngành "Công nghệ thông tin" là chịu thuế 10%. 
+    * Các dịch vụ phần mềm và sản phẩm phần mềm thuộc đối tượng **không chịu thuế GTGT** theo quy định của Luật Thuế GTGT.
+    * Các dịch vụ công nghệ thông tin thông thường không thuộc danh mục loại trừ cụ thể (theo Phụ lục mã ngành cấp 7 và mã sản phẩm VCPA) vẫn được hưởng thuế suất giảm 8%.
+    * Tax Referee khi xử lý hóa đơn phải đối soát theo bảng danh mục mã ngành chi tiết, nếu có dấu hiệu mập mờ phải kích hoạt phân luồng tham vấn Kế toán trưởng, không được tự động quy kết sai lệch.
 
-### 2.2 Thuế Thu Nhập Doanh Nghiệp (TNDN - CIT)
-
-#### A. Quy Định Tạm Nộp Thuế TNDN Theo Quý
-Theo Nghị định 91/2022/NĐ-CP (sửa đổi bổ sung Nghị định 126/2020/NĐ-CP):
-- Hàng quý, doanh nghiệp **không phải nộp tờ khai thuế TNDN tạm tính**, mà kế toán căn cứ vào kết quả hoạt động sản xuất kinh doanh quý để **tự tính toán số tiền thuế TNDN tạm nộp**.
-- **Quy tắc 80% an toàn tối thượng:** Tổng số thuế TNDN đã tạm nộp của 4 quý trong năm tài chính **không được thấp hơn 80%** số thuế TNDN phải nộp theo quyết toán năm.
-- Nếu nộp thiếu so với ngưỡng 80%, doanh nghiệp bị tính tiền chậm nộp 0.03%/ngày trên số tiền nộp thiếu tính từ ngày tiếp sau ngày cuối cùng của thời hạn nộp thuế quý 4.
-- Hạn nộp tiền tạm nộp quý: Ngày 30 của tháng đầu quý sau (Quý 1 hạn 30/04; Quý 2 hạn 30/07; Quý 3 hạn 30/10; Quý 4 hạn 30/01 năm sau).
-
-#### B. Quyết Toán Thuế TNDN Cuối Năm (Mẫu 03/TNDN)
-Hạn chót nộp hồ sơ quyết toán: **Ngày cuối cùng của tháng thứ 3** kể từ ngày kết thúc năm dương lịch hoặc năm tài chính (thông thường là ngày **31/03** hàng năm).
-
-Hồ sơ quyết toán thuế TNDN bao gồm:
-1. Tờ khai quyết toán thuế TNDN theo mẫu số 03/TNDN (Thông tư 80/2021/TT-BTC).
-2. Báo cáo tài chính năm (Bảng cân đối kế toán, Báo cáo kết quả hoạt động kinh doanh, Báo cáo lưu chuyển tiền tệ, Thuyết minh BCTC).
-3. Các phụ lục đính kèm: Phụ lục kết quả sản xuất kinh doanh (03-1A/TNDN), Phụ lục chuyển lỗ (03-2/TNDN), Phụ lục giao dịch liên kết theo Nghị định 132/2020/NĐ-CP (nếu có).
-
-#### C. Kỹ Thuật Điều Chỉnh Doanh Thu & Chi Phí (Chỉ Tiêu B trên Mẫu 03/TNDN)
-Điểm mấu chốt của kế toán thuế TNDN là phân định rạch ròi giữa **Lợi nhuận kế toán (sổ sách)** và **Thu nhập tính thuế (luật thuế)**:
-
-```text
-Thu nhập tính thuế = Lợi nhuận trước thuế + Các khoản điều chỉnh tăng (B) - Các khoản điều chỉnh giảm (B) - Thu nhập miễn thuế - Các khoản lỗ được kết chuyển
-```
-
-- **Các khoản chi phí kế toán nhưng KHÔNG ĐƯỢC TRỪ khi tính thuế TNDN (phải ghi vào Chỉ tiêu [B4] trên tờ khai 03/TNDN):**
-  + Hóa đơn không có chứng từ thanh toán không dùng tiền mặt (giá trị ≥ 20 triệu).
-  + Hóa đơn bất hợp pháp, hóa đơn từ doanh nghiệp bỏ trốn/đóng MST mà không chứng minh được hàng hóa thực tế.
-  + Chi phí mua đồ uống có cồn (rượu bia), tiệc tùng cá nhân không phục vụ SXKD.
-  + Tiền phạt vi phạm hành chính (phạt vi phạm luật giao thông, phạt vi phạm thuế, phạt chậm nộp).
-  + Chi phí tiền lương không có hợp đồng lao động, không có chứng từ chi trả thực tế hoặc chưa thanh toán đến hạn quyết toán.
-  + Chi phí trích lập dự phòng không đúng quy định Thông tư 48/2019/TT-BTC.
-  + Chi phí lãi vay vượt mức trần 30% EBITDA đối với doanh nghiệp có giao dịch liên kết (Nghị định 132/2020/NĐ-CP).
+#### D. Cấu Trúc Biểu Mẫu Tờ Khai 01/GTGT Mới (Thông Tư 89/2026/TT-BTC)
+Kế toán cần lưu ý sự thay đổi quan trọng của hệ thống chỉ tiêu trên Tờ khai 01/GTGT mới so với Thông tư 80/2021/TT-BTC cũ:
+- **Chỉ tiêu [21]:** Đánh dấu (x) nếu trong kỳ tính thuế **không phát sinh hoạt động mua bán hàng hóa, dịch vụ**. Khi chọn chỉ tiêu này, người nộp thuế không phải điền các chỉ tiêu mua bán khác.
+- **Chỉ tiêu [22]:** **Thuế GTGT còn được khấu trừ kỳ trước chuyển sang** (Hệ thống tự động đối chiếu khớp đúng với Chỉ tiêu [43] của kỳ trước liền kề).
+- **Chỉ tiêu [23]:** Giá trị của hàng hóa, dịch vụ mua vào trong kỳ (chưa bao gồm thuế GTGT).
+- **Chỉ tiêu [24]:** Tổng số thuế GTGT của hàng hóa, dịch vụ mua vào trong kỳ.
+- **Chỉ tiêu [25]:** **Tổng số thuế GTGT đầu vào ĐƯỢC KHẤU TRỪ trong kỳ** (Chỉ ghi nhận những hóa đơn đáp ứng đầy đủ điều kiện luật định: hợp pháp, có chứng từ không tiền mặt nếu ≥ 5 triệu, phục vụ SXKD).
+- **Chỉ tiêu Doanh thu và Thuế GTGT đầu ra phân nhóm theo thuế suất:**
+  + Chỉ tiêu [26]: Hàng hóa, dịch vụ không chịu thuế GTGT.
+  + Chỉ tiêu [27]: Hàng hóa, dịch vụ chịu thuế suất 0%.
+  + Chỉ tiêu [28] & [29]: Doanh thu và Thuế GTGT của hàng hóa, dịch vụ chịu thuế suất 5%.
+  + Chỉ tiêu [30] & [31]: Doanh thu và Thuế GTGT của hàng hóa, dịch vụ chịu thuế suất giảm 8% (theo NQ 204/2025/QH15).
+  + Chỉ tiêu [32] & [33]: Doanh thu và Thuế GTGT của hàng hóa, dịch vụ chịu thuế suất 10%.
+  + Chỉ tiêu [34]: Tổng doanh thu bán ra (= [26] + [27] + [28] + [30] + [32]).
+  + Chỉ tiêu [35]: Tổng thuế GTGT bán ra (= [29] + [31] + [33]).
+- **Chỉ tiêu Tổng hợp kết quả nghĩa vụ thuế:**
+  + Chỉ tiêu [36]: Thuế GTGT phát sinh trong kỳ (= [35] - [25]).
+  + Chỉ tiêu [40]: Thuế GTGT còn phải nộp trong kỳ (khi [36] - [22] > 0).
+  + Chỉ tiêu [43]: Thuế GTGT chưa khấu trừ hết chuyển sang kỳ sau (khi [36] - [22] < 0).
 
 ---
 
-### 2.3 Thuế Thu Nhập Cá Nhân (TNCN - PIT)
+### 3.2 Thuế Thu Nhập Doanh Nghiệp (TNDN - CIT)
 
-1. **Kỳ kê khai:** Doanh nghiệp kê khai thuế TNCN theo kỳ kê khai thuế GTGT (khai theo tháng hoặc theo quý). Nếu trong kỳ không phát sinh khấu trừ thuế TNCN của bất kỳ cá nhân nào thì không phải nộp tờ khai tháng/quý đó.
-2. **Khấu trừ tại nguồn:**
-   - Cá nhân cư trú ký HĐLĐ từ 3 tháng trở lên: Khấu trừ theo Biểu thuế lũy tiến từng phần (từ 5% đến 35%) sau khi trừ giảm trừ gia cảnh (bản thân 11 triệu/tháng, người phụ thuộc 4.4 triệu/người/tháng) và các khoản bảo hiểm bắt buộc.
-   - Cá nhân không ký hợp đồng hoặc hợp đồng dưới 3 tháng: Khấu trừ 10% tại nguồn đối với mỗi lần chi trả từ 2.000.000 VNĐ trở lên (trừ trường hợp làm cam kết mẫu 08/CK-TNCN theo Thông tư 80 nếu đủ điều kiện).
-3. **Quyết toán thuế TNCN năm (Mẫu 05/QTT-TNCN):**
-   - Hạn nộp: Chậm nhất là ngày cuối cùng của tháng thứ 3 kể từ ngày kết thúc năm dương lịch (31/03).
-   - Kế toán thực hiện tổng hợp thu nhập của toàn bộ người lao động trong năm, quyết toán thay cho các nhân sự có giấy ủy quyền quyết toán và xác định số thuế nộp thừa/thiếu.
-
----
-
-## 3. QUY TRÌNH 5 BƯỚC KIỂM SOÁT HÓA ĐƠN ĐẦU VÀO (NGUYÊN TẮC 3H)
-
-Hóa đơn đầu vào là "mạch máu" quyết định chi phí được trừ và số thuế được khấu trừ của doanh nghiệp. Để được công nhận, hóa đơn bắt buộc phải thỏa mãn đồng thời nguyên tắc **3H: HỢP PHÁP - HỢP LỆ - HỢP LÝ**.
+#### A. Thuế Suất Phân Tầng Theo Luật Thuế TNDN Mới (Luật 67/2025/QH15 & NĐ 320/2025/NĐ-CP)
+Từ kỳ tính thuế 2025 - 2026, Việt Nam áp dụng cơ chế thuế suất thuế TNDN phân tầng linh hoạt nhằm hỗ trợ doanh nghiệp vừa và nhỏ (SME):
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       TAM GIÁC KIỂM SOÁT HÓA ĐƠN 3H                         │
+│                 BIỂU THUẾ SUẤT THUẾ TNDN PHÂN TẦNG HIỆN HÀNH                 │
+├───────────────────────────────────┬──────────────┬──────────────────────────┤
+│         QUY MÔ DOANH THU NĂM      │  THUẾ SUẤT   │     ĐỐI TƯỢNG ÁP DỤNG    │
+├───────────────────────────────────┼──────────────┼──────────────────────────┤
+│ Doanh thu không quá 3 tỷ đồng     │     15%      │ Doanh nghiệp siêu nhỏ    │
+├───────────────────────────────────┼──────────────┼──────────────────────────┤
+│ Doanh thu từ trên 3 đến 50 tỷ đồng│     17%      │ Doanh nghiệp nhỏ (SME)   │
+├───────────────────────────────────┼──────────────┼──────────────────────────┤
+│ Doanh thu trên 50 tỷ đồng         │     20%      │ Doanh nghiệp phổ thông   │
+├───────────────────────────────────┼──────────────┼──────────────────────────┤
+│ Thăm dò, khai thác khoáng sản quý │  32% - 50%   │ Doanh nghiệp tài nguyên  │
+└───────────────────────────────────┴──────────────┴──────────────────────────┘
+```
+
+*Lưu ý đối với doanh nghiệp thành lập mới hoặc hoạt động không đủ 12 tháng:* Doanh thu để xác định thuế suất được quy đổi theo công thức: (Tổng doanh thu thực tế phát sinh / Số tháng hoạt động thực tế) x 12 tháng.
+
+#### B. Quy Tắc Tạm Nộp Thuế TNDN Hàng Quý (Quy Tắc 80%)
+- Hàng quý, doanh nghiệp không phải nộp tờ khai thuế TNDN tạm tính, mà kế toán căn cứ vào sổ sách kế toán để tạm tính và nộp tiền thuế TNDN vào Kho bạc Nhà nước.
+- **Nguyên tắc an toàn (Quy tắc 80%):** Tổng số thuế TNDN đã tạm nộp của 4 quý **không được thấp hơn 80%** số thuế TNDN phải nộp theo quyết toán năm. Hạn tạm nộp tiền thuế quý 4 là ngày **30/01** của năm tiếp theo.
+- Nếu nộp thiếu ngưỡng 80%, doanh nghiệp phải chịu tiền chậm nộp tính trên số thuế nộp thiếu kể từ ngày 31/01 cho đến ngày thực nộp.
+
+#### C. Chi Phí Không Được Trừ Khi Tính Thuế TNDN (Chỉ Tiêu B4 Mẫu 03/TNDN)
+Khi lập Tờ khai Quyết toán thuế TNDN mẫu 03/TNDN, kế toán phải loại trừ các khoản chi phí hạch toán kế toán nhưng không được trừ theo quy định thuế:
+- Khoản chi mua hàng hóa, dịch vụ từng lần từ 5.000.000 VNĐ trở lên thanh toán bằng tiền mặt (theo Luật GTGT 2024 và NĐ 320/2025/NĐ-CP).
+- Các khoản chi không tương ứng với doanh thu tính thuế, không phục vụ hoạt động sản xuất kinh doanh có chứng từ hợp pháp.
+- Tiền phạt vi phạm hành chính (phạt thuế, phạt hợp đồng kinh tế vi phạm pháp luật).
+- Chi phí lãi vay vượt mức trần **30% EBITDA** đối với doanh nghiệp có phát sinh giao dịch liên kết theo Nghị định 255/2026/NĐ-CP.
+
+#### D. Thời Hạn Quyết Toán Thuế TNDN & Nộp Báo Cáo Tài Chính
+- Thời hạn nộp hồ sơ quyết toán thuế năm và Báo cáo tài chính năm: Chậm nhất là **ngày cuối cùng của tháng thứ 3** kể từ ngày kết thúc năm tài chính.
+- Đối với doanh nghiệp áp dụng năm tài chính trùng với năm dương lịch (01/01 - 31/12): Hạn nộp là ngày **31/03** của năm tiếp theo.
+
+---
+
+### 3.3 Thuế Thu Nhập Cá Nhân (TNCN - PIT)
+
+Căn cứ Luật Thuế Thu nhập cá nhân số 109/2025/QH15, Nghị quyết 110/2025/UBTVQH15, Nghị định 253/2026/NĐ-CP và Thông tư 87/2026/TT-BTC:
+
+#### A. Mức Giảm Trừ Gia Cảnh Hiện Hành
+- Giảm trừ cho bản thân người nộp thuế: **15.500.000 VNĐ/tháng** (tương đương **186.000.000 VNĐ/năm**).
+- Giảm trừ cho mỗi người phụ thuộc hợp pháp: **6.200.000 VNĐ/tháng** (tương đương **74.400.000 VNĐ/năm**).
+
+#### B. Biểu Thuế Lũy Tiến Từng Phần Rút Gọn (5 Bậc)
+Biểu thuế lũy tiến từng phần áp dụng cho thu nhập từ tiền lương, tiền công của cá nhân cư trú ký hợp đồng lao động từ 3 tháng trở lên:
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                   BIỂU THUẾ LŨY TIẾN TỪNG PHẦN RÚT GỌN (5 BẬC)              │
+├─────┬───────────────────────────────────────────┬───────────┬───────────────┤
+│ BẬC │   THU NHẬP TÍNH THUẾ / THÁNG (VNĐ)        │ THUẾ SUẤT │ CÁCH TÍNH NHANH
+├─────┼───────────────────────────────────────────┼───────────┼───────────────┤
+│  1  │ Đến 10 triệu đồng                         │    5%     │ 0.05 x TNTT   │
+├─────┼───────────────────────────────────────────┼───────────┼───────────────┤
+│  2  │ Trên 10 đến 30 triệu đồng                 │    10%    │ 0.10 x TNTT - 0.5M
+├─────┼───────────────────────────────────────────┼───────────┼───────────────┤
+│  3  │ Trên 30 đến 60 triệu đồng                 │    20%    │ 0.20 x TNTT - 3.5M
+├─────┼───────────────────────────────────────────┼───────────┼───────────────┤
+│  4  │ Trên 60 đến 100 triệu đồng                │    30%    │ 0.30 x TNTT - 9.5M
+├─────┼───────────────────────────────────────────┼───────────┼───────────────┤
+│  5  │ Trên 100 triệu đồng                       │    35%    │ 0.35 x TNTT - 14.5M
+└─────┴───────────────────────────────────────────┴───────────┴───────────────┘
+```
+
+#### C. Khấu Trừ Thuế Đối Với Thu Nhập Vãng Lai (Từ 5 Triệu Đồng)
+- Đối với cá nhân không ký hợp đồng lao động hoặc ký hợp đồng lao động dưới 3 tháng: Tổ chức, doanh nghiệp trả thu nhập thực hiện khấu trừ thuế 10% tại nguồn trước khi trả cho cá nhân đối với mỗi lần chi trả từ **5.000.000 VNĐ trở lên**.
+- Trường hợp cá nhân chỉ có duy nhất thu nhập thuộc đối tượng phải khấu trừ thuế nêu trên nhưng ước tính tổng mức thu nhập chịu thuế của cá nhân sau khi trừ gia cảnh chưa đến mức phải nộp thuế thì cá nhân làm Cam kết (Mẫu 08/CK-TNCN theo Thông tư 87/2026/TT-BTC) gửi tổ chức chi trả để làm căn cứ tạm thời chưa khấu trừ thuế TNCN.
+
+---
+
+## 4. QUY TRÌNH 5 BƯỚC KIỂM SOÁT HÓA ĐƠN ĐẦU VÀO (KHUNG NGHIỆP VỤ 3H)
+
+Để tối ưu hóa việc quản lý chứng từ, phòng kế toán áp dụng khung kiểm soát nội bộ **3H: HỢP PHÁP - HỢP LỆ - HỢP LÝ**:
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         KHUNG KIỂM SOÁT NỘI BỘ 3H                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │                                 HỢP PHÁP                                    │
-│                     (Người bán hoạt động bình thường,                       │
-│                      hóa đơn có mã CQT, không mua bán                       │
-│                      hóa đơn khống, đúng thời điểm)                         │
+│                     • Người bán đang hoạt động hợp pháp                     │
+│                     • Hóa đơn điện tử có mã hợp lệ trên Cục Thuế            │
+│                     • Không thuộc diện nghi vấn mua bán hóa đơn             │
 │                                   ▲                                         │
 │                                  ╱ ╲                                        │
 │                                 ╱   ╲                                       │
@@ -181,192 +275,158 @@ Hóa đơn đầu vào là "mạch máu" quyết định chi phí được trừ
 │                              ╱         ╲                                    │
 │                             ▼           ▼                                   │
 │                        HỢP LỆ ◄───────► HỢP LÝ                              │
-│             (Đầy đủ tiêu thức bắt     (Phục vụ hoạt động SXKD,              │
-│              buộc, đúng thuế suất,     có hợp đồng, phiếu kho,              │
-│              thanh toán đúng luật,     biên bản giao nhận và                │
-│              chữ ký số hợp chuẩn)      định mức kinh tế kỹ thuật)           │
+│             • Đầy đủ tiêu thức bắt buộc • Phục vụ sản xuất kinh doanh       │
+│             • Đúng thuế suất quy định   • Có hồ sơ chứng minh giao dịch thật│
+│             • Thanh toán không tiền mặt • Hợp đồng, biên bản, phiếu kho     │
+│               khi từ 5 triệu trở lên    • Đúng định mức kinh tế kỹ thuật    │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### Bước 1: Tiếp Nhận & Kiểm Tra Hình Thức (Tính Hợp Lệ)
-Ngay khi phòng mua hàng hoặc nhân sự nộp hóa đơn, kế toán viên thực hiện kiểm tra các chỉ tiêu bắt buộc theo Điều 10 Nghị định 123/2020/NĐ-CP:
-1. **Thông tin định danh hai bên:**
-   - Tên, địa chỉ, Mã số thuế của Người bán phải chính xác từng ký tự theo Giấy chứng nhận ĐKKD.
-   - Tên, địa chỉ, Mã số thuế của Công ty mình (Người mua) phải chuẩn xác 100%. Nếu sai mã số thuế thì hóa đơn không có giá trị khấu trừ.
-2. **Chỉ tiêu hàng hóa & Thuế suất:**
-   - Tên hàng hóa, dịch vụ phải rõ ràng, đúng ngành nghề, không ghi chung chung "Dịch vụ", "Chi phí khác" mà không có hợp đồng/bảng kê chi tiết.
-   - Thuế suất GTGT: Kiểm tra xem hàng hóa có thuộc diện được giảm 2% thuế GTGT (áp 8%) theo Nghị định 72/2024/NĐ-CP hay thuộc danh mục loại trừ (bắt buộc 10% như viễn thông, CNTT, tài chính, ngân hàng, bảo hiểm, bất động sản, kim loại, hóa chất, sản phẩm chịu thuế TTĐB).
-3. **Thời điểm lập và Thời điểm ký số:**
-   - Ngày lập hóa đơn và ngày ký số của người bán. Nếu ngày ký số lệch quá xa ngày lập hoặc ký lùi ngày thì tiềm ẩn rủi ro hóa đơn xuất sai thời điểm (bị phạt vi phạm hành chính từ 3.000.000 đến 8.000.000 VNĐ theo Điều 24 Nghị định 125/2020/NĐ-CP).
-4. **File dữ liệu điện tử gốc:**
-   - Hóa đơn điện tử chỉ có giá trị pháp lý cao nhất ở **định dạng file XML**. File PDF chỉ là bản hiển thị đồ họa. Kế toán bắt buộc phải lưu trữ cả file XML và PDF.
+### Bước 1: Tiếp Nhận & Kiểm Tra Tiêu Thức Hóa Đơn (Tính Hợp Lệ)
+- **Kiểm tra thông tin định danh:** Tên, địa chỉ, Mã số thuế của người bán và người mua (Công ty mình).
+- **Phân loại và xử lý sai sót thông tin (Nghị định 254/2026/NĐ-CP & NĐ 70/2025/NĐ-CP):**
+  + **Trường hợp sai tên hoặc địa chỉ người mua nhưng đúng Mã số thuế:** Hóa đơn **KHÔNG BỊ VÔ HIỆU**. Người bán gửi Thông báo sai sót hóa đơn điện tử (Mẫu 04/SS-HĐĐT) cho cơ quan thuế và thông báo cho người mua. Hóa đơn này vẫn được chấp nhận kê khai khấu trừ thuế GTGT và tính vào chi phí được trừ bình thường.
+  + **Trường hợp sai Mã số thuế, sai số tiền, sai thuế suất, hoặc sai quy cách hàng hóa:** Bắt buộc người bán và người mua phải thỏa thuận lựa chọn lập **Hóa đơn điều chỉnh** hoặc **Hóa đơn thay thế**. Hóa đơn điều chỉnh/thay thế bắt buộc phải ghi rõ tham chiếu đến Số hóa đơn, Ký hiệu, Ngày tháng của hóa đơn gốc.
+- **Kiểm tra tính toàn vẹn dữ liệu:** Hóa đơn điện tử hợp lệ phải lưu trữ file dữ liệu gốc định dạng **XML** có chữ ký số hợp lệ của người bán được cấp bởi đơn vị cung cấp dịch vụ chứng thực chữ ký số (CA). Bản thể hiện PDF chỉ có giá trị tham khảo để đọc mắt thường.
 
 ---
 
-### Bước 2: Tra Cứu & Xác Thực Pháp Lý Trên Cổng Thuế (Tính Hợp Pháp)
-Kế toán thuế tiến hành đối soát trực tuyến:
-1. **Tra cứu hóa đơn trên Hệ thống Hóa đơn điện tử của Tổng cục Thuế (`hoadondientu.gdt.gov.vn`):**
-   - Nhập thông tin: MST người bán, Loại hóa đơn, Ký hiệu hóa đơn, Số hóa đơn, Tổng tiền, Tiền thuế.
-   - Trạng thái hợp lệ: *"Hóa đơn hợp lệ, đã được cấp mã của cơ quan thuế"* hoặc *"Hóa đơn không mã đã được gửi đầy đủ dữ liệu đến cơ quan thuế"*.
-2. **Tra cứu trạng thái hoạt động của Người bán trên Cổng `tracuunnt.gdt.gov.vn`:**
-   - **Trạng thái 00 - Đang hoạt động (Active):** An toàn, hợp lệ.
-   - **Trạng thái 01 - Ngừng hoạt động nhưng chưa hoàn thành thủ tục đóng MST:** Tạm dừng thanh toán và kê khai, yêu cầu giải trình.
-   - **Trạng thái 03 - Ngừng hoạt động đã đóng MST (Suspended/Closed):**
-     + *Trường hợp A (Hóa đơn lập TRƯỚC ngày đóng MST):* Kế toán tạm treo kê khai, yêu cầu rà soát toàn bộ hồ sơ giao dịch thực tế (hợp đồng, phiếu xuất kho, chứng từ vận chuyển, UNC). Nếu chứng minh được giao dịch có thật 100% trước thời điểm người bán giải thể thì vẫn được bảo vệ khấu trừ.
-     + *Trường hợp B (Hóa đơn lập SAU ngày đóng MST):* Hóa đơn bất hợp pháp 100%! Doanh nghiệp bán đã mất tư cách pháp nhân nhưng vẫn dùng chữ ký số xuất hóa đơn lậu. Cấm tuyệt đối không được kê khai, phải loại bỏ ngay để tránh dính líu hình sự.
-   - **Trạng thái 05 - NNT không hoạt động tại địa chỉ đã đăng ký (Bỏ trốn):** Hóa đơn có rủi ro cực cao, cơ quan thuế sẽ gửi thông báo yêu cầu giải trình ngay khi đối soát chéo.
+### Bước 2: Tra Cứu Trạng Thái Hoạt Động Của Người Bán (Tính Hợp Pháp)
+Kế toán thực hiện tra cứu tự động trên Cổng thông tin của Tổng cục Thuế (`tracuunnt.gdt.gov.vn`) hoặc qua API kết nối:
+- **Trạng thái 00 - Đang hoạt động:** Hóa đơn đủ điều kiện tiếp tục xét duyệt.
+- **Trạng thái 05 - Tạm ngừng kinh doanh có thời hạn:** Kiểm tra ngày lập hóa đơn xem có rơi vào khoảng thời gian tạm ngừng hay không. Nếu phát hành trong thời gian tạm ngừng mà không có thông báo mở lại thì cần tạm dừng kê khai để kiểm tra.
+- **Trạng thái 01 (Ngừng hoạt động chưa đóng MST) hoặc Trạng thái 03 (Đã hoàn thành đóng MST) hoặc Trạng thái 06 (Không hoạt động tại địa chỉ đăng ký - Bỏ trốn):**
+  + **Hóa đơn lập TRƯỚC ngày cơ quan thuế công bố đóng MST / bỏ trốn:** Tạm dừng hạch toán tự động (kích hoạt `UNCERTAIN_INFO`); kế toán viên phối hợp bộ phận mua hàng tập hợp toàn bộ hồ sơ chứng minh giao dịch có thật trước ngày thông báo (hợp đồng, biên bản giao nhận thực tế, chứng từ ngân hàng). Nếu hồ sơ phòng vệ đầy đủ thì vẫn được kê khai theo quy định.
+  + **Hóa đơn lập SAU ngày cơ quan thuế công bố đóng MST / bỏ trốn:** Hóa đơn bất hợp pháp 100% (kích hoạt `OUT_OF_POLICY`). Nghiêm cấm kê khai khấu trừ và nghiêm cấm đưa vào chi phí được trừ.
 
 ---
 
-### Bước 3: Kiểm Soát Rủi Ro Chứng Từ Thanh Toán (Thông Tư 219/2013/TT-BTC)
-Căn cứ Điều 15 Thông tư 219/2013/TT-BTC (được sửa đổi bởi Thông tư 26/2015/TT-BTC và Thông tư 173/2016/TT-BTC):
-1. **Ngưỡng giá trị 20 triệu VNĐ:**
-   - Hóa đơn mua vào từng lần có giá trị **từ 20.000.000 VNĐ trở lên (giá đã bao gồm thuế GTGT)** bắt buộc phải có **chứng từ thanh toán không dùng tiền mặt** (Ủy nhiệm chi ngân hàng - UNC).
-   - Nếu thanh toán bằng tiền mặt: **Toàn bộ tiền thuế GTGT đầu vào không được khấu trừ**, và chi phí không được tính là chi phí hợp lý khi tính thuế TNDN.
-2. **Bẫy hóa đơn chia nhỏ trong cùng 1 ngày:**
-   - Nếu mua hàng của cùng một nhà cung cấp trong cùng một ngày có nhiều hóa đơn dưới 20 triệu nhưng **tổng giá trị cộng lại từ 20 triệu trở lên**, thì bắt buộc phải thanh toán qua ngân hàng cho toàn bộ các hóa đơn này. Nếu trả tiền mặt sẽ bị loại thuế toàn bộ.
-3. **Quy chuẩn tài khoản ngân hàng:**
-   - Tiền phải được chuyển từ **Tài khoản ngân hàng đứng tên Bên Mua (Công ty mình)** sang **Tài khoản ngân hàng đứng tên Bên Bán** (mở tại các tổ chức cung ứng dịch vụ thanh toán hợp pháp).
-   - Giám đốc dùng tài khoản cá nhân thanh toán thay cho công ty thì không được coi là chứng từ thanh toán không dùng tiền mặt hợp lệ (trừ trường hợp quy chế tài chính công ty có quy định ủy quyền cho cá nhân thanh toán bằng thẻ tín dụng doanh nghiệp hoặc thẻ cá nhân sau đó công ty hoàn ứng qua tài khoản ngân hàng).
+### Bước 3: Kiểm Soát Điều Kiện Thanh Toán Ngân Hàng (Ngưỡng 5 Triệu Đồng)
+- Kiểm tra số tiền thanh toán: Nếu tổng giá trị thanh toán trên hóa đơn **từ 5.000.000 VNĐ trở lên**, bắt buộc kiểm tra xem đã có chứng từ thanh toán không dùng tiền mặt (Ủy nhiệm chi ngân hàng) hay chưa.
+- **Nguyên tắc xử lý của Tax Referee:**
+  + Nếu đã có UNC ngân hàng: Hợp lệ, đưa vào Chỉ tiêu [25] của Tờ khai 01/GTGT.
+  + Nếu chưa đến hạn thanh toán theo hợp đồng trả chậm: Vẫn được tạm khấu trừ trong kỳ, nhưng hệ thống phải gắn cờ theo dõi hạn thanh toán ngân hàng.
+  + Nếu đã thanh toán bằng tiền mặt: Loại bỏ thuế GTGT đầu vào (không đưa vào [25]), đồng thời ghi nhận điều chỉnh tăng thu nhập chịu thuế TNDN (Chỉ tiêu B4 trên Mẫu 03/TNDN).
 
 ---
 
-### Bước 4: Kiểm Soát Tính Thực Tế & Hồ Sơ Đi Kèm (Tính Hợp Lý)
-Hóa đơn hợp pháp và hợp lệ vẫn có thể bị cơ quan thuế "bóc" ra nếu không chứng minh được tính phục vụ sản xuất kinh doanh:
-1. **Hóa đơn ăn uống, tiếp khách, tổ chức hội nghị:**
-   - Bắt buộc phải có: Hợp đồng hoặc Giấy đề xuất tiếp khách, **Bảng kê chi tiết các món ăn, dịch vụ kèm theo**, Danh sách khách mời tham dự và mục đích phục vụ kinh doanh.
-   - **Mặt hàng cấm khấu trừ (Điều 2.1 SOP):** Hóa đơn tiệc tùng chứa đồ uống có cồn (rượu ngoại, bia) đắt tiền phục vụ mục đích cá nhân, giải trí xa hoa không phục vụ SXKD sẽ bị loại thuế GTGT và gạt chi phí TNDN.
-2. **Hóa đơn mua vật tư, hàng hóa nhập kho:**
-   - Bắt buộc có: Hợp đồng mua bán, Phiếu xuất kho của bên bán, **Biên bản giao nhận hàng hóa**, **Phiếu nhập kho (Mẫu 01-VT)** của công ty mình, Biên bản kiểm định chất lượng (nếu là thiết bị kỹ thuật).
-3. **Hóa đơn dịch vụ thuê ngoài (vận chuyển, tư vấn, sửa chữa):**
-   - Bắt buộc có: Hợp đồng dịch vụ, **Biên bản nghiệm thu hoàn thành công việc**, Bảng kê chi tiết giờ làm việc/khối lượng hoàn thành, Lệnh điều xe/phiếu vận chuyển (nếu là cước vận tải).
-4. **Hóa đơn điều chỉnh / thay thế theo Nghị định 123/2020/NĐ-CP:**
-   - Hóa đơn điều chỉnh giảm doanh thu/giảm giá bắt buộc phải có: **Mã số hóa đơn gốc** cần điều chỉnh ghi rõ trên hóa đơn mới, Biên bản thỏa thuận điều chỉnh có chữ ký và con dấu của cả 2 bên. Nếu hóa đơn điều chỉnh không truy vết được hóa đơn gốc trong CSDL thì kế toán không được ghi nhận giảm trừ doanh thu/thuế.
+### Bước 4: Kiểm Tra Tính Phục Vụ Sản Xuất Kinh Doanh (Tính Hợp Lý)
+- **Mặt hàng không phục vụ kinh doanh:** Rượu, bia, thuốc lá, dịch vụ giải trí xa xỉ cá nhân, hóa đơn mua sắm trang thiết bị cho mục đích riêng của lãnh đạo không thuộc quy chế công ty thì không được khấu trừ thuế GTGT và không được tính vào chi phí được trừ.
+- **Hóa đơn tiếp khách, hội nghị:** Bắt buộc phải có Giấy đề xuất tiếp khách, danh sách khách mời tham dự, và **Bảng kê chi tiết các món ăn / dịch vụ** đi kèm.
+- **Hóa đơn chiết khấu thương mại / Giảm giá hàng bán:** Phải khớp đúng với hợp đồng thương mại ban đầu và có Biên bản thỏa thuận giảm giá giữa hai bên.
 
 ---
 
-### Bước 5: Hạch Toán & Phân Loại Vào Kỳ Kê Khai
-- **Trường hợp Đạt chuẩn 100% (Routine):** Kế toán hạch toán Nợ TK 152/156/642, Nợ TK 1331 (Thuế GTGT được khấu trừ), Có TK 331/112. Tự động đưa số tiền thuế vào **Chỉ tiêu [25]** trên Tờ khai 01/GTGT.
-- **Trường hợp Có rủi ro / Chờ xử lý (Escalated):**
-  + Tạm dừng đưa vào Tờ khai 01/GTGT kỳ này (không đưa vào chỉ tiêu [25]).
-  + Treo trên tài khoản tạm tính (TK 1388 hoặc TK 331).
-  + Kích hoạt Thẻ phán quyết chuyển tiếp lên Kế toán trưởng hoặc Giám đốc Tài chính để ra quyết định: bắt nhà cung cấp xuất lại hay bóc tách chi phí.
+### Bước 5: Hạch Toán Kế Toán & Phân Luồng Kê Khai
+- **Luồng Tự Động Thường Quy (Routine Stream):** Đối với các hóa đơn thường xuyên, nhà cung cấp uy tín, giá trị nhỏ, thỏa mãn 100% điều kiện 3H: Hệ thống tự động ghi sổ kế toán theo Thông tư 99/2025/TT-BTC và tổng hợp số liệu lên Tờ khai thuế.
+- **Luồng Chuyển Tiếp Tham Vấn (Escalation Stream):** Đối với hóa đơn phát hiện rủi ro (lóa mờ, sai thuế suất, tiền mặt ≥ 5M, đối tác bỏ trốn, K chạm ngưỡng đỏ): Hệ thống dừng tự động hóa ngay lập tức, phân luồng theo ma trận thẩm quyền RACI kèm câu hỏi Đóng A/B trong 3 giây để người có trách nhiệm phê duyệt.
 
 ---
 
-## 4. CƠ CHẾ GIÁM SÁT RỦI RO HÓA ĐƠN & HỆ SỐ K CỦA TỔNG CỤC THUẾ (CV 2392/TCT-QLRR)
+## 5. HỆ THỐNG GIÁM SÁT RỦI RO & THAM SỐ NGUỒN HÀNG K (CV 2392/TCT-QLRR & TT 94/2026/TT-BTC)
 
-Đây là "vũ khí AI" kiểm soát thuế hiện đại nhất đang được áp dụng từ năm 2023 đến nay, mà mọi Kế toán trưởng và CFO tại Việt Nam bắt buộc phải nắm vững.
+### 5.1 Bản Chất Của Tham Số K Trong Quản Trị Rủi Ro Của Cơ Quan Thuế
+Công văn số 2392/TCT-QLRR của Tổng cục Thuế kết hợp với Thông tư 94/2026/TT-BTC xác lập cơ chế quản lý tuân thủ và phân tích rủi ro tự động hóa trong quản lý thuế.
 
-### 4.1 Khái Niệm & Bản Chất Của Hệ Số K
-Ngày 14/06/2023, Tổng cục Thuế ban hành **Công văn số 2392/TCT-QLRR** triển khai ứng dụng tự động kiểm soát hóa đơn điện tử, ngăn chặn tình trạng thành lập doanh nghiệp "ma" để bán hóa đơn khống rồi bỏ trốn.
+Cơ quan Thuế áp dụng thuật toán kiểm tra mối tương quan giữa năng lực nguồn hàng đầu vào và giá trị bán ra. Nếu một doanh nghiệp bán ra một lượng hàng hóa quá lớn trong khi kho không có hàng và không mua hàng đầu vào, hệ thống của Cục Thuế sẽ tự động gắn cờ cảnh báo rủi ro.
 
-Cơ quan thuế nhận diện: Một doanh nghiệp muốn bán được hàng ra (doanh thu) thì bắt buộc phải có nguồn gốc hàng hóa đầu vào (hoặc là tồn kho từ kỳ trước, hoặc là mua vào trong kỳ). Nếu một doanh nghiệp không có kho, không mua hàng vào mà đột nhiên xuất hóa đơn hàng chục, hàng trăm tỷ thì 99% là xuất hóa đơn khống.
-
-### 4.2 Công Thức Xác Định Hệ Số K
+### 5.2 Công Thức Tính Tham Số Nguồn Hàng K Tham Chiếu
 
 ```text
 Hệ số K = (Tổng giá trị hàng hóa bán ra trên hóa đơn) / (Tổng giá trị hàng tồn kho + Tổng giá trị hàng hóa mua vào)
 ```
 
 *Trong đó:*
-- **Tử số:** Tổng giá trị hàng hóa, dịch vụ bán ra trên các hóa đơn điện tử đã phát hành trong kỳ (chưa bao gồm thuế GTGT).
-- **Mẫu số:** Tổng giá trị nguồn hàng đầu vào gồm:
-  + Tổng giá trị hàng tồn kho đầu kỳ (căn cứ theo Báo cáo tài chính hoặc Tờ khai quyết toán năm trước).
-  + Tổng giá trị hàng hóa mua vào trên các hóa đơn điện tử đầu vào đã tiếp nhận trong kỳ (chưa bao gồm thuế GTGT).
+- **Tử số:** Tổng doanh số hàng hóa, dịch vụ bán ra trên hóa đơn điện tử trong kỳ (chưa gồm thuế GTGT).
+- **Mẫu số:** Nguồn hàng hóa đầu vào gồm giá trị hàng tồn kho đầu kỳ cộng giá trị hàng hóa mua vào trong kỳ (chưa gồm thuế GTGT).
 
-### 4.3 Phân Định Ngưỡng An Toàn & Phản Ứng Của Ngành Thuế
+### 5.3 Phân Định Ngưỡng Cảnh Báo Heuristic & Hành Động Của Doanh Nghiệp
+
+> [!NOTE]
+> **Lưu ý nghiệp vụ:** Các dải ngưỡng K dưới đây là **tham số heuristic tham khảo từ thực tiễn hành nghề tư vấn thuế**, không phải quy định pháp lý cứng cho mọi ngành nghề. Tùy theo vòng quay vốn và tỷ suất lợi nhuận gộp của từng ngành (bán lẻ, sản xuất, xây dựng, dịch vụ), biên độ an toàn của K sẽ có sự khác biệt.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                   THƯỚC ĐO HỆ SỐ K THEO CÔNG VĂN 2392/TCT-QLRR              │
+│                    DẢI CẢNH BÁO THAM SỐ K THAM CHIẾU NỘI BỘ                 │
 ├─────────────────────┬───────────────────┬───────────────────────────────────┤
-│    KHOẢNG HỆ SỐ K   │     PHÂN VÙNG     │     HÀNH ĐỘNG CỦA CƠ QUAN THUẾ    │
+│    KHOẢNG HỆ SỐ K   │     PHÂN VÙNG     │     ĐÁNH GIÁ & PHẢN ỨNG NỘI BỘ    │
 ├─────────────────────┼───────────────────┼───────────────────────────────────┤
-│   1.05 ≤ K ≤ 1.25   │ VÙNG XANH         │ Hệ thống đánh giá hoạt động bình  │
-│                     │ (An toàn)         │ thường, doanh nghiệp có tỷ suất   │
-│                     │                   │ lợi nhuận gộp hợp lý.             │
+│   1.05 ≤ K ≤ 1.25   │ VÙNG XANH         │ Hoạt động cân bằng, tỷ suất lãi   │
+│                     │ (An toàn)         │ gộp hợp lý so với nguồn hàng.     │
 ├─────────────────────┼───────────────────┼───────────────────────────────────┤
-│   0.95 ≤ K < 1.05   │ VÙNG VÀNG         │ Hệ thống đưa vào danh sách theo   │
-│         hoặc        │ (Cảnh báo nhẹ)    │ dõi biến động. Chưa yêu cầu giải  │
-│   1.25 < K ≤ 1.35   │                   │ trình nếu không có dấu hiệu khác. │
+│   0.95 ≤ K < 1.05   │ VÙNG VÀNG         │ Có sự biến động về tồn kho hoặc   │
+│         hoặc        │ (Cần lưu ý)       │ doanh thu, cần theo dõi sát.      │
+│   1.25 < K ≤ 1.35   │                   │                                   │
 ├─────────────────────┼───────────────────┼───────────────────────────────────┤
-│      K < 0.95       │ VÙNG ĐỎ           │ Hệ thống tự động đẩy vào:         │
-│         hoặc        │ (Nguy cơ cao)     │ "Danh sách NNT thuộc diện giám sát│
-│      K > 1.35       │                   │ xuất HĐ vượt ngưỡng an toàn".     │
-│                     │                   │ Cơ quan thuế gửi giấy mời giải    │
-│                     │                   │ trình hoặc tạm dừng cấp mã HĐ.    │
+│      K < 0.95       │ VÙNG ĐỎ           │ Mua vào tăng vọt nhưng bán chậm,  │
+│         hoặc        │ (Rủi ro cao)      │ hoặc bán ra vượt xa nguồn hàng.   │
+│      K > 1.35       │                   │ Nguy cơ bị cơ quan thuế gửi thông │
+│                     │                   │ báo yêu cầu giải trình số liệu.   │
 └─────────────────────┴───────────────────┴───────────────────────────────────┘
 ```
 
-- **K > 1.35 (Bán ra vượt quá xa nguồn hàng):** Doanh nghiệp có dấu hiệu xuất khống hóa đơn đầu ra khi nguồn hàng không đủ, buôn bán hóa đơn lòng vòng.
-- **K < 0.95 (Mua vào ồ ạt nhưng không bán được):** Doanh nghiệp có dấu hiệu gom hóa đơn đầu vào trôi nổi để hợp thức hóa chi phí trốn thuế TNDN hoặc mua hóa đơn để rút tiền hoàn thuế GTGT.
-- **Nghiệp vụ kế toán thực tế:** Khi kế toán tiếp nhận một lô hóa đơn mua sắm vật tư có giá trị lớn bất thường (ví dụ ca `TC-14` mua 4.86 tỷ), mẫu số tăng đột biến làm Hệ số K tụt dốc xuống 0.88 (Vùng Đỏ). Kế toán viên không thể tự ý duyệt kê khai mà bắt buộc phải chuyển tiếp lên Giám đốc Tài chính (CFO) để cân nhắc: Kê khai ngay kỳ này kèm phương án giải trình, hay giãn tiến độ kê khai sang kỳ sau để giữ Hệ số K ở Vùng Xanh an toàn.
+#### Hành Động Đúng Đắn Của Kế Toán Trưởng & CFO Khi K Rơi Vào Vùng Đỏ:
+- **Tuyệt đối KHÔNG trì hoãn việc kê khai hợp pháp:** Mọi hóa đơn hợp lệ phát sinh trong kỳ phải được kê khai trung thực theo đúng kỳ tính thuế quy định của pháp luật. Trì hoãn kê khai để "làm đẹp" chỉ số rủi ro là hành vi sai lệch chuẩn mực kế toán.
+- **Chủ động lập Hồ sơ Giải trình Nguồn hàng (Tax Defense Dossier):** Khi tiếp nhận các lô mua sắm vật tư lớn (làm mẫu số tăng vọt khiến K tụt xuống dưới 0.95), Kế toán trưởng và CFO cần chỉ đạo chuẩn bị sẵn sàng hồ sơ chứng minh giao dịch có thật (hợp đồng dự án, phiếu nhập kho thực tế, tiến độ thi công công trình) để giải trình ngay khi cơ quan Thuế có văn bản tra soát.
 
 ---
 
-## 5. BẢN ĐỒ PHÂN CÔNG CÔNG VIỆC & MA TRẬN THẨM QUYỀN TRONG PHÒNG KẾ TOÁN (RACI MATRIX)
+## 6. BẢN ĐỒ PHÂN CÔNG CÔNG VIỆC & MA TRẬN THẨM QUYỀN TRONG PHÒNG KẾ TOÁN (RACI)
 
-Một phòng kế toán tài chính doanh nghiệp chuẩn mực thường được phân cấp thành 4 tầng bậc rõ ràng:
+Một phòng tài chính - kế toán doanh nghiệp được phân nhiệm rõ ràng để đảm bảo nguyên tắc kiểm soát chéo và trách nhiệm giải trình:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│              SƠ ĐỒ PHÂN CẤP THẨM QUYỀN 4 TẦNG TRONG PHÒNG TÀI CHÍNH         │
+│              SƠ ĐỒ PHÂN CẤP THẨM QUYỀN NỘI BỘ TRONG DOANH NGHIỆP             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│   [TẦNG 4]  GIÁM ĐỐC TÀI CHÍNH (CFO) / TỔNG GIÁM ĐỐC (CEO)                  │
-│             • Phê duyệt chi phí đặc thù ≥ 200 triệu VNĐ                     │
-│             • Quản trị Hệ số K & Chiến lược phòng vệ thanh tra thuế         │
-│             • Ký duyệt Báo cáo tài chính & Quyết toán thuế năm              │
+│   [CẤP 3]  GIÁM ĐỐC TÀI CHÍNH (CFO) / TỔNG GIÁM ĐỐC (CEO)                   │
+│            • Phê duyệt các khoản chi đặc thù, giảm giá, bồi thường ≥ 200M   │
+│            • Quản trị rủi ro thanh tra thuế & Ký duyệt BCTC, Quyết toán năm │
+│            • Quyết định chiến lược ứng phó khi Hệ số K chạm Vùng Đỏ         │
 │                                  ▲                                          │
 │                                  │ (Chuyển tiếp khi vượt hạn mức/rủi ro cao)│
-│   [TẦNG 3]  KẾ TOÁN TRƯỞNG (CHIEF ACCOUNTANT - KTT)                         │
-│             • Chịu trách nhiệm pháp lý cao nhất về sổ sách và tờ khai       │
-│             • Phán quyết xử lý hóa đơn sai phạm (Nhóm 1 & Nhóm 2)           │
-│             • Hạn mức tự duyệt: Các khoản chi phí thông thường < 200M       │
+│   [CẤP 2]  KẾ TOÁN TRƯỞNG (CHIEF ACCOUNTANT - KTT)                          │
+│            • Chịu trách nhiệm pháp lý trực tiếp về tính đúng đắn của sổ sách │
+│            • Phán quyết xử lý hóa đơn sai phạm (Nhóm 1 & Nhóm 2)            │
+│            • Hạn mức tự duyệt: Hóa đơn điều chỉnh/chi phí thông thường < 200M│
 │                                  ▲                                          │
-│                                  │ (Chuyển tiếp khi phát hiện dấu hiệu rủi ro)
-│   [TẦNG 2]  KẾ TOÁN THUẾ / KẾ TOÁN TỔNG HỢP (TAX ACCOUNTANT)               │
-│             • Tra cứu tính hợp pháp trên Cổng hoadondientu.gdt.gov.vn       │
-│             • Đối soát ma trận thuế 8% vs 10%, kiểm tra điều kiện UNC       │
-│             • Lập Bảng kê, Tờ khai 01/GTGT, tính thuế TNDN tạm tính         │
-│                                  ▲                                          │
-│                                  │ (Chuyển tiếp chứng từ đã kiểm tra)       │
-│   [TẦNG 1]  KẾ TOÁN VIÊN / KẾ TOÁN THANH TOÁN (STAFF ACCOUNTANT)            │
-│             • Tiếp nhận hóa đơn, kiểm tra tính đầy đủ hình thức             │
-│             • Tự động xử lý các hóa đơn thường quy < 20M (ROUTINE)          │
-│             • Thu thập UNC ngân hàng, phiếu nhập kho, bảng kê món ăn        │
+│                                  │ (Chuyển tiếp chứng từ nghi vấn)          │
+│   [CẤP 1]  KẾ TOÁN VIÊN / KẾ TOÁN THUẾ (STAFF / TAX ACCOUNTANT)             │
+│            • Kiểm tra tính hợp lệ hình thức, tra cứu Cục Thuế               │
+│            • Xử lý luồng hóa đơn thường quy hợp lệ (ROUTINE)                 │
+│            • Lập bảng kê, dự thảo Tờ khai 01/GTGT, tạm tính thuế TNDN       │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Ma Trận Trách Nhiệm RACI Trong Xử Lý Hóa Đơn & Thuế
-- **R (Responsible):** Người trực tiếp thực hiện công việc.
+### Ma Trận Trách Nhiệm RACI
+- **R (Responsible):** Người trực tiếp thực hiện.
 - **A (Accountable):** Người chịu trách nhiệm phê duyệt cuối cùng và giải trình trước pháp luật.
-- **C (Consulted):** Người được tham vấn ý kiến nghiệp vụ chuyên sâu.
+- **C (Consulted):** Người được tham vấn chuyên môn.
 - **I (Informed):** Người được thông báo kết quả.
 
-| Công việc / Nghiệp vụ Kế toán | Kế toán viên (KTV) | Kế toán Thuế (KTT/TH) | Kế toán trưởng (KTT) | Giám đốc CFO / CEO |
-| :--- | :---: | :---: | :---: | :---: |
-| Tiếp nhận hóa đơn & kiểm tra tính hợp lệ ban đầu | **R / A** | C | I | I |
-| Duyệt tự động hóa đơn thường quy hợp lệ < 20M | **R** | A | I | I |
-| Tra cứu tính hợp pháp MST người bán (Active/Closed) | **R** | R / A | C | I |
-| Xử lý hóa đơn mờ số tiền, thiếu HĐ gốc (Nhóm 1: UNCERTAIN) | R | R | **A** | I |
-| Xử lý hóa đơn sai thuế 8%, tiền mặt ≥ 20M (Nhóm 2: OUT_OF_POLICY) | C | R | **A** | I |
-| Xử lý hóa đơn điều chỉnh/bồi thường ≥ 200M (Nhóm 3: EXCEED) | I | C | R | **A** |
-| Đánh giá biến động Hệ số K rơi vào Vùng Đỏ | I | R | C | **A** |
-| Lập Tờ khai thuế GTGT 01/GTGT và ký nộp điện tử | C | R | **A** | I |
+| Nghiệp vụ Quản trị Thuế & Hóa đơn | Kế toán viên (KTV) | Kế toán Thuế | Kế toán trưởng (KTT) | CFO / CEO |
+| :--- | :--- :--- | :--- :--- | :--- :--- | :--- :--- |
+| Tiếp nhận hóa đơn & kiểm tra tiêu thức hợp lệ | **R / A** | C | I | I |
+| Xử lý hóa đơn thường quy hợp lệ (ROUTINE) | **R** | A | I | I |
+| Tra cứu tính hợp pháp MST người bán trên Cổng thuế | **R** | R / A | C | I |
+| Xử lý hóa đơn mờ số tiền, thiếu mã HĐ gốc (Nhóm 1: UNCERTAIN) | R | R | **A** | I |
+| Xử lý hóa đơn sai thuế 8%, tiền mặt ≥ 5M (Nhóm 2: OUT_OF_POLICY) | C | R | **A** | I |
+| Phê duyệt khoản chi giảm giá, bồi thường ≥ 200M (Nhóm 3: EXCEED) | I | C | R | **A** |
+| Đánh giá biến động Hệ số K chạm Vùng Đỏ | I | R | C | **A** |
+| Lập Tờ khai thuế GTGT (01/GTGT) và ký nộp điện tử | C | R | **A** | I |
 | Ký duyệt Báo cáo tài chính & Quyết toán thuế năm | I | C | R | **A** |
-| Làm việc và giải trình với đoàn Thanh tra thuế | C | R | **R / A** | **A** |
+| Trực tiếp làm việc và giải trình với Đoàn Thanh tra thuế | C | R | **R / A** | **A** |
 
 ---
 
-## 6. CHU KỲ CÔNG VIỆC CỦA KẾ TOÁN TRONG MỘT NĂM TÀI CHÍNH
+## 7. CHU KỲ CÔNG VIỆC CỦA KẾ TOÁN TRONG MỘT NĂM TÀI CHÍNH
 
-Công việc của một kế toán doanh nghiệp được phân bổ theo nhịp điệu thời gian khắt khe:
+Công việc kế toán thuế được vận hành theo chu kỳ thời gian nghiêm ngặt:
 
 ```text
 HÀNG NGÀY ──────> HÀNG THÁNG ──────> HÀNG QUÝ ──────> CUỐI NĂM & QUYẾT TOÁN
@@ -376,100 +436,85 @@ HÀNG NGÀY ──────> HÀNG THÁNG ──────> HÀNG QUÝ ─�
   kiểm tra UNC)     sổ phụ NH)         nộp tờ khai)        kiểm toán & thanh tra)
 ```
 
-### 6.1 Công Việc Hàng Ngày (Daily Workflow)
-1. Thu thập hóa đơn đầu vào phát sinh trong ngày từ các phòng ban (mua hàng, hành chính, kinh doanh).
-2. Kiểm tra tính hợp lệ hình thức và tra cứu tính hợp pháp trên Cổng hóa đơn điện tử TCT.
-3. Kiểm tra chứng từ thanh toán ngân hàng (Ủy nhiệm chi) đối với các giao dịch từ 20 triệu VNĐ trở lên.
-4. Lập phiếu thu, phiếu chi, phiếu nhập kho, hạch toán các nghiệp vụ kinh tế phát sinh vào phần mềm kế toán.
-5. Theo dõi dòng tiền và số dư tài khoản ngân hàng hàng ngày.
+### 7.1 Công Việc Hàng Ngày (Daily)
+1. Tiếp nhận hóa đơn mua vào, đối chiếu với đơn đặt hàng và phiếu nhập kho.
+2. Kiểm tra chứng từ thanh toán ngân hàng (UNC) đối với các giao dịch từ 5.000.000 VNĐ trở lên.
+3. Tra cứu tính hợp pháp của hóa đơn trên Cổng thông tin hóa đơn điện tử của Cục Thuế.
+4. Hạch toán các nghiệp vụ kinh tế phát sinh vào phần mềm kế toán theo Thông tư 99/2025/TT-BTC.
 
-### 6.2 Công Việc Hàng Tháng (Monthly Workflow)
-1. Đối soát sổ phụ ngân hàng, lập biên bản đối chiếu số dư tiền gửi ngân hàng.
-2. Đối soát công nợ phải thu (TK 131) và công nợ phải trả (TK 331), gửi thư xác nhận công nợ với các đối tác lớn.
-3. Tính lương, trích các khoản bảo hiểm bắt buộc (BHXH, BHYT, BHTN, KPCĐ) và hạch toán bảng lương.
-4. Trích khấu hao tài sản cố định (TK 214) và phân bổ chi phí trả trước ngắn hạn, dài hạn (TK 242).
-5. Nộp Tờ khai thuế GTGT, TNCN tháng (nếu doanh nghiệp thuộc diện kê khai theo tháng, hạn ngày 20).
+### 7.2 Công Việc Hàng Tháng (Monthly)
+1. Đối chiếu sổ phụ ngân hàng, lập biên bản đối soát tiền gửi.
+2. Đối chiếu công nợ phải thu (TK 131) và công nợ phải trả (TK 331).
+3. Tính lương, trích bảo hiểm bắt buộc và thuế TNCN phát sinh trong tháng.
+4. Trích khấu hao tài sản cố định và phân bổ chi phí trả trước.
+5. Nộp Tờ khai thuế GTGT và TNCN tháng (đối với doanh nghiệp có doanh thu năm trước trên 50 tỷ, hạn ngày 20).
 
-### 6.3 Công Việc Hàng Quý (Quarterly Workflow - Cao Điểm Thuế)
-1. **Kiểm tra và chốt bảng kê hóa đơn mua vào - bán ra trong quý:** Rà soát toàn bộ hóa đơn sót, hóa đơn điều chỉnh, hủy bỏ.
-2. **Tính toán Hệ số rủi ro K của quý:** Đối chiếu tổng doanh thu bán ra với tổng nguồn hàng (tồn kho đầu quý + mua vào trong quý) theo Công văn 2392/TCT-QLRR để đảm bảo nằm trong Vùng Xanh an toàn.
-3. **Lập và nộp Tờ khai thuế GTGT (Mẫu 01/GTGT):** Hạn chót là ngày cuối cùng của tháng đầu tiên của quý sau.
-4. **Lập và nộp Tờ khai khấu trừ thuế TNCN (Mẫu 05/KK-TNCN).**
-5. **Tính toán số thuế TNDN tạm nộp quý:** Lập bảng tính kết quả kinh doanh quý, xác định số thuế TNDN tạm nộp và thực hiện nộp tiền vào NSNN (đảm bảo tích lũy 4 quý đạt tối thiểu 80%).
+### 7.3 Công Việc Hàng Quý (Quarterly - Cao Điểm Kê Khai)
+1. Kiểm tra, chốt bảng kê hóa đơn mua vào - bán ra trong quý.
+2. Tính toán tham số nguồn hàng K theo Công văn 2392/TCT-QLRR để nhận diện sớm rủi ro biến động.
+3. Lập và nộp Tờ khai thuế GTGT (Mẫu 01/GTGT theo Thông tư 89/2026/TT-BTC) trước ngày cuối cùng của tháng đầu quý sau.
+4. Lập và nộp Tờ khai khấu trừ thuế TNCN (Mẫu 05/KK-TNCN).
+5. Tự tính toán và nộp tiền thuế TNDN tạm nộp quý (đảm bảo tích lũy 4 quý đạt tối thiểu 80%).
 
-### 6.4 Công Việc Cuối Năm & Quyết Toán Thuế (Year-End Peak Season)
-Thời gian từ tháng 1 đến tháng 3 năm sau là giai đoạn căng thẳng nhất của nghề kế toán:
-1. **Thực hiện kiểm kê thực tế tài sản:** Kiểm kê quỹ tiền mặt, kiểm kê toàn bộ hàng tồn kho tại các kho bãi, kiểm kê tài sản cố định và đối chiếu với sổ sách kế toán.
-2. **Trích lập các khoản dự phòng:** Dự phòng giảm giá hàng tồn kho, dự phòng nợ phải thu khó đòi, dự phòng tổn thất tài chính theo Thông tư 48/2019/TT-BTC.
-3. **Thực hiện các bút toán kết chuyển cuối năm:** Kết chuyển doanh thu, chi phí, xác định kết quả kinh doanh lãi/lỗ (TK 911).
-4. **Lập Báo cáo tài chính năm:** Bảng Cân đối kế toán (Mẫu B01-DN), Báo cáo Kết quả hoạt động kinh doanh (Mẫu B02-DN), Báo cáo Lưu chuyển tiền tệ (Mẫu B03-DN), Bản Thuyết minh BCTC (Mẫu B09-DN).
-5. **Lập Tờ khai Quyết toán thuế TNDN (Mẫu 03/TNDN) & Thuế TNCN (Mẫu 05/QTT-TNCN).**
-6. **Hạn nộp toàn bộ hồ sơ BCTC và Quyết toán thuế:** Chậm nhất ngày **31/03** của năm tiếp theo.
-7. **In ấn, đóng chứng từ và lưu trữ hồ sơ kế toán:** In sổ cái, sổ chi tiết, phiếu thu, phiếu chi, kẹp cùng hóa đơn và chứng từ gốc, đóng tập và lưu kho bảo mật trong thời gian tối thiểu 10 năm theo Luật Kế toán.
+### 7.4 Công Việc Cuối Năm & Quyết Toán Thuế (Year-End Closure)
+1. Kiểm kê quỹ tiền mặt, kiểm kê kho hàng tồn kho thực tế, kiểm kê tài sản cố định.
+2. Trích lập dự phòng giảm giá hàng tồn kho, dự phòng nợ phải thu khó đòi.
+3. Lập Báo cáo tài chính năm (Bảng Cân đối kế toán, Báo cáo KQHĐKD, Báo cáo LCTT, Thuyết minh BCTC).
+4. Lập Tờ khai Quyết toán thuế TNDN (Mẫu 03/TNDN) và Thuế TNCN (Mẫu 05/QTT-TNCN).
+5. Hạn chót nộp BCTC và hồ sơ quyết toán: Chậm nhất ngày cuối cùng của tháng thứ 3 kể từ khi kết thúc năm tài chính (ngày **31/03** của năm tiếp theo đối với năm tài chính trùng năm dương lịch).
+6. In đóng chứng từ, lưu trữ file XML hóa đơn gốc an toàn trong thời hạn tối thiểu 10 năm theo Luật Kế toán.
 
 ---
 
-## 7. QUY TRÌNH KHI BỊ CƠ QUAN THUẾ KIỂM TRA, THANH TRA & HỒ SƠ PHÒNG VỆ THUẾ
+## 8. QUY TRÌNH GIẢI TRÌNH KHI THANH TRA THUẾ & BỘ CHỨNG CỨ PHÒNG VỆ 4 LỚP
 
-### 7.1 Quy Trình Xử Lý Khi Nhận Thông Báo Của Cơ Quan Thuế
-Căn cứ Điều 110 Luật Quản lý thuế số 38/2019/QH14:
+### 8.1 Bộ Hồ Sơ Chứng Cứ Phòng Vệ 4 Lớp (Tax Defense Dossier)
+Khi cơ quan thuế kiểm tra hoặc gửi yêu cầu giải trình đối với các hóa đơn có dấu hiệu rủi ro, doanh nghiệp cần xuất trình ngay **Bộ Chứng cứ 4 Lớp (Evidence Package)** để bảo vệ tính có thật của giao dịch:
 
 ```text
-[NHẬN THÔNG BÁO / QUYẾT ĐỊNH CỦA THUẾ]
-                │
-                ▼
-      ┌──────────────────┐
-      │  Rà soát nội bộ  │ (Đối chiếu danh sách hóa đơn, kiểm tra 4 lớp chứng từ)
-      └─────────┬────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ Lập Hồ sơ Giải   │ (Tax Defense Dossier: Trích dẫn văn bản luật, hợp đồng,
-      │ trình Tuân thủ   │  phiếu kho, UNC, biên bản đối soát chữ ký số)
-      └─────────┬────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ Làm việc với     │ (Giải trình trực tiếp tại trụ sở Thuế hoặc kiểm tra
-      │ Đoàn Thanh tra   │  tại trụ sở DN trong 5 - 10 ngày làm việc)
-      └─────────┬────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ Ký Biên bản      │ (Ghi nhận số liệu thống nhất, bảo lưu ý kiến nếu có)
-      │ Thanh tra Thuế   │
-      └──────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    BỘ CHỨNG CỨ PHÒNG VỆ THUẾ 4 LỚP                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ • LỚP 1: HÓA ĐƠN ĐIỆN TỬ HỢP PHÁP                                           │
+│   File dữ liệu gốc XML kèm chữ ký số hợp lệ của người bán; mã tra cứu Cục   │
+│   Thuế; ngày lập và ký số trước thời điểm người bán có biến động MST.       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ • LỚP 2: CƠ SỞ PHÁP LÝ & THỎA THUẬN KINH TẾ                                 │
+│   Hợp đồng kinh tế có hiệu lực pháp luật, phụ lục điều khoản giao nhận, đơn │
+│   đặt hàng (PO), báo giá, thỏa thuận bảo hành và trách nhiệm bồi thường.    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ • LỚP 3: CHỨNG CỨ GIAO NHẬN THỰC TẾ (TÍNH CÓ THẬT CỦA HÀNG HÓA / DỊCH VỤ)   │
+│   Biên bản bàn giao hàng hóa, phiếu xuất kho bên bán, phiếu nhập kho công   │
+│   ty, biên bản nghiệm thu dịch vụ, vận đơn/phiếu cân xe, hình ảnh tại kho.  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ • LỚP 4: CHỨNG CỨ DÒNG TIỀN MINH BẠCH (NON-CASH PAYMENT EVIDENCE)           │
+│   Ủy nhiệm chi ngân hàng có xác nhận của ngân hàng thương mại; sao kê đối   │
+│   chiếu tiền đi từ tài khoản công ty đến đúng tài khoản chính chủ bên bán.  │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 7.2 Bộ Hồ Sơ Phòng Vệ Thuế Chuẩn 4 Lớp (Tax Defense Dossier)
-Khi cơ quan thuế nghi ngờ hóa đơn đầu vào (đặc biệt là hóa đơn từ doanh nghiệp sau đó bỏ trốn hoặc hóa đơn giá trị lớn), kế toán cần xuất trình ngay lập tức **Bộ Hồ sơ 4 Lớp** để bảo vệ chi phí:
-1. **Lớp 1 - Hóa đơn hợp pháp:** File XML gốc kèm mã tra cứu của cơ quan thuế, thời điểm lập và ký số trước ngày đối tác ngừng hoạt động.
-2. **Lớp 2 - Cơ sở pháp lý & Hợp đồng giao dịch:** Hợp đồng kinh tế có hiệu lực pháp luật, các phụ lục hợp đồng, điều khoản giao nhận và bảo hành rõ ràng.
-3. **Lớp 3 - Chứng cứ giao nhận thực tế (Tính có thật của hàng hóa):** Biên bản bàn giao, phiếu xuất kho bên bán, phiếu nhập kho công ty mình, biên bản nghiệm thu, vận đơn/phiếu cân hàng, hình ảnh bốc dỡ hàng tại kho.
-4. **Lớp 4 - Chứng cứ dòng tiền minh bạch:** Ủy nhiệm chi ngân hàng có đóng dấu của ngân hàng thương mại, sao kê tài khoản ngân hàng thể hiện rõ tiền đi từ tài khoản công ty đến đúng tài khoản người thụ hưởng.
-
 ---
 
-## 8. ĐỐI CHIẾU THỰC TIỄN VỚI THIẾT KẾ HỆ THỐNG TAX REFEREE
+## 9. ĐỐI CHIẾU THỰC TIỄN VỚI THIẾT KẾ CỦA HỆ THỐNG TAX REFEREE
 
-Hệ thống **Tax Referee** được thiết kế chính xác để số hóa và tự động hóa các mắt xích yếu nhất trong chuỗi quy trình kế toán thuế thực tế nói trên:
+Hệ thống **Tax Referee** được thiết kế chính xác để số hóa và tự động hóa các mắt xích rủi ro cao nhất trong chuỗi quy trình kế toán thuế thực tế:
 
-| Vấn Đề Khốc Liệt Trong Thực Tế | Rủi Ro Kế Toán Thường Gặp | Tính Năng Đối Ứng Của Tax Referee | Giá Trị Mang Lại Cho Doanh Nghiệp |
+| Thách Thức Nghiệp Vụ Thực Tế | Rủi Ro Kế Toán Đối Mặt | Tính Năng Đối Ứng Của Tax Referee | Giá Trị Thực Tiễn Mang Lại |
 | :--- | :--- | :--- | :--- |
-| **Quá tải nhập liệu hóa đơn thường quy** | Kế toán viên mất 80% thời gian gõ tay hóa đơn điện, nước, VP phẩm; dễ nhập sai số tiền, sai thuế suất. | **Nhánh ROUTINE (Straight-Through Processing):** Tự động duyệt ngầm trong < 15ms, tự cộng Tờ khai 01/GTGT, ghi Audit Log. | Tiết kiệm 80% thời gian nhập liệu cho kế toán viên; loại bỏ hoàn toàn lỗi gõ nhầm số liệu. |
-| **Bẫy áp sai thuế suất 8% theo NĐ 72/2024** | Viễn thông, CNTT bị xuất nhầm 8%; cơ quan thuế kiểm tra bóc chi phí, truy thu và phạt 20%. | **Nhóm 2 OUT_OF_POLICY:** Tự động đối chiếu danh mục loại trừ, cắm cờ và sinh câu hỏi A/B: Yêu cầu NCC xuất lại 10% hay loại thuế. | Chặn đứng 100% nguy cơ bị truy thu thuế do lỗi xuất nhầm của nhà cung cấp. |
-| **Bẫy tiền mặt ≥ 20M theo Thông tư 219** | Nhân viên thanh toán tiền mặt đem bill về; kế toán sơ suất kê khai khấu trừ, bị thuế gạt ra. | **Zero-Hallucination Guardrail:** Hóa đơn tiền mặt ≥ 20M tuyệt đối không có `approvedTaxAmount`. | Bảo đảm tính tuân thủ tuyệt đối quy định thanh toán không dùng tiền mặt. |
-| **Bẫy NCC đóng MST theo Nghị định 123** | Kế toán không phân biệt được hóa đơn xuất trước hay sau ngày đóng MST, dẫn đến nguy cơ hình sự. | **Logic Mốc thời gian SOP 2.2:**<br/>• Xuất TRƯỚC ngày đóng -> Phân vào `UNCERTAIN_INFO` (treo chờ xác minh hồ sơ).<br/>• Xuất SAU ngày đóng -> Phân vào `OUT_OF_POLICY` (cấm hạch toán 100%). | Bảo vệ doanh nghiệp và cá nhân Kế toán trưởng trước nguy cơ dính líu đến án hóa đơn khống. |
-| **Bẫy Hệ số K của Tổng cục Thuế (CV 2392)** | Mua vào ồ ạt đẩy Hệ số K rơi vào Vùng Đỏ (< 0.95); doanh nghiệp bị đưa vào danh sách kiểm tra đột xuất. | **Giám sát K-Factor Thời gian thực:** Tự động tính K kỳ này; nếu chạm Vùng Đỏ, cắm cờ `EXCEED_AUTHORITY` và yêu cầu CFO duyệt. | Trao quyền kiểm soát rủi ro toàn cục cho Giám đốc Tài chính (CFO), tránh bị thanh tra đột xuất. |
-| **Sợ bị đổ lỗi & Thiếu bằng chứng giải trình** | Kế toán viên và KTT bất an khi ký duyệt; khi bị thuế phạt thì mất 2-3 tuần lục tìm chứng từ. | **Audit Trail & 1-Click Tax Defense Dossier:** Lưu vết minh bạch 100% kèm mã băm SHA-256, xuất hồ sơ giải trình in PDF trong 1 giây. | Cung cấp "lá chắn pháp lý" bảo vệ kế toán và doanh nghiệp trước mọi đoàn thanh tra thuế. |
+| **Quá tải hóa đơn thường quy** | Kế toán mất 80% thời gian nhập liệu thủ công tiền điện, nước, cước mạng; dễ gõ sai số tiền và thuế. | **Nhánh ROUTINE (Straight-Through):** Tự động duyệt ngầm trong < 15ms, tự cộng Tờ khai 01/GTGT, ghi Audit Log. | Giải phóng 80% áp lực nhập liệu; loại bỏ hoàn toàn lỗi gõ nhầm số liệu của con người. |
+| **Bẫy áp sai thuế suất 8% theo NQ 204** | Áp sai thuế suất đối với hàng hóa thuộc danh mục loại trừ; bị cơ quan thuế bóc chi phí và phạt 20%. | **Nhóm 2 OUT_OF_POLICY:** Đối soát danh mục loại trừ, cắm cờ và sinh câu hỏi A/B: Yêu cầu xuất lại 10% hay loại thuế. | Giúp Kế toán trưởng xử lý ngay trong kỳ, tránh bị truy thu thuế sau 3 năm thanh tra. |
+| **Ngưỡng thanh toán không tiền mặt 5M** | Bỏ sót điều kiện thanh toán không dùng tiền mặt cho hóa đơn từ 5 triệu đồng trở lên. | **Zero-Hallucination Guardrail:** Hóa đơn từ 5M thanh toán tiền mặt tuyệt đối không có `approvedTaxAmount`. | Đảm bảo tuân thủ nghiêm ngặt Luật Thuế GTGT số 48/2024/QH15. |
+| **Bẫy đối tác đóng MST** | Khó phân biệt tính pháp lý giữa hóa đơn lập trước và lập sau ngày bên bán đóng MST. | **Logic Mốc thời gian SOP 2.2:**<br/>• Lập TRƯỚC: Phân vào `UNCERTAIN_INFO` (treo chờ xác minh hồ sơ).<br/>• Lập SAU: Phân vào `OUT_OF_POLICY` (cấm hạch toán 100%). | Bảo vệ doanh nghiệp và KTT trước nguy cơ dính líu đến án hóa đơn bất hợp pháp. |
+| **Giám sát rủi ro Tham số K (CV 2392)** | Mua vật tư lớn đẩy Hệ số K vào Vùng Đỏ; doanh nghiệp bị đưa vào danh sách kiểm tra đột xuất. | **Giám sát K-Factor Thời gian thực:** Tự động tính toán tham số K; nếu vào Vùng Đỏ, kích hoạt `EXCEED_AUTHORITY` chuyển CFO. | Giúp Giám đốc Tài chính (CFO) chủ động nắm bắt vị thế rủi ro và chuẩn bị hồ sơ giải trình kịp thời. |
+| **Thiếu chứng cứ bảo vệ khi thanh tra** | Bị cơ quan thuế xuất toán chi phí vì thiếu hồ sơ đối soát logic và chữ ký số xác thực. | **Audit Trail & 1-Click Tax Defense Dossier:** Lưu vết 100% kèm mã băm SHA-256; xuất bộ hồ sơ giải trình in PDF trong 1 giây. | Cung cấp tài liệu hỗ trợ đắc lực giúp doanh nghiệp giải trình thuyết phục trước cơ quan Thuế. |
 
 ---
 
-## 9. LỜI KẾT: TƯ DUY NỀN TẢNG CHO ĐỘI NGŨ PHÁT TRIỂN & CHẤM THI
+## 10. LỜI KẾT: TƯ DUY NỀN TẢNG CỦA TAX REFEREE
 
 Một tác tử AI trong quản trị thuế doanh nghiệp (The Escalation Referee) **không phải là cố gắng thay thế con người làm mọi việc**, mà là:
-1. **Làm cỗ máy lọc sạch tự động (The Silent Processor):** Âm thầm xử lý 80-90% các công việc thường quy, chuẩn tắc, tẻ nhạt với độ chính xác tuyệt đối.
-2. **Làm trọng tài cảnh giới nhạy bén (The Vigilant Referee):** Dừng ngay tự động hóa khi phát hiện bất thường dù là nhỏ nhất, không bao giờ tự ý bịa đặt (Zero-Hallucination).
-3. **Làm trợ lý tham mưu đắc lực trong 3 giây (The 3-Second Co-pilot):** Cung cấp cho Kế toán trưởng và CFO đầy đủ căn cứ luật, giải thích bình dân và 2 phương án đối ứng rõ ràng để họ ra quyết định chính xác nhất.
+1. **Một cỗ máy lọc sạch tự động (The Silent Processor):** Âm thầm xử lý 80-90% các hóa đơn thường quy hợp lệ với tốc độ mili-giây và độ chính xác cao.
+2. **Một trọng tài cảnh giới chuẩn xác (The Vigilant Referee):** Cưỡng chế dừng tự động hóa ngay khi phát hiện dấu hiệu rủi ro, không bao giờ tự ý suy diễn (Zero-Hallucination).
+3. **Một trợ lý tham mưu đắc lực trong 3 giây (The 3-Second Co-pilot):** Cung cấp cho Kế toán trưởng và CFO đầy đủ căn cứ luật, giải thích bình dân và 2 phương án đối ứng rõ ràng để người có thẩm quyền ra quyết định tối cao.
 
-Tài liệu này là căn cứ chân lý nghiệp vụ để toàn bộ đội ngũ phát triển, kiểm thử và thuyết trình bám sát trong suốt quá trình hoàn thiện giải pháp Tax Referee tại Cuộc thi MLAI Hackathon 2026.
+Tài liệu này là căn cứ chân lý nghiệp vụ chuẩn xác, hiện đại và toàn diện nhất cho toàn bộ đội ngũ phát triển, kiểm thử và thuyết trình giải pháp Tax Referee tại Cuộc thi MLAI Hackathon 2026.

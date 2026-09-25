@@ -10,6 +10,10 @@
 /.next/
 /out/
 
+# Local pilot runtime data
+/data/runtime/
+/data/uploads/
+
 # Production build artifacts
 build
 dist
@@ -40,6 +44,8 @@ next-env.d.ts
 # IDEs and Editors
 .idea/
 .vscode/
+.kilo/
+graphify-out/
 *.suo
 *.ntvs*
 *.njsproj

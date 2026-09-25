@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice>
+    <InvoiceData>
+        <InvoiceNumber>0000003</InvoiceNumber>
+        <InvoiceSeries>MS23</InvoiceSeries>
+        <InvoiceDate>2026-01-17</InvoiceDate>
+        <InvoiceType>Normal</InvoiceType>
+        <CurrencyCode>VND</CurrencyCode>
+        <ExchangeRate>1</ExchangeRate>
+        <PaymentMethod>Cash</PaymentMethod>
+        <PaymentTerms>Immediate</PaymentTerms>
+        <Description>Office supplies order</Description>
+    </InvoiceData>
+    <SellerInfo>
+        <MST>0555666777</MST>
+        <CompanyName>MISA Office Supplies</CompanyName>
+        <Address>100 Pham Van Dong, Da Nang</Address>
+        <Phone>0236-333-4444</Phone>
+        <Email>order@misa-office.vn</Email>
+        <BankAccount>9999888877776666</BankAccount>
+        <BankName>Sacombank</BankName>
+    </SellerInfo>
+    <BuyerInfo>
+        <MST>0888999000</MST>
+        <CompanyName>GHI Consulting</CompanyName>
+        <Address>50 Nguyen Thi Minh Khai, HCMC</Address>
+        <Phone>028-5555-4444</Phone>
+        <Email>admin@ghi.vn</Email>
+        <BankAccount>1212343456567878</BankAccount>
+        <BankName>MB Bank</BankName>
+    </BuyerInfo>
+    <InvoiceDetail>
+        <Item>
+            <STT>1</STT>
+            <MaHang>PAPER001</MaHang>
+            <TenHang>A4 Paper</TenHang>
+            <MoTa>Premium quality A4 paper, 500 sheets/ream</MoTa>
+            <DVT>Ream</DVT>
+            <SoLuong>100</SoLuong>
+            <DonGia>80000</DonGia>
+            <ChietKhau>0</ChietKhau>
+            <TienCK>0</TienCK>
+            <ThanhTien>8000000</ThanhTien>
+            <ThueSuat>10</ThueSuat>
+            <TienThue>800000</TienThue>
+            <TongCong>8800000</TongCong>
+        </Item>
+        <Item>
+            <STT>2</STT>
+            <MaHang>PEN001</MaHang>
+            <TenHang>Ballpoint Pen</TenHang>
+            <MoTa>Blue ink, pack of 12</MoTa>
+            <DVT>Pack</DVT>
+            <SoLuong>50</SoLuong>
+            <DonGia>60000</DonGia>
+            <ChietKhau>5</ChietKhau>
+            <TienCK>150000</TienCK>
+            <ThanhTien>2850000</ThanhTien>
+            <ThueSuat>10</ThueSuat>
+            <TienThue>285000</TienThue>
+            <TongCong>3135000</TongCong>
+        </Item>
+    </InvoiceDetail>
+    <TotalSection>
+        <TongTienHang>10850000</TongTienHang>
+        <TongChietKhau>150000</TongChietKhau>
+        <TongTienThue>1085000</TongTienThue>
+        <TongThanhToan>11935000</TongThanhToan>
+        <SoTienBangChu>Eleven million nine hundred thirty-five thousand dong</SoTienBangChu>
+    </TotalSection>
+    <SignatureInfo>
+        <GiaTriChuKy>MISA-SIGN-003</GiaTriChuKy>
+        <NgayKy>2026-01-17</NgayKy>
+        <NguoiKy>Le Thi C</NguoiKy>
+        <ChucDanh>Sales Manager</ChucDanh>
+        <SoChungThu>MISA-CERT-003</SoChungThu>
+    </SignatureInfo>
+</Invoice>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice>
+    <InvoiceNo>0000001</InvoiceNo>
+    <InvoiceSeries>KK23</InvoiceSeries>
+    <InvoiceDate>2026-01-15</InvoiceDate>
+    <InvoiceType>Normal</InvoiceType>
+    <Currency>VND</Currency>
+    <ExchangeRate>1</ExchangeRate>
+    <Seller>
+        <Name>ABC Technology Company</Name>
+        <TaxID>0123456789</TaxID>
+        <Address>123 Nguyen Hue Street, District 1, HCMC</Address>
+        <PhoneNumber>028-1234-5678</PhoneNumber>
+        <Email>contact@abc.com.vn</Email>
+        <BankAccount>1234567890</BankAccount>
+        <BankName>Vietcombank</BankName>
+    </Seller>
+    <Buyer>
+        <Name>XYZ Corporation</Name>
+        <TaxID>9876543210</TaxID>
+        <Address>456 Le Loi Street, District 3, HCMC</Address>
+        <PhoneNumber>028-8765-4321</PhoneNumber>
+        <Email>purchase@xyz.com.vn</Email>
+        <BankAccount>0987654321</BankAccount>
+        <BankName>Techcombank</BankName>
+    </Buyer>
+    <Items>
+        <Item>
+            <ItemNo>1</ItemNo>
+            <ItemCode>PROD001</ItemCode>
+            <ItemName>Software License</ItemName>
+            <Description>Enterprise license - 1 year</Description>
+            <UnitOfMeasure>License</UnitOfMeasure>
+            <Quantity>2</Quantity>
+            <UnitPrice>5000000</UnitPrice>
+            <Discount>0</Discount>
+            <Amount>10000000</Amount>
+            <TaxRatePercent>10</TaxRatePercent>
+            <TaxAmount>1000000</TaxAmount>
+            <LineTotal>11000000</LineTotal>
+        </Item>
+        <Item>
+            <ItemNo>2</ItemNo>
+            <ItemCode>SVC001</ItemCode>
+            <ItemName>Support Service</ItemName>
+            <Description>24/7 technical support</Description>
+            <UnitOfMeasure>Month</UnitOfMeasure>
+            <Quantity>12</Quantity>
+            <UnitPrice>1000000</UnitPrice>
+            <Discount>10</Discount>
+            <Amount>12000000</Amount>
+            <TaxRatePercent>10</TaxRatePercent>
+            <TaxAmount>1080000</TaxAmount>
+            <LineTotal>11880000</LineTotal>
+        </Item>
+    </Items>
+    <SubtotalAmount>22000000</SubtotalAmount>
+    <TaxAmount>2080000</TaxAmount>
+    <TotalAmount>22880000</TotalAmount>
+    <PaymentTerms>Net 30</PaymentTerms>
+    <Remarks>Thank you for your business</Remarks>
+    <Signature>
+        <SignatureValue>ABC123DEF456</SignatureValue>
+        <SignatureDate>2026-01-15</SignatureDate>
+        <SignerName>Nguyen Van A</SignerName>
+        <SignerPosition>Director</SignerPosition>
+        <CertificateNo>CERT-2026-001</CertificateNo>
+    </Signature>
+</Invoice>

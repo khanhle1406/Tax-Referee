@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EInvoice>
+    <Header>
+        <InvoiceNumber>0000005</InvoiceNumber>
+        <InvoiceSeries>FP23</InvoiceSeries>
+        <InvoiceDate>2026-01-18</InvoiceDate>
+        <InvoiceType>Normal</InvoiceType>
+        <CurrencyCode>VND</CurrencyCode>
+        <ExchangeRate>1</ExchangeRate>
+        <PaymentMethod>Credit</PaymentMethod>
+        <DueDate>2026-02-18</DueDate>
+        <Notes>IT services and consulting</Notes>
+    </Header>
+    <Seller>
+        <CompanyCode>FPT001</CompanyCode>
+        <CompanyName>FPT Information System</CompanyName>
+        <TaxCode>0300300300</TaxCode>
+        <Address>FPT Tower, 10 Pham Van Bach, Hanoi</Address>
+        <PhoneNumber>024-7300-7300</PhoneNumber>
+        <EmailAddress>einvoice@fpt.com.vn</EmailAddress>
+        <BankAccountNo>9988776655443322</BankAccountNo>
+        <BankName>OCB</BankName>
+        <ContactPerson>Nguyen FPT</ContactPerson>
+    </Seller>
+    <Buyer>
+        <CompanyCode>MNO001</CompanyCode>
+        <CompanyName>MNO Manufacturing</CompanyName>
+        <TaxCode>0400400400</TaxCode>
+        <Address>Industrial Zone A, Binh Duong</Address>
+        <PhoneNumber>0274-888-9999</PhoneNumber>
+        <EmailAddress>ap@mno.com.vn</EmailAddress>
+        <BankAccountNo>1122334455667788</BankAccountNo>
+        <BankName>Agribank</BankName>
+        <ContactPerson>Tran MNO</ContactPerson>
+    </Buyer>
+    <Details>
+        <Line>
+            <LineNumber>1</LineNumber>
+            <ProductCode>CONSULT01</ProductCode>
+            <ProductName>IT Consulting</ProductName>
+            <ProductDesc>Digital transformation consulting - 40 hours</ProductDesc>
+            <UnitOfMeasure>Hour</UnitOfMeasure>
+            <Quantity>40</Quantity>
+            <UnitPrice>2000000</UnitPrice>
+            <DiscountRate>0</DiscountRate>
+            <DiscountAmount>0</DiscountAmount>
+            <LineAmount>80000000</LineAmount>
+            <VATRatePercent>10</VATRatePercent>
+            <VATAmount>8000000</VATAmount>
+            <LineTotal>88000000</LineTotal>
+        </Line>
+        <Line>
+            <LineNumber>2</LineNumber>
+            <ProductCode>DEV01</ProductCode>
+            <ProductName>Software Development</ProductName>
+            <ProductDesc>Custom ERP module development</ProductDesc>
+            <UnitOfMeasure>Project</UnitOfMeasure>
+            <Quantity>1</Quantity>
+            <UnitPrice>200000000</UnitPrice>
+            <DiscountRate>5</DiscountRate>
+            <DiscountAmount>10000000</DiscountAmount>
+            <LineAmount>190000000</LineAmount>
+            <VATRatePercent>10</VATRatePercent>
+            <VATAmount>19000000</VATAmount>
+            <LineTotal>209000000</LineTotal>
+        </Line>
+    </Details>
+    <Totals>
+        <SubTotal>270000000</SubTotal>
+        <TotalDiscount>10000000</TotalDiscount>
+        <TotalVAT>27000000</TotalVAT>
+        <GrandTotal>297000000</GrandTotal>
+        <AmountInWords>Two hundred ninety-seven million dong</AmountInWords>
+    </Totals>
+    <Signatures>
+        <SellerSignature>
+            <SignatureValue>FPT-SELLER-SIG-005</SignatureValue>
+            <SignedDateTime>2026-01-18T10:30:00</SignedDateTime>
+            <SignerFullName>Hoang Van E</SignerFullName>
+            <SignerJobTitle>Project Director</SignerJobTitle>
+            <CertificateSerial>FPT-CERT-2026-005</CertificateSerial>
+        </SellerSignature>
+        <BuyerSignature>
+            <SignatureValue>MNO-BUYER-SIG-005</SignatureValue>
+            <SignedDateTime>2026-01-18T11:00:00</SignedDateTime>
+            <SignerFullName>Vu Thi F</SignerFullName>
+            <SignerJobTitle>Finance Manager</SignerJobTitle>
+            <CertificateSerial>MNO-CERT-2026-001</CertificateSerial>
+        </BuyerSignature>
+    </Signatures>
+</EInvoice>

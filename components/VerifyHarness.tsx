@@ -10,10 +10,9 @@ interface VerifyResultItem {
   invoiceNumber: string;
   supplierName: string;
   totalAmount: number;
-  expectedStatus: 'ROUTINE' | 'ESCALATED';
   actualStatus: 'ROUTINE' | 'ESCALATED';
   riskGroup?: string;
-  passed: boolean;
+  schemaValid: boolean;
   executionTimeMs: number;
   actionableQuestion?: string;
   plainExplanation?: string;
@@ -24,7 +23,8 @@ interface VerifySummary {
   passedCases: number;
   routineCases: number;
   escalatedCases: number;
-  allPassed: boolean;
+  allSchemaValid: boolean;
+  verificationScope: string;
   totalTimeMs: number;
   timestamp: string;
 }
@@ -50,7 +50,7 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
       setResults(data.results);
       setHasRun(true);
 
-      if (data.summary?.allPassed) {
+      if (data.summary?.allSchemaValid) {
         confetti({
           particleCount: 50,
           spread: 60,
@@ -74,7 +74,7 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
             Bộ Công cụ Kiểm thử Tự động (Verify Harness)
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Thao tác 1 chạm dành cho Giám khảo · Thực thi 5 ca chuẩn theo Đề bài A
+            Chạy lại policy trên các hóa đơn đã upload hoặc ingest vào hệ thống
           </p>
         </div>
 
@@ -96,13 +96,13 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
       {hasRun && summary && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-in fade-in duration-300">
           <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center gap-2.5">
-            <div className={`p-1.5 rounded-lg ${summary.allPassed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
-              {summary.allPassed ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            <div className={`p-1.5 rounded-lg ${summary.allSchemaValid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+              {summary.allSchemaValid ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
             </div>
             <div>
               <div className="text-[11px] text-slate-400">Kết quả chung</div>
               <div className="text-xs sm:text-sm font-black text-slate-200">
-                {summary.allPassed ? '100% ĐẠT CHUẨN' : 'CÓ LỖI'}
+                {summary.allSchemaValid ? 'SCHEMA HỢP LỆ' : 'CÓ LỖI DỮ LIỆU'}
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
             <div>
               <div className="text-[11px] text-slate-400">Tự động duyệt</div>
               <div className="text-xs sm:text-sm font-bold text-emerald-400">
-                {summary.routineCases} / 3 ca (ROUTINE)
+                {summary.routineCases} ca (ROUTINE)
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
             <div>
               <div className="text-[11px] text-slate-400">Dừng chuyển tiếp</div>
               <div className="text-xs sm:text-sm font-bold text-amber-400">
-                {summary.escalatedCases} / 2 ca (ESCALATED)
+                {summary.escalatedCases} ca (ESCALATED)
               </div>
             </div>
           </div>
@@ -213,10 +213,10 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
 
                     {/* Column 3: Verification Result */}
                     <td className="py-2.5 px-1 text-center overflow-hidden">
-                      {item.passed ? (
+                      {item.schemaValid ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 whitespace-nowrap">
                           <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                          <span>ĐẠT</span>
+                          <span>HỢP SCHEMA</span>
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-400 whitespace-nowrap">
@@ -254,7 +254,7 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
       ) : (
         <div className="py-8 text-center border border-dashed border-slate-800 rounded-xl bg-slate-950/30">
           <p className="text-xs sm:text-sm text-slate-400">
-            Chưa có kết quả kiểm thử. Hãy bấm nút <span className="text-emerald-400 font-bold uppercase">"RUN VERIFY 90s"</span> ở trên để khởi chạy tự động 5 ca chuẩn.
+            Chưa có dữ liệu kiểm thử. Hãy upload hoặc ingest ít nhất một hóa đơn rồi bấm <span className="text-emerald-400 font-bold uppercase">"RUN VERIFY 90s"</span>.
           </p>
         </div>
       )}

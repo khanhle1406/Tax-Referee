@@ -1,26 +1,48 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Send, FilePlus, Sparkles, ChevronDown, CheckCircle2, AlertCircle } from 'lucide-react';
-import { InvoiceInput, RefereeDecision } from '@/lib/schemas';
-import { MOCK_INVOICES } from '@/data/mockInvoices';
+import { Send, FilePlus, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
+import { InvoiceInput, RefereeDecision, SystemPolicyConfig } from '@/lib/schemas';
 import { formatVND } from '@/lib/utils';
 import { getApplicableRegulations } from '@/data/regulatoryRegistry';
+import { toast } from 'sonner';
 
 interface InteractiveInputFormProps {
   onEvaluateResult: (decision: RefereeDecision, invoice: InvoiceInput) => void;
+  dynamicConfig?: Partial<SystemPolicyConfig>;
+  demoMode?: boolean;
 }
 
-export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({ onEvaluateResult }) => {
-  // 10 ca ngoài bộ verify 90s để Giám khảo chọn nhanh
-  const extraCases = MOCK_INVOICES.filter(inv => inv.id !== 'TC-01' && inv.id !== 'TC-02' && inv.id !== 'TC-06' && inv.id !== 'TC-07' && inv.id !== 'TC-13');
-
-  const [selectedCaseId, setSelectedCaseId] = useState<string>('TC-10');
-  const [formData, setFormData] = useState<InvoiceInput>(
-    MOCK_INVOICES.find(inv => inv.id === 'TC-10') || MOCK_INVOICES[0]
-  );
+export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
+  onEvaluateResult,
+  dynamicConfig,
+  demoMode = false
+}) => {
+  const [formData, setFormData] = useState<InvoiceInput>(() => {
+    return {
+      id: `INV-${Date.now()}`,
+      invoiceNumber: '',
+      invoiceDate: new Date().toISOString().slice(0, 10),
+      supplierTaxCode: '',
+      supplierName: '',
+      itemName: '',
+      preTaxAmount: 0,
+      taxRate: 10,
+      taxAmount: 0,
+      totalAmount: 0,
+      paymentMethod: 'BANK_TRANSFER',
+      hasBankSlip: true,
+      hasItemManifest: true,
+      sellerStatus: 'ACTIVE',
+      isImageBlurry: false,
+      isAdjustment: false,
+      isStaffReimbursed: false
+    };
+  });
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [lastEngine, setLastEngine] = useState<string | null>(null);
+  const [isParsingDocument, setIsParsingDocument] = useState(false);
+  const [documentWarnings, setDocumentWarnings] = useState<string[]>([]);
   const [lastResult, setLastResult] = useState<{
     status: 'ROUTINE' | 'ESCALATED';
     message: string;
@@ -28,12 +50,32 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({ onEv
     riskGroup?: string;
   } | null>(null);
 
-  const handleSelectPreset = (id: string) => {
-    setSelectedCaseId(id);
-    setLastResult(null);
-    const found = MOCK_INVOICES.find(inv => inv.id === id);
-    if (found) {
-      setFormData({ ...found });
+  const handleDocumentUpload = async (file: File) => {
+    setIsParsingDocument(true);
+    setDocumentWarnings([]);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const response = await fetch('/api/documents/parse', { method: 'POST', body: form });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Không thể đọc chứng từ');
+      const extracted = Object.fromEntries(Object.entries(data.invoice || {}).filter(([, value]) => value !== undefined && value !== null && value !== ''));
+      setFormData((previous) => ({
+        ...previous,
+        ...extracted,
+        sourceArtifactId: data.artifactId,
+        sourceHash: data.sourceHash,
+        id: previous.id || `DOC-${Date.now()}`
+      } as InvoiceInput));
+      setDocumentWarnings(data.warnings || ['Dữ liệu trích xuất chỉ là đề xuất; hãy xác nhận lại trước khi thẩm định.']);
+      setLastResult(null);
+      toast.success(data.invoice?.invoiceNumber ? `Đã trích xuất thành công hóa đơn số ${data.invoice.invoiceNumber}` : 'Đã nạp dữ liệu chứng từ vào form');
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Không thể đọc chứng từ';
+      setDocumentWarnings([msg]);
+      toast.error(msg);
+    } finally {
+      setIsParsingDocument(false);
     }
   };
 
@@ -60,7 +102,13 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({ onEv
       const res = await fetch('/api/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          invoice: formData,
+          customConfig: dynamicConfig,
+          demo: demoMode,
+          forceLocalOnly: false,
+          useGenerativeQGen: true
+        })
       });
       const data = await res.json();
       if (data.decision) {
@@ -68,13 +116,15 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({ onEv
         if (data.decision.status === 'ROUTINE') {
           setLastResult({
             status: 'ROUTINE',
-            message: 'Hóa đơn HỢP LỆ 100%! AI đã tự động duyệt thông suốt (Straight-Through). Thẻ phán quyết ngoại lệ đã được giải phóng.',
+            message: demoMode
+              ? 'Dữ liệu phù hợp với nhánh Routine. Đây là đề xuất kiểm thử, chưa ghi vào hồ sơ production.'
+              : 'Dữ liệu phù hợp với nhánh Routine. Hệ thống tạo đề xuất để kế toán xác nhận trước khi xuất hồ sơ.',
             approvedTax: data.decision.approvedTaxAmount
           });
         } else {
           setLastResult({
             status: 'ESCALATED',
-            message: `Hóa đơn phát sinh rủi ro (${data.decision.riskGroup}). Đã kích hoạt Thẻ Phán quyết A/B bên cột phải.`,
+            message: `Hồ sơ cần xử lý thêm (${data.decision.riskGroup}). Hãy đọc lý do và chọn một trong hai phương án.`,
             riskGroup: data.decision.riskGroup
           });
         }
@@ -97,10 +147,10 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({ onEv
           </div>
           <div>
             <h3 className="text-base font-extrabold text-slate-100 flex items-center gap-2">
-              Thử nghiệm Hóa đơn Mới Tùy biến (Giám khảo Input)
+              {demoMode ? 'Thử một hồ sơ mới' : 'Tiếp nhận chứng từ'}
             </h3>
-            <p className="text-xs text-slate-400">
-              Tiêu chí 8 điểm dữ liệu mới · Nhập tay hoặc chọn nhanh các ca ngoại lệ
+          <p className="text-xs text-slate-400">
+              {demoMode ? 'Nhập tay hoặc chọn nhanh một ca để kiểm thử.' : 'Nhập form hoặc tải chứng từ để bắt đầu kiểm tra.'}
             </p>
           </div>
         </div>
@@ -112,25 +162,38 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({ onEv
         )}
       </div>
 
-      {/* Preset Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
+        <div className="text-xs text-cyan-200">
+          <strong>Nhập chứng từ:</strong> XML đọc trực tiếp; PDF/ảnh cần xác nhận lại các trường OCR.
+        </div>
+        <label className="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold cursor-pointer">
+          {isParsingDocument ? 'Đang đọc...' : 'Tải XML / PDF / ảnh'}
+          <input
+            type="file"
+            accept=".xml,application/xml,application/pdf,image/png,image/jpeg"
+            className="hidden"
+            disabled={isParsingDocument}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void handleDocumentUpload(file);
+              event.currentTarget.value = '';
+            }}
+          />
+        </label>
+      </div>
+
+      {documentWarnings.length > 0 && (
+        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-1">
+          <strong>Kiểm tra trước khi thẩm định:</strong>
+          {documentWarnings.map((warning) => <div key={warning}>• {warning}</div>)}
+        </div>
+      )}
+
+      {/* Manual input */}
       <div className="space-y-1.5">
         <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-          Chọn nhanh hồ sơ mẫu để thử nghiệm:
+          Nhập tay hoặc tải chứng từ thật ở phía trên:
         </label>
-        <div className="relative">
-          <select
-            value={selectedCaseId}
-            onChange={(e) => handleSelectPreset(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 text-sm font-semibold focus:outline-none focus:border-amber-500 transition-colors appearance-none cursor-pointer"
-          >
-            {extraCases.map((c) => (
-              <option key={c.id} value={c.id}>
-                [{c.id}] {c.supplierName} - {formatVND(c.totalAmount)} ({c.itemName.substring(0, 45)}...)
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-3.5 pointer-events-none" />
-        </div>
       </div>
 
       {/* Interactive Form */}
@@ -233,6 +296,33 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({ onEv
           </div>
         </div>
 
+        {/* Options Row: Hoàn ứng & Điều chỉnh */}
+        <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 rounded-lg bg-slate-950/70 border border-slate-800 text-xs">
+          <label className="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white">
+            <input
+              type="checkbox"
+              checked={!!formData.isStaffReimbursed}
+              onChange={(e) => handleInputChange('isStaffReimbursed', e.target.checked)}
+              className="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-amber-400 w-4 h-4 cursor-pointer"
+            />
+            <span className="font-medium">Ngoại lệ hoàn ứng nhân viên (Staff Reimbursement)</span>
+          </label>
+
+          <label className="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white">
+            <input
+              type="checkbox"
+              checked={!!formData.isAdjustment}
+              onChange={(e) => handleInputChange('isAdjustment', e.target.checked)}
+              className="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-amber-400 w-4 h-4 cursor-pointer"
+            />
+            <span className="font-medium">Hóa đơn điều chỉnh / Thay thế</span>
+          </label>
+
+          <div className="text-[11px] text-slate-400 font-mono">
+            Ngưỡng TM: <strong className="text-amber-400">{formatVND(dynamicConfig?.nonCashThreshold ?? 5_000_000)}</strong>
+          </div>
+        </div>
+
         {/* Live Tax Preview Bar */}
         <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
           <div className="flex items-center gap-2 flex-wrap">
@@ -278,7 +368,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({ onEv
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 cursor-pointer"
         >
           <Sparkles className="w-4 h-4 fill-current" />
-          <span>{isEvaluating ? 'Đang thẩm định bằng AI...' : 'Thẩm định bằng Jev Referee AI'}</span>
+          <span>{isEvaluating ? 'Đang kiểm tra...' : 'Kiểm tra hồ sơ'}</span>
         </button>
       </form>
     </div>

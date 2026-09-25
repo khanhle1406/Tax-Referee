@@ -4,6 +4,7 @@ import React from 'react';
 import { AlertOctagon, Scale, HelpCircle, Check, ArrowRight, UserCheck, ShieldAlert, Sparkles } from 'lucide-react';
 import { EscalatedDecision, ActionOption } from '@/lib/schemas';
 import { formatVND } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface EscalationCardProps {
   decision: EscalatedDecision | null;
@@ -79,14 +80,14 @@ export const EscalationCard: React.FC<EscalationCardProps> = ({ decision, onReso
     <div className="w-full bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 border-2 border-amber-500/60 rounded-2xl p-6 shadow-2xl shadow-amber-500/10 backdrop-blur-md animate-in slide-in-from-top-4 duration-300 space-y-5">
       {/* Top Tag & Approver Role */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
-        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border ${riskLabels.badgeClass}`}>
+        <Badge variant="outline" className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${riskLabels.badgeClass}`}>
           <RiskIcon className="w-4 h-4" />
           <span>{riskLabels.name}</span>
-        </div>
+        </Badge>
 
         <div className="flex items-center gap-2 flex-wrap">
           {decision.engineUsed && (
-            <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-full bg-slate-800 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+            <Badge variant="outline" className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-full bg-slate-800 text-emerald-300 border-emerald-500/30 flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-emerald-400" />
               {decision.engineUsed === 'JEV_AND_GEMINI_AI'
                 ? 'Gemini Flash AI + Jev AI'
@@ -98,14 +99,14 @@ export const EscalationCard: React.FC<EscalationCardProps> = ({ decision, onReso
               {decision.confidence && (
                 <span className="text-slate-400 font-normal">({Math.round(decision.confidence * 100)}%)</span>
               )}
-            </span>
+            </Badge>
           )}
 
-          <span className="text-xs font-bold text-slate-300 bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700">
-            Cấp duyệt: <span className={decision.requiresCFO ? 'text-rose-400 font-extrabold' : 'text-purple-400 font-extrabold'}>
+          <Badge variant="secondary" className="text-xs font-bold text-slate-300 bg-slate-800/80 px-3 py-1 border-slate-700">
+            Cấp duyệt: <span className={decision.requiresCFO ? 'text-rose-400 font-extrabold ml-1' : 'text-purple-400 font-extrabold ml-1'}>
               {decision.requiresCFO ? 'Giám đốc Tài chính (CFO)' : 'Kế toán trưởng (KTT)'}
             </span>
-          </span>
+          </Badge>
         </div>
       </div>
 

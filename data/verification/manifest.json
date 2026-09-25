@@ -1,0 +1,12 @@
+{
+  "manifestVersion": "2026-09-24.1",
+  "policyVersion": "TAX-SOP-2026-v2.5",
+  "description": "Regression expectations for source invoice files. These are test fixtures, not runtime invoice data.",
+  "cases": [
+    { "sourceFile": "01_real_viettel_sinvoice.xml", "sourceType": "XML", "expectedStatus": "ROUTINE" },
+    { "sourceFile": "02_real_misa_meinvoice.xml", "sourceType": "XML", "expectedStatus": "ESCALATED", "expectedRiskGroup": "OUT_OF_POLICY", "expectedRequiresCFO": false },
+    { "sourceFile": "03_real_vnpt_einvoice.xml", "sourceType": "XML", "expectedStatus": "ROUTINE" },
+    { "sourceFile": "04_real_fpt_einvoice.xml", "sourceType": "XML", "expectedStatus": "ESCALATED", "expectedRiskGroup": "EXCEED_AUTHORITY", "expectedRequiresCFO": true },
+    { "sourceFile": "05_real_tct_invoice.xml", "sourceType": "XML", "expectedStatus": "ESCALATED", "expectedRiskGroup": "OUT_OF_POLICY", "expectedRequiresCFO": false }
+  ]
+}
