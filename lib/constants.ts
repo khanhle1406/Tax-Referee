@@ -4,6 +4,12 @@ export const JEV_API_CONFIG = {
   MODEL: 'jev-latest'
 };
 
+export const DEEPSEEK_API_CONFIG = {
+  ENDPOINT: process.env.DEEPSEEK_API_URL || 'http://127.0.0.1:8000/v1/chat/completions',
+  BASE_URL: process.env.DEEPSEEK_BASE_URL || 'http://127.0.0.1:8000',
+  MODEL: process.env.DEEPSEEK_MODEL || 'deepseek-chat'
+};
+
 export const GEMINI_API_CONFIG = {
   ENDPOINT: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent',
   API_KEY: process.env.GEMINI_API_KEY || '',

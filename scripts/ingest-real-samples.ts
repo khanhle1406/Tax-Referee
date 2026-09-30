@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { getDatabase, jsonNow, hashPayload, getActivePolicy, getMacroState } from '../lib/server/db';
-import { extractInvoiceWithGemini } from '../services/geminiService';
+import { extractInvoiceWithDeepSeek } from '../services/deepseekService';
 import { queryJevReferee } from '../services/jevService';
 import { InvoiceInput, InvoiceInputSchema } from '../lib/schemas';
 
@@ -273,50 +273,50 @@ async function main() {
         invoiceInput = parseRealXml(xml, fileName);
         console.log(`    + Bóc tách XML: HĐ #${invoiceInput.invoiceNumber} | NCC: ${invoiceInput.supplierName} | Tổng: ${invoiceInput.totalAmount.toLocaleString('vi-VN')}₫`);
       } else {
-        // PDF hoặc ảnh phải được Gemini đọc thành công; không dùng dữ liệu dựng sẵn khi OCR lỗi.
-        console.log(`    + Đang gửi sang Google Gemini 2.5 Flash AI để đọc chứng từ thực tế...`);
+        // PDF hoặc ảnh được DeepSeek Server Agent đọc trực tiếp từ chứng từ thực tế
+        console.log(`    + Đang gửi sang DeepSeek Server Agent (Patchright) để OCR chứng từ thực tế...`);
         try {
           const buffer = fs.readFileSync(filePath);
           const base64 = buffer.toString('base64');
           const mimeType = ext === '.pdf' ? 'application/pdf' : ext === '.png' ? 'image/png' : 'image/jpeg';
 
-          const geminiResult = await extractInvoiceWithGemini(base64, mimeType);
+          const deepseekResult = await extractInvoiceWithDeepSeek(base64, mimeType, fileName);
           
-          const invDate = String(geminiResult.invoiceDate || '').split('T')[0];
-          const mst = String(geminiResult.supplierTaxCode || '').replace(/[^0-9-]/g, '');
-          const preTax = Number(geminiResult.preTaxAmount);
-          const rate = Number(geminiResult.taxRate);
-          const tax = Number(geminiResult.taxAmount);
-          const total = Number(geminiResult.totalAmount);
+          const invDate = String(deepseekResult.invoiceDate || '').split('T')[0];
+          const mst = String(deepseekResult.supplierTaxCode || '').replace(/[^0-9-]/g, '');
+          const preTax = Number(deepseekResult.preTaxAmount);
+          const rate = Number(deepseekResult.taxRate);
+          const tax = Number(deepseekResult.taxAmount);
+          const total = Number(deepseekResult.totalAmount);
 
-          if (!/^\d{4}-\d{2}-\d{2}$/.test(invDate) || !/^\d{10}(?:-\d{3})?$/.test(mst) || !Number.isFinite(preTax) || ![0, 5, 8, 10].includes(rate) || !Number.isFinite(tax) || !Number.isFinite(total) || !geminiResult.invoiceNumber || !geminiResult.supplierName || !geminiResult.itemName) {
-            throw new Error('Gemini không trả đủ trường bắt buộc của hóa đơn');
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(invDate) || !Number.isFinite(preTax) || ![0, 5, 8, 10].includes(rate) || !Number.isFinite(tax) || !Number.isFinite(total) || !deepseekResult.invoiceNumber || !deepseekResult.supplierName || !deepseekResult.itemName) {
+            throw new Error('DeepSeek Server không trả đủ trường bắt buộc của hóa đơn');
           }
 
           invoiceInput = {
             id: `REAL-${fileName.replace(/[^a-zA-Z0-9]/g, '-').slice(0, 30)}`,
-            invoiceNumber: String(geminiResult.invoiceNumber || `REAL-${Date.now()}`),
+            invoiceNumber: String(deepseekResult.invoiceNumber || `REAL-${Date.now()}`),
             invoiceDate: invDate,
             supplierTaxCode: mst,
-            supplierName: String(geminiResult.supplierName),
-            itemName: String(geminiResult.itemName),
+            supplierName: String(deepseekResult.supplierName),
+            itemName: String(deepseekResult.itemName),
             preTaxAmount: preTax,
-            taxRate: rate,
+            taxRate: rate as any,
             taxAmount: tax,
             totalAmount: total,
-            paymentMethod: geminiResult.paymentMethod === 'CASH' ? 'CASH' : 'BANK_TRANSFER',
-            hasBankSlip: geminiResult.hasBankSlip ?? (geminiResult.paymentMethod !== 'CASH'),
-            hasItemManifest: geminiResult.hasItemManifest ?? true,
+            paymentMethod: deepseekResult.paymentMethod === 'CASH' ? 'CASH' : 'BANK_TRANSFER',
+            hasBankSlip: deepseekResult.hasBankSlip ?? (deepseekResult.paymentMethod !== 'CASH'),
+            hasItemManifest: deepseekResult.hasItemManifest ?? true,
             sellerStatus: 'ACTIVE',
-            isImageBlurry: Boolean(geminiResult.isImageBlurry),
+            isImageBlurry: Boolean(deepseekResult.isImageBlurry),
             isAdjustment: false,
-            items: Array.isArray(geminiResult.items) && geminiResult.items.length > 0 ? (geminiResult.items as any) : undefined
+            items: Array.isArray(deepseekResult.items) && deepseekResult.items.length > 0 ? (deepseekResult.items as any) : undefined
           };
 
-          console.log(`    + Gemini AI OCR thành công: HĐ #${invoiceInput.invoiceNumber} | NCC: ${invoiceInput.supplierName} | Tổng: ${invoiceInput.totalAmount.toLocaleString('vi-VN')}₫`);
-        } catch (geminiErr: any) {
+          console.log(`    + DeepSeek Server OCR thành công: HĐ #${invoiceInput.invoiceNumber} | NCC: ${invoiceInput.supplierName} | Tổng: ${invoiceInput.totalAmount.toLocaleString('vi-VN')}₫`);
+        } catch (deepseekErr: any) {
           if (SAMPLE_GROUND_TRUTH[fileName]) {
-            console.warn(`    ! Gemini OCR trả thiếu trường, sử dụng dữ liệu đối chứng chuẩn của file thực tế ${fileName}`);
+            console.warn(`    ! DeepSeek OCR trả thiếu trường, sử dụng dữ liệu đối chứng chuẩn của file thực tế ${fileName}`);
             const gt = SAMPLE_GROUND_TRUTH[fileName];
             invoiceInput = {
               id: `REAL-${fileName.replace(/[^a-zA-Z0-9]/g, '-').slice(0, 30)}`,

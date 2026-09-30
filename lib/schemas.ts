@@ -184,7 +184,7 @@ export const RoutineDecisionSchema = z.object({
   kFactorAfter: z.number(),           // Hệ số K sau khi hạch toán
   applicableRegulations: z.array(z.string()).optional(), // Căn cứ pháp luật áp dụng theo ngày hóa đơn
   sopVersion: z.string().optional(),  // Phiên bản SOP áp dụng
-  engineUsed: z.enum(['JEV_AND_GEMINI_AI', 'GEMINI_AI', 'JEV_AI', 'LOCAL_FALLBACK']).optional(),
+  engineUsed: z.enum(['DEEPSEEK_AI', 'JEV_AND_DEEPSEEK_AI', 'JEV_AND_GEMINI_AI', 'GEMINI_AI', 'JEV_AI', 'LOCAL_FALLBACK']).optional(),
   confidence: z.number().optional(),
   riskScore: z.number().optional(),
   precedentApplied: z.object({
@@ -223,7 +223,7 @@ export const EscalatedDecisionSchema = z.object({
   requiresCFO: z.boolean().default(false),
   applicableRegulations: z.array(z.string()).optional(), // Căn cứ pháp luật áp dụng theo ngày hóa đơn
   sopVersion: z.string().optional(),  // Phiên bản SOP áp dụng
-  engineUsed: z.enum(['JEV_AND_GEMINI_AI', 'GEMINI_AI', 'JEV_AI', 'LOCAL_FALLBACK']).optional(),
+  engineUsed: z.enum(['DEEPSEEK_AI', 'JEV_AND_DEEPSEEK_AI', 'JEV_AND_GEMINI_AI', 'GEMINI_AI', 'JEV_AI', 'LOCAL_FALLBACK']).optional(),
   confidence: z.number().optional(),
   riskScore: z.number().optional(),
   duplicateInfo: DuplicateInfoSchema.optional(),

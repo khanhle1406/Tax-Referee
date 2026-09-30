@@ -1,8 +1,8 @@
 import { InvoiceInput, MacroState, RefereeDecision, RiskGroup, SystemPolicyConfig } from '@/lib/schemas';
 import { evaluateInvoiceLocally } from './policyEngine';
-import { generateActionableQuestionWithGemini } from './geminiService';
+import { generateActionableQuestionWithDeepSeek } from './deepseekService';
 
-export type DualEngineType = 'JEV_AND_GEMINI_AI' | 'GEMINI_AI' | 'JEV_AI' | 'LOCAL_FALLBACK';
+export type DualEngineType = 'DEEPSEEK_AI' | 'JEV_AND_DEEPSEEK_AI' | 'JEV_AND_GEMINI_AI' | 'GEMINI_AI' | 'JEV_AI' | 'LOCAL_FALLBACK';
 
 export interface EvaluationResult {
   decision: RefereeDecision;
@@ -45,7 +45,7 @@ export async function queryJevReferee(
   }
 
   try {
-    const generated = await generateActionableQuestionWithGemini(
+    const generated = await generateActionableQuestionWithDeepSeek(
       invoice,
       localDecision.riskGroup as RiskGroup,
       localDecision.flaggedReason,
@@ -59,20 +59,20 @@ export async function queryJevReferee(
       flaggedReason: localDecision.flaggedReason,
       options: localDecision.options,
       requiresCFO: localDecision.requiresCFO,
-      engineUsed: 'GEMINI_AI',
-      confidence: 0.9,
+      engineUsed: 'DEEPSEEK_AI',
+      confidence: 0.95,
       riskScore: localRiskScore
     };
     return {
       decision: enrichedDecision,
-      engineUsed: 'GEMINI_AI',
-      confidence: 0.9,
+      engineUsed: 'DEEPSEEK_AI',
+      confidence: 0.95,
       riskScore: localRiskScore,
       decisionAuthority: 'LOCAL_POLICY_ENGINE',
       policyVersion: options?.policyVersion
     };
   } catch (error) {
-    console.warn('[Gemini Q-Gen] Fallback về template deterministic:', error);
+    console.warn('[DeepSeek Q-Gen] Fallback về template deterministic:', error);
     return {
       decision: { ...localDecision, engineUsed: 'LOCAL_FALLBACK', confidence: 1, riskScore: localRiskScore },
       engineUsed: 'LOCAL_FALLBACK',

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Play, CheckCircle2, XCircle, Clock, Zap, AlertTriangle, ShieldCheck, ChevronRight } from 'lucide-react';
+import { Play, CheckCircle2, XCircle, Clock, ShieldCheck, AlertTriangle, ArrowRight } from 'lucide-react';
 import { formatVND } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 
@@ -52,118 +52,103 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
 
       if (data.summary?.allSchemaValid) {
         confetti({
-          particleCount: 50,
-          spread: 60,
+          particleCount: 35,
+          spread: 45,
           origin: { y: 0.7 }
         });
       }
     } catch (error) {
-      console.error('Lỗi khi chạy Verify Harness:', error);
+      console.error('Lỗi kiểm thử:', error);
     } finally {
       setIsRunning(false);
     }
   };
 
   return (
-    <div className="w-full bg-slate-900/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl backdrop-blur-md space-y-4">
-      {/* Header with Run Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+    <div className="w-full bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-card space-y-6">
+      
+      {/* Header & Run Action - To, Rõ, Cực ít chữ */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-100 flex items-center gap-2">
-            <Zap className="w-6 h-6 text-emerald-400" />
-            Bộ Công cụ Kiểm thử Tự động (Verify Harness)
+          <h2 className="text-2xl font-bold tracking-tight text-slate-950">
+            Kiểm thử 5 Ca Mẫu Chuẩn
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Chạy lại policy trên các hóa đơn đã upload hoặc ingest vào hệ thống
+          <p className="text-sm font-semibold text-slate-500 mt-1">
+            Đánh giá phân luồng: 3 Routine · 2 Escalated
           </p>
         </div>
 
         <button
           onClick={handleRunVerify}
           disabled={isRunning}
-          className="relative flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 text-base font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group cursor-pointer shrink-0"
+          className="flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-slate-950 hover:bg-slate-900 active:scale-[0.99] text-white text-sm font-bold tracking-wide transition-all disabled:opacity-50 cursor-pointer shadow-sm shrink-0"
         >
-          <Play className={`w-5 h-5 fill-current ${isRunning ? 'animate-spin' : 'group-hover:scale-110'} transition-transform`} />
-          <span className="whitespace-nowrap">{isRunning ? 'Đang Kiểm thử...' : 'RUN VERIFY 90s'}</span>
-          <span className="absolute -top-1 -right-1 flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-          </span>
+          <Play className={`w-4 h-4 fill-brand-lime text-brand-lime ${isRunning ? 'animate-spin' : ''}`} />
+          <span>{isRunning ? 'ĐANG CHẠY...' : 'CHẠY KIỂM THỬ TOÀN BỘ'}</span>
         </button>
       </div>
 
-      {/* Summary Stat Pills */}
+      {/* 4 Big KPI Stat Cards (To, Rõ số liệu, Ít chữ) */}
       {hasRun && summary && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-in fade-in duration-300">
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center gap-2.5">
-            <div className={`p-1.5 rounded-lg ${summary.allSchemaValid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
-              {summary.allSchemaValid ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-400">Kết quả chung</div>
-              <div className="text-xs sm:text-sm font-black text-slate-200">
-                {summary.allSchemaValid ? 'SCHEMA HỢP LỆ' : 'CÓ LỖI DỮ LIỆU'}
-              </div>
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400">
-              <Clock className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-400">Tổng thời gian</div>
-              <div className="text-xs sm:text-sm font-mono font-bold text-cyan-300">
-                {summary.totalTimeMs} ms <span className="text-[10px] text-slate-500 font-normal">(~2ms/ca)</span>
-              </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Cấu trúc Schema</span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-extrabold text-slate-950">
+                {summary.allSchemaValid ? '100%' : 'Lỗi'}
+              </span>
+              <span className="text-xs font-bold text-emerald-600">Đạt chuẩn</span>
             </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-400">Tự động duyệt</div>
-              <div className="text-xs sm:text-sm font-bold text-emerald-400">
-                {summary.routineCases} ca (ROUTINE)
-              </div>
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Tốc độ xử lý</span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-extrabold text-slate-950 font-numeric">
+                {summary.totalTimeMs} ms
+              </span>
+              <span className="text-xs font-semibold text-slate-500">~2ms/ca</span>
             </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
-              <AlertTriangle className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-400">Dừng chuyển tiếp</div>
-              <div className="text-xs sm:text-sm font-bold text-amber-400">
-                {summary.escalatedCases} ca (ESCALATED)
-              </div>
+          <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Tự động duyệt</span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-extrabold text-emerald-950 font-numeric">
+                {summary.routineCases}
+              </span>
+              <span className="text-xs font-bold text-emerald-700">ca Routine</span>
             </div>
           </div>
+
+          <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-700">Chặn xét duyệt</span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-extrabold text-amber-950 font-numeric">
+                {summary.escalatedCases}
+              </span>
+              <span className="text-xs font-bold text-amber-700">ca Escalated</span>
+            </div>
+          </div>
+
         </div>
       )}
 
-      {/* Results Table - Streamlined 4-Column Layout with strict column constraints */}
+      {/* Results Table - Chữ to, Rõ, Đậm số tiền */}
       {hasRun && results.length > 0 ? (
-        <div className="w-full rounded-xl border border-slate-800 bg-slate-950/60 overflow-hidden">
-          <table className="w-full table-fixed text-left text-xs border-collapse">
-            <colgroup>
-              <col className="w-5/12" />
-              <col className="w-3/12" />
-              <col className="w-2/12" />
-              <col className="w-2/12" />
-            </colgroup>
+        <div className="w-full rounded-xl border border-slate-200 bg-white overflow-hidden shadow-subtle">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/90 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th className="py-2.5 px-3 truncate">Hóa đơn & Đối tác</th>
-                <th className="py-2.5 px-1 text-center">Phân loại AI</th>
-                <th className="py-2.5 px-1 text-center">Đánh giá</th>
-                <th className="py-2.5 px-2 text-right">Thao tác</th>
+              <tr className="border-b border-slate-200 bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-600">
+                <th className="py-3 px-4">Mã Ca & Đối Tác</th>
+                <th className="py-3 px-4 text-right">Số Tiền (VNĐ)</th>
+                <th className="py-3 px-4 text-center">Phân Luồng</th>
+                <th className="py-3 px-4 text-center">Schema</th>
+                <th className="py-3 px-4 text-right">Thao Tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-300 font-normal">
+            <tbody className="divide-y divide-slate-100 text-slate-800">
               {results.map((item) => {
                 const isSelected = selectedCaseId === item.testId;
                 const isEscalated = item.actualStatus === 'ESCALATED';
@@ -171,78 +156,74 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
                 return (
                   <tr
                     key={item.testId}
-                    className={`transition-all ${
+                    className={`transition-colors ${
                       isSelected
-                        ? 'bg-amber-500/15 border-l-4 border-amber-400 shadow-inner'
-                        : isEscalated
-                        ? 'bg-amber-500/5 hover:bg-slate-800/40'
-                        : 'hover:bg-slate-800/40'
+                        ? 'bg-amber-50/80 font-medium'
+                        : 'hover:bg-slate-50/60'
                     }`}
                   >
-                    {/* Column 1: Supplier & Invoice Info */}
-                    <td className="py-2.5 px-3 overflow-hidden">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="font-mono font-bold text-slate-200 text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700 shrink-0">
+                    {/* Mã & Tên đối tác */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                           {item.testId}
                         </span>
-                        <span className="font-semibold text-slate-100 text-xs truncate" title={item.supplierName}>
+                        <span className="font-bold text-slate-950 text-sm">
                           {item.supplierName}
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5 truncate">
-                        <span>{item.invoiceNumber}</span>
-                        <span>·</span>
-                        <span className="text-emerald-400 font-bold whitespace-nowrap">
-                          {formatVND(item.totalAmount)}
-                        </span>
+                      <div className="text-xs text-slate-500 font-mono mt-0.5">
+                        HĐ: {item.invoiceNumber}
                       </div>
                     </td>
 
-                    {/* Column 2: Status Badge */}
-                    <td className="py-2.5 px-1 text-center overflow-hidden">
+                    {/* Số tiền to rõ */}
+                    <td className="py-3.5 px-4 text-right font-numeric font-bold text-base text-slate-950">
+                      {formatVND(item.totalAmount)}
+                    </td>
+
+                    {/* Badge trạng thái */}
+                    <td className="py-3.5 px-4 text-center">
                       <span
-                        className={`inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold whitespace-nowrap ${
+                        className={`inline-flex px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${
                           item.actualStatus === 'ROUTINE'
-                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                            : 'bg-amber-100 text-amber-900 border border-amber-200'
                         }`}
                       >
                         {item.actualStatus}
                       </span>
                     </td>
 
-                    {/* Column 3: Verification Result */}
-                    <td className="py-2.5 px-1 text-center overflow-hidden">
+                    {/* Schema status */}
+                    <td className="py-3.5 px-4 text-center">
                       {item.schemaValid ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 whitespace-nowrap">
-                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                          <span>HỢP SCHEMA</span>
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700">
+                          <CheckCircle2 className="w-4 h-4" /> Đạt
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-400 whitespace-nowrap">
-                          <XCircle className="w-3.5 h-3.5 shrink-0" />
-                          <span>SAI</span>
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-700">
+                          <XCircle className="w-4 h-4" /> Lỗi
                         </span>
                       )}
                     </td>
 
-                    {/* Column 4: Actions */}
-                    <td className="py-2.5 px-2 text-right">
+                    {/* Thao tác */}
+                    <td className="py-3.5 px-4 text-right">
                       {isEscalated && onSelectEscalatedCase ? (
                         <button
                           onClick={() => onSelectEscalatedCase(item.testId)}
-                          className={`inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap ${
+                          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                             isSelected
-                              ? 'bg-amber-400 text-slate-950 ring-2 ring-amber-300'
-                              : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 hover:scale-105 active:scale-95'
+                              ? 'bg-slate-950 text-white'
+                              : 'border border-slate-300 bg-white hover:bg-slate-100 text-slate-900'
                           }`}
-                          title="Mở Thẻ Phán Quyết Con Người (Option A/B) ở cột bên phải"
                         >
-                          <span>{isSelected ? 'Đang mở' : 'Xử lý A/B'}</span>
-                          <ChevronRight className="w-3 h-3" />
+                          <span>{isSelected ? 'Đang xem' : 'Xem phán quyết'}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       ) : (
-                        <span className="text-[10px] text-slate-500 font-mono italic">Routine</span>
+                        <span className="text-xs font-semibold text-slate-400">Tự động duyệt</span>
                       )}
                     </td>
                   </tr>
@@ -252,12 +233,13 @@ export const VerifyHarness: React.FC<VerifyHarnessProps> = ({ onSelectEscalatedC
           </table>
         </div>
       ) : (
-        <div className="py-8 text-center border border-dashed border-slate-800 rounded-xl bg-slate-950/30">
-          <p className="text-xs sm:text-sm text-slate-400">
-            Chưa có dữ liệu kiểm thử. Hãy upload hoặc ingest ít nhất một hóa đơn rồi bấm <span className="text-emerald-400 font-bold uppercase">"RUN VERIFY 90s"</span>.
+        <div className="py-12 text-center border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+          <p className="text-sm font-semibold text-slate-600">
+            Bấm <span className="font-bold text-slate-950">"CHẠY KIỂM THỬ TOÀN BỘ"</span> ở trên để bắt đầu.
           </p>
         </div>
       )}
+
     </div>
   );
 };

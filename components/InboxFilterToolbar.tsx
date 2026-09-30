@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, X, Filter, RotateCcw } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Search, X, RotateCcw } from 'lucide-react';
 
 export interface InboxFilterState {
   searchTerm: string;
@@ -42,42 +41,39 @@ export const InboxFilterToolbar: React.FC<InboxFilterToolbarProps> = ({
   };
 
   return (
-    <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm space-y-3">
+    <div className="mb-4 rounded-xl border border-slate-200 bg-white p-3 shadow-subtle space-y-3">
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        {/* Search input with live debouncing/clearing */}
+        {/* Search input */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
             value={filters.searchTerm}
             onChange={(e) => onChange({ ...filters, searchTerm: e.target.value })}
-            placeholder="Tìm theo số HĐ, MST, NCC hoặc tên hàng..."
-            className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-9 pr-9 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 transition"
+            placeholder="Tìm theo số HĐ, MST, tên NCC..."
+            className="w-full rounded-lg border border-slate-200 bg-slate-50/70 pl-9 pr-9 py-2 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
           />
           {filters.searchTerm && (
             <button
               onClick={() => onChange({ ...filters, searchTerm: '' })}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 cursor-pointer"
               title="Xóa tìm kiếm"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
 
-        {/* Counter badge and Reset button */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
-          <Badge
-            variant="secondary"
-            className="bg-slate-100 text-slate-700 font-mono text-xs px-2.5 py-1 font-semibold"
-          >
-            {filteredCount} / {totalCount} hồ sơ
-          </Badge>
+        {/* Counter and Reset */}
+        <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+          <span className="rounded-lg bg-slate-100 border border-slate-200 text-slate-900 font-mono text-xs font-bold px-3 py-1.5">
+            {filteredCount} / {totalCount} HĐ
+          </span>
 
           {isFiltered && (
             <button
               onClick={handleReset}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-2.5 py-1 rounded-lg transition"
+              className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-slate-950 px-2 py-1.5 rounded transition cursor-pointer"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               <span>Đặt lại</span>
@@ -86,51 +82,44 @@ export const InboxFilterToolbar: React.FC<InboxFilterToolbarProps> = ({
         </div>
       </div>
 
-      {/* Filter Selectors Pills */}
-      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 text-xs">
-        <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px] mr-1 flex items-center gap-1">
-          <Filter className="h-3 w-3" /> Lọc nhanh:
-        </span>
-
-        {/* Risk Group Filter */}
+      {/* Filter Selectors - To & Rõ */}
+      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 text-xs">
         <select
           value={filters.riskGroup}
           onChange={(e) => onChange({ ...filters, riskGroup: e.target.value as InboxFilterState['riskGroup'] })}
           aria-label="Phân loại rủi ro"
-          className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-slate-300 focus:border-sky-500 focus:bg-white focus:outline-none transition cursor-pointer"
+          className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-1.5 text-xs font-bold text-slate-800 hover:border-slate-400 focus:border-slate-900 focus:bg-white focus:outline-none transition cursor-pointer"
         >
-          <option value="ALL">Tất cả rủi ro</option>
-          <option value="ROUTINE">Thường quy (ROUTINE)</option>
-          <option value="UNCERTAIN_INFO">Nhóm 1: Chưa xác định thông tin</option>
-          <option value="OUT_OF_POLICY">Nhóm 2: Ngoài quy định</option>
-          <option value="EXCEED_AUTHORITY">Nhóm 3: Vượt thẩm quyền</option>
+          <option value="ALL">Tất cả phân loại</option>
+          <option value="ROUTINE">Thường quy (Routine)</option>
+          <option value="UNCERTAIN_INFO">Thông tin chưa rõ</option>
+          <option value="OUT_OF_POLICY">Ngoài chính sách</option>
+          <option value="EXCEED_AUTHORITY">Vượt thẩm quyền</option>
         </select>
 
-        {/* Amount Range Filter */}
         <select
           value={filters.amountRange}
           onChange={(e) => onChange({ ...filters, amountRange: e.target.value as InboxFilterState['amountRange'] })}
-          aria-label="Khoảng giá trị tiền"
-          className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-slate-300 focus:border-sky-500 focus:bg-white focus:outline-none transition cursor-pointer"
+          aria-label="Khoảng tiền"
+          className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-1.5 text-xs font-bold text-slate-800 hover:border-slate-400 focus:border-slate-900 focus:bg-white focus:outline-none transition cursor-pointer"
         >
-          <option value="ALL">Mọi mức giá trị</option>
-          <option value="UNDER_5M">&lt; 5 triệu VNĐ (Tiền mặt hợp lệ)</option>
-          <option value="5M_TO_20M">5M - 20 triệu VNĐ</option>
-          <option value="20M_TO_200M">20M - 200 triệu VNĐ</option>
-          <option value="ABOVE_200M">&gt;= 200 triệu VNĐ (Vượt hạn mức KTT)</option>
+          <option value="ALL">Mọi hạn mức tiền</option>
+          <option value="UNDER_5M">&lt; 5 triệu</option>
+          <option value="5M_TO_20M">5 - 20 triệu</option>
+          <option value="20M_TO_200M">20 - 200 triệu</option>
+          <option value="ABOVE_200M">&gt; 200 triệu</option>
         </select>
 
-        {/* Approval Status Filter */}
         <select
           value={filters.approvalStatus}
           onChange={(e) => onChange({ ...filters, approvalStatus: e.target.value as InboxFilterState['approvalStatus'] })}
-          aria-label="Trạng thái phê duyệt"
-          className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-slate-300 focus:border-sky-500 focus:bg-white focus:outline-none transition cursor-pointer"
+          aria-label="Trạng thái xử lý"
+          className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-1.5 text-xs font-bold text-slate-800 hover:border-slate-400 focus:border-slate-900 focus:bg-white focus:outline-none transition cursor-pointer"
         >
-          <option value="ALL">Mọi trạng thái</option>
-          <option value="PENDING">Đang chờ xử lý</option>
-          <option value="APPROVED">Đã phê duyệt (APPROVED)</option>
-          <option value="REJECTED">Đã từ chối (REJECTED)</option>
+          <option value="ALL">Tất cả trạng thái</option>
+          <option value="PENDING">Chờ xử lý</option>
+          <option value="APPROVED">Đã chấp thuận</option>
+          <option value="REJECTED">Đã từ chối</option>
         </select>
       </div>
     </div>

@@ -278,36 +278,36 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-5xl h-[92vh] flex flex-col p-0 overflow-hidden bg-slate-900 border-slate-700 shadow-2xl">
+      <DialogContent className="max-w-5xl h-[92vh] flex flex-col p-0 overflow-hidden bg-white border border-slate-200 text-slate-950 shadow-[0_16px_48px_rgba(0,0,0,0.08)]">
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/70 gap-3">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-100/40 gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-purple-500/20 rounded-xl border border-purple-500/40 text-purple-400">
-              <Scale className="w-6 h-6" />
+            <div className="p-2.5 bg-slate-950 text-parchment rounded-xl shadow-xs">
+              <Scale className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <DialogTitle className="text-xl font-extrabold text-slate-100">
+                <DialogTitle className="text-lg font-serif font-normal text-slate-950 tracking-tight">
                   Trung tâm Quản trị Quy chế & Pháp lý Thuế Động
                 </DialogTitle>
-                <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/40 font-mono text-xs">
-                  {policyMetadata.version} · Active
+                <Badge variant="secondary" className="bg-slate-100 text-slate-700 border border-slate-200 font-mono text-[10px]">
+                  {policyMetadata.version} · Hiệu lực
                 </Badge>
               </div>
-              <p className="text-xs text-slate-400 font-mono mt-0.5">
-                Mã hiệu: TAX-SOP-2026 · Ngưỡng không tiền mặt: {formatVND(dynamicConfig.nonCashThreshold)} · Hạn mức KTT: {formatVND(dynamicConfig.kttApprovalLimit)}
+              <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                Mã SOP: TAX-SOP-2026 · Ngưỡng TM: {formatVND(dynamicConfig.nonCashThreshold)} · Hạn mức KTT: {formatVND(dynamicConfig.kttApprovalLimit)}
               </p>
             </div>
           </div>
 
-          {/* Tab Selection using shadcn Tabs */}
+          {/* Tab Selection */}
           <Tabs value={activeTab} onValueChange={(val) => {
             const nextTab = val as typeof activeTab;
             setActiveTab(nextTab);
             if (nextTab === 'LEGAL') void loadLegalUpdates();
             if (nextTab === 'PRECEDENTS') void loadPrecedents();
           }}>
-            <TabsList className="bg-slate-800/80 border-slate-700 h-9 p-1">
+            <TabsList className="bg-slate-100/80 border border-slate-200 h-9 p-1">
               <TabsTrigger value="STUDIO" className="flex items-center gap-1.5 px-3 py-1 text-xs">
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 <span>Policy Studio</span>
@@ -330,7 +330,7 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
               </TabsTrigger>
               <TabsTrigger value="PRECEDENTS" className="flex items-center gap-1.5 px-3 py-1 text-xs">
                 <BookmarkCheck className="w-3.5 h-3.5" />
-                <span>Sổ Tiền lệ ({precedents.length})</span>
+                <span>Tiền lệ ({precedents.length})</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -338,8 +338,8 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
 
         {/* Success Alert Banner */}
         {savedSuccess && (
-          <div className="px-6 py-2.5 bg-emerald-500/20 border-b border-emerald-500/40 text-emerald-300 text-sm flex items-center gap-2 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="px-6 py-2.5 bg-emerald-50 border-b border-emerald-200 text-emerald-900 text-xs flex items-center gap-2 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
             <span>{successMessage}</span>
           </div>
         )}
@@ -347,53 +347,53 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
         {/* Body Content by Tab */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
-          {/* TAB 0: DYNAMIC POLICY STUDIO (THE WOW FACTOR) */}
+          {/* TAB 0: DYNAMIC POLICY STUDIO */}
           {activeTab === 'STUDIO' && (
             <div className="space-y-6 animate-in fade-in duration-200">
-              <div className="p-4 bg-gradient-to-r from-purple-950/40 via-blue-950/30 to-slate-950 border border-purple-500/30 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="p-4 bg-slate-100/40 border border-slate-200 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <h4 className="text-base font-extrabold text-purple-300 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-purple-400" />
+                  <h4 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-slate-900" />
                     Trình Điều Khiển Quy Chế & Tham Số Luật Động (Dynamic Policy Studio)
                   </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
+                  <p className="text-xs text-slate-700 leading-relaxed max-w-2xl">
                     Dành cho Kế toán trưởng: thay đổi tham số để tạo bản nháp, chạy kiểm tra rồi mới duyệt áp dụng. Policy đang chạy không bị thay đổi khi chưa publish.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={handleResetDynamicConfig}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all border border-slate-700"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:border-carbon text-slate-700 hover:text-slate-950 text-xs font-medium transition-all border border-slate-200 shadow-xs cursor-pointer"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" />
+                    <RotateCcw className="w-3 h-3 text-slate-500" />
                     <span>Chuẩn Luật 2026</span>
                   </button>
                   <button
                     onClick={handleSaveDynamicConfig}
                     disabled={isSaving}
-                    className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-purple-900/30 transition-all hover:scale-105"
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-slate-950 hover:bg-graphite text-parchment text-xs font-medium shadow-xs transition-all cursor-pointer"
                   >
-                    <Save className="w-4 h-4" />
+                    <Save className="w-3.5 h-3.5" />
                     <span>{isSaving ? 'Đang lưu...' : pendingPolicyVersion ? 'Duyệt & Áp dụng' : 'Tạo bản nháp'}</span>
                   </button>
                 </div>
               </div>
 
               {/* Grid 4 Control Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 
                 {/* Knob 1: Non-cash Threshold */}
-                <div className="p-5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-4 hover:border-purple-500/40 transition-all">
+                <div className="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                      <Sliders className="w-4 h-4" />
-                      1. Ngưỡng Thanh Toán Không Dùng Tiền Mặt
+                    <span className="text-xs font-semibold text-slate-950 flex items-center gap-1.5">
+                      <Sliders className="w-3.5 h-3.5 text-slate-500" />
+                      1. Ngưỡng TT Không Dùng Tiền Mặt
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 font-mono">
+                    <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-950 border border-slate-200 font-mono">
                       {formatVND(dynamicConfig.nonCashThreshold)}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     Theo Luật Thuế GTGT 48/2024/QH15, ngưỡng chuẩn từ 01/07/2025 là <strong>5.000.000 VNĐ</strong> (thay thế mức 20.000.000 VNĐ cũ). Thử đổi ngưỡng để xem AI phản ứng:
                   </p>
                   <div className="grid grid-cols-4 gap-2">
@@ -401,10 +401,10 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
                       <button
                         key={amt}
                         onClick={() => setDynamicConfig({ ...dynamicConfig, nonCashThreshold: amt })}
-                        className={`py-2 px-2 rounded-xl text-xs font-bold font-mono transition-all text-center ${
+                        className={`py-1.5 px-2 rounded-lg text-xs font-mono transition-all text-center cursor-pointer ${
                           dynamicConfig.nonCashThreshold === amt
-                            ? 'bg-purple-600 text-white shadow-md'
-                            : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'
+                            ? 'bg-slate-950 text-parchment font-semibold shadow-xs'
+                            : 'bg-slate-100/40 border border-slate-200 text-slate-700 hover:border-carbon hover:text-slate-950'
                         }`}
                       >
                         {amt / 1_000_000}M {amt === 5_000_000 ? '(2026)' : amt === 20_000_000 ? '(Cũ)' : ''}
@@ -414,17 +414,17 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
                 </div>
 
                 {/* Knob 2: Chief Accountant Approval Limit */}
-                <div className="p-5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-4 hover:border-purple-500/40 transition-all">
+                <div className="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
-                      <Scale className="w-4 h-4" />
-                      2. Hạn Mức Tự Duyệt Chi Của KTT
+                    <span className="text-xs font-semibold text-slate-950 flex items-center gap-1.5">
+                      <Scale className="w-3.5 h-3.5 text-slate-500" />
+                      2. Hạn Mức Tự Duyệt Của KTT
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-500/20 text-blue-300 border border-blue-500/40 font-mono">
+                    <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-950 border border-slate-200 font-mono">
                       {formatVND(dynamicConfig.kttApprovalLimit)}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     Hóa đơn điều chỉnh giảm hoặc chi phí đặc thù vượt quá hạn mức này sẽ tự động kích hoạt chuyển tiếp lên Giám đốc Tài chính (CFO):
                   </p>
                   <div className="grid grid-cols-4 gap-2">
@@ -432,10 +432,10 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
                       <button
                         key={amt}
                         onClick={() => setDynamicConfig({ ...dynamicConfig, kttApprovalLimit: amt })}
-                        className={`py-2 px-2 rounded-xl text-xs font-bold font-mono transition-all text-center ${
+                        className={`py-1.5 px-2 rounded-lg text-xs font-mono transition-all text-center cursor-pointer ${
                           dynamicConfig.kttApprovalLimit === amt
-                            ? 'bg-blue-600 text-white shadow-md'
-                            : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'
+                            ? 'bg-slate-950 text-parchment font-semibold shadow-xs'
+                            : 'bg-slate-100/40 border border-slate-200 text-slate-700 hover:border-carbon hover:text-slate-950'
                         }`}
                       >
                         {amt / 1_000_000}M {amt === 200_000_000 ? '(SOP)' : ''}
@@ -445,67 +445,67 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
                 </div>
 
                 {/* Knob 3: K-Factor Heuristic Safe Range */}
-                <div className="p-5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-4 hover:border-purple-500/40 transition-all">
+                <div className="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                      <Sliders className="w-4 h-4" />
-                      3. Dải An Toàn Tham Số Nguồn Hàng K (CV 2392)
+                    <span className="text-xs font-semibold text-slate-950 flex items-center gap-1.5">
+                      <Sliders className="w-3.5 h-3.5 text-slate-500" />
+                      3. Dải An Toàn Tham Số K (CV 2392)
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">
+                    <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-950 border border-slate-200 font-mono">
                       {dynamicConfig.kFactorSafeMin} - {dynamicConfig.kFactorSafeMax}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     Biên độ an toàn nội bộ (Vùng Xanh). Khi K tụt dưới 0.95 hoặc vọt trên 1.35, hệ thống lập tức gắn cờ Nhóm 3 (EXCEED_AUTHORITY):
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[11px] text-slate-400 font-semibold block mb-1">Ngưỡng tối thiểu (Min Safe):</label>
+                      <label className="text-[11px] text-slate-500 font-medium block mb-1">Ngưỡng tối thiểu (Min):</label>
                       <input
                         type="number"
                         step="0.05"
                         value={dynamicConfig.kFactorSafeMin}
                         onChange={(e) => setDynamicConfig({ ...dynamicConfig, kFactorSafeMin: parseFloat(e.target.value) || 1.05 })}
-                        className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-sm text-emerald-300 font-mono focus:outline-none focus:border-emerald-500"
+                        className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-950 font-mono focus:outline-none focus:border-carbon focus:ring-1 focus:ring-carbon transition"
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] text-slate-400 font-semibold block mb-1">Ngưỡng tối đa (Max Safe):</label>
+                      <label className="text-[11px] text-slate-500 font-medium block mb-1">Ngưỡng tối đa (Max):</label>
                       <input
                         type="number"
                         step="0.05"
                         value={dynamicConfig.kFactorSafeMax}
                         onChange={(e) => setDynamicConfig({ ...dynamicConfig, kFactorSafeMax: parseFloat(e.target.value) || 1.25 })}
-                        className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-sm text-emerald-300 font-mono focus:outline-none focus:border-emerald-500"
+                        className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-950 font-mono focus:outline-none focus:border-carbon focus:ring-1 focus:ring-carbon transition"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Knob 4: Staff Reimbursement Exception */}
-                <div className="p-5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-4 hover:border-purple-500/40 transition-all">
+                <div className="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                      <ShieldAlert className="w-4 h-4" />
+                    <span className="text-xs font-semibold text-slate-950 flex items-center gap-1.5">
+                      <ShieldAlert className="w-3.5 h-3.5 text-slate-500" />
                       4. Ngoại Lệ Hoàn Ứng Ủy Quyền Nhân Viên
                     </span>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-black border font-mono ${
+                    <span className={`px-2 py-0.5 rounded-md text-xs font-semibold border font-mono ${
                       dynamicConfig.allowStaffReimbursement
-                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                        : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        : 'bg-rose-50 text-rose-800 border-rose-200'
                     }`}>
                       {dynamicConfig.allowStaffReimbursement ? 'BẬT' : 'TẮT'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     Chấp thuận nhân viên dùng thẻ cá nhân thanh toán các giao dịch phục vụ công ty sau đó công ty chuyển khoản hoàn ứng kèm UNC:
                   </p>
                   <button
                     onClick={() => setDynamicConfig({ ...dynamicConfig, allowStaffReimbursement: !dynamicConfig.allowStaffReimbursement })}
-                    className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    className={`w-full py-2 px-3 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
                       dynamicConfig.allowStaffReimbursement
-                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                        ? 'bg-slate-950 text-parchment hover:bg-graphite'
+                        : 'bg-slate-100/40 border border-slate-200 text-slate-700 hover:border-carbon hover:text-slate-950'
                     }`}
                   >
                     <span>{dynamicConfig.allowStaffReimbursement ? '✓ Đang cho phép hoàn ứng hợp lệ theo Luật 48' : '✕ Cấm hoàn ứng (Bắt buộc tài khoản công ty)'}</span>
@@ -518,35 +518,35 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
 
           {/* TAB 1: VIEW FULL TEXT */}
           {activeTab === 'VIEW' && (
-            <div className="space-y-6">
-              <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-sm">
+            <div className="space-y-5">
+              <div className="p-4 bg-slate-100/40 border border-slate-200 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
                 <div>
-                  <span className="font-bold text-slate-200">Phiên bản hiện hành: {policyMetadata.version}</span>
-                  <span className="text-xs text-slate-400 ml-2">({policyMetadata.releaseDate})</span>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <span className="font-semibold text-slate-950">Phiên bản hiện hành: {policyMetadata.version}</span>
+                  <span className="text-[11px] text-slate-500 ml-2">({policyMetadata.releaseDate})</span>
+                  <p className="text-xs text-slate-700 mt-1 leading-relaxed">
                     Căn cứ tích hợp: Luật Thuế GTGT 48/2024/QH15, Nghị quyết 204/2025/QH15, Nghị định 254/2026/NĐ-CP, Thông tư 89/2026/TT-BTC, Công văn 2392/TCT-QLRR.
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     Đang nạp làm Ground Truth
                   </span>
                 </div>
               </div>
 
-              <div className="font-mono text-sm leading-relaxed text-slate-300 bg-slate-950/80 p-6 rounded-xl border border-slate-800 whitespace-pre-wrap">
+              <div className="font-mono text-xs leading-relaxed text-slate-700 bg-slate-100/30 p-5 rounded-xl border border-slate-200 whitespace-pre-wrap">
                 {policyMetadata.text}
               </div>
 
-              <div className="p-4 bg-slate-950/40 border border-slate-800 rounded-xl space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <div className="p-4 bg-white border border-slate-200 rounded-xl space-y-2">
+                <h4 className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
                   Lịch sử Sửa đổi & Quản lý Phiên bản (Version Change Log)
                 </h4>
                 <div className="space-y-1.5">
                   {policyMetadata.changeLog.map((log, idx) => (
-                    <div key={idx} className="text-xs text-slate-300 font-mono flex items-start gap-2">
-                      <span className="text-purple-400">•</span>
+                    <div key={idx} className="text-xs text-slate-700 font-mono flex items-start gap-2">
+                      <span className="text-slate-900">•</span>
                       <span>{log}</span>
                     </div>
                   ))}
@@ -571,20 +571,20 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <FileText className="w-4 h-4 text-purple-400" />
+                <label className="text-[11px] font-mono uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-slate-900" />
                   Nội dung Toàn văn Quy chế Quản trị Thuế (TAX-SOP-2026):
                 </label>
                 <textarea
                   value={editableText}
                   onChange={(e) => setEditableText(e.target.value)}
-                  rows={16}
-                  className="w-full p-4 bg-slate-950 border border-slate-700 rounded-xl font-mono text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-purple-500 transition-colors"
+                  rows={15}
+                  className="w-full p-4 bg-white border border-slate-200 rounded-xl font-mono text-xs text-slate-950 leading-relaxed focus:outline-none focus:border-carbon focus:ring-1 focus:ring-carbon transition-colors"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
                   Ghi chú sửa đổi (Change Log Note):
                 </label>
                 <input
@@ -592,7 +592,7 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
                   placeholder="Ví dụ: Bổ sung điều khoản khấu trừ chi phí vé máy bay điện tử..."
                   value={changeLogNote}
                   onChange={(e) => setChangeLogNote(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-950 focus:outline-none focus:border-carbon focus:ring-1 focus:ring-carbon"
                 />
               </div>
 
@@ -600,26 +600,26 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
                 <button
                   type="button"
                   onClick={handleResetPolicyText}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all border border-slate-700"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-100/40 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-all border border-slate-200 cursor-pointer"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
+                  <RotateCcw className="w-3 h-3 text-slate-500" />
                   <span>Khôi phục Bản Gốc Chuẩn</span>
                 </button>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setActiveTab('VIEW')}
-                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all"
+                    className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-medium transition-all hover:border-carbon hover:text-slate-950 cursor-pointer"
                   >
                     Hủy bỏ
                   </button>
                   <button
                     type="button"
                     onClick={handleSavePolicyText}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold shadow-lg shadow-purple-900/30 transition-all hover:scale-105 active:scale-95"
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-slate-950 hover:bg-graphite text-parchment text-xs font-medium shadow-xs transition-all cursor-pointer"
                   >
-                    <Save className="w-4 h-4" />
+                    <Save className="w-3.5 h-3.5" />
                     <span>Lưu & Kích hoạt Phiên bản Mới</span>
                   </button>
                 </div>
@@ -630,36 +630,36 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
           {/* TAB 3: TEMPORAL LAW TIMELINE */}
           {activeTab === 'TIMELINE' && (
             <div className="space-y-6">
-              <div className="p-4 bg-gradient-to-r from-blue-950/40 via-purple-950/30 to-slate-950/60 border border-blue-500/30 rounded-xl">
+              <div className="p-4 bg-slate-100/40 border border-slate-200 rounded-xl">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div>
-                    <h4 className="text-base font-bold text-blue-300 flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-blue-400" />
+                    <h4 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-slate-900" />
                       Công cụ Tra cứu Mốc Thời gian Pháp lý (Temporal Law Inspector)
                     </h4>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       Chọn ngày lập hóa đơn để kiểm tra ngay AI sẽ áp dụng các Nghị định, Thông tư nào có hiệu lực tại ngày đó.
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <label className="text-xs text-slate-300 font-bold uppercase tracking-wider">
-                      Ngày lập hóa đơn:
+                    <label className="text-[11px] font-mono text-slate-700 uppercase tracking-wider">
+                      Ngày lập:
                     </label>
                     <input
                       type="date"
                       value={testDate}
                       onChange={(e) => handleDateChange(e.target.value)}
-                      className="px-3 py-1.5 bg-slate-950 border border-blue-500/50 rounded-lg text-sm text-blue-200 font-mono focus:outline-none focus:border-blue-400"
+                      className="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs text-slate-950 font-mono focus:outline-none focus:border-carbon"
                     />
                   </div>
                 </div>
 
-                <div className="mt-4 p-3 bg-slate-950/70 border border-slate-800 rounded-lg space-y-1 text-xs font-mono">
-                  <div className="text-emerald-400 font-bold">
+                <div className="mt-3 p-3 bg-white border border-slate-200 rounded-lg space-y-1 text-xs font-mono">
+                  <div className="text-emerald-800 font-semibold">
                     ✓ {temporalResult.decreeSummary}
                   </div>
                   {temporalResult.notes.map((n, idx) => (
-                    <div key={idx} className="text-slate-300">
+                    <div key={idx} className="text-slate-700">
                       • {n}
                     </div>
                   ))}
@@ -667,39 +667,39 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
               </div>
 
               <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                <h4 className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
                   Danh mục Văn bản Quy phạm Pháp luật Niên độ 2025 - 2026 ({GOVERNMENT_REGULATORY_REGISTRY.length} văn bản)
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   {GOVERNMENT_REGULATORY_REGISTRY.map((doc) => (
                     <div
                       key={doc.id}
-                      className="p-4 bg-slate-950/70 border border-slate-800 rounded-xl space-y-2 hover:border-slate-700 transition-colors"
+                      className="p-4 bg-white border border-slate-200 rounded-xl space-y-2 shadow-xs"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="px-2 py-0.5 rounded text-xs font-extrabold bg-blue-500/20 text-blue-300 border border-blue-500/40 font-mono">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-slate-100 text-slate-950 border border-slate-200">
                           {doc.code}
                         </span>
-                        <span className="text-[11px] font-mono text-slate-400">
-                          Hiệu lực: {doc.effectiveFrom} {doc.effectiveTo ? '-> ' + doc.effectiveTo : '(Đang hiệu lực)'}
+                        <span className="text-[10px] font-mono text-slate-500">
+                          Hiệu lực: {doc.effectiveFrom} {doc.effectiveTo ? '-> ' + doc.effectiveTo : '(Hiện hành)'}
                         </span>
                       </div>
 
-                      <h5 className="text-sm font-bold text-slate-100 leading-snug">
+                      <h5 className="text-xs font-semibold text-slate-950 leading-snug">
                         {doc.title}
                       </h5>
 
-                      <p className="text-xs text-slate-400 leading-relaxed">
+                      <p className="text-[11px] text-slate-700 leading-relaxed">
                         {doc.summary}
                       </p>
 
-                      <div className="pt-2 border-t border-slate-800/80 space-y-1">
-                        <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider block">
-                          Quy chuẩn cốt lõi áp dụng:
+                      <div className="pt-2 border-t border-slate-200 space-y-1">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 block">
+                          Quy chuẩn cốt lõi:
                         </span>
                         {doc.keyRules.map((rule, idx) => (
-                          <div key={idx} className="text-xs text-slate-300 flex items-start gap-1.5">
-                            <span className="text-slate-500">-</span>
+                          <div key={idx} className="text-[11px] text-slate-700 flex items-start gap-1.5">
+                            <span className="text-slate-500">•</span>
                             <span>{rule}</span>
                           </div>
                         ))}
@@ -712,35 +712,35 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
           )}
 
           {activeTab === 'LEGAL' && (
-            <div className="space-y-5 animate-in fade-in duration-200">
-              <div className="p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="p-4 bg-slate-100/40 border border-slate-200 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
-                  <h4 className="text-base font-bold text-cyan-300">Theo dõi cập nhật pháp luật</h4>
-                  <p className="text-xs text-slate-300 mt-1">Hệ thống chỉ tạo candidate và policy draft. Luật mới không tự động áp dụng khi chưa được người có thẩm quyền duyệt.</p>
+                  <h4 className="text-sm font-semibold text-slate-950">Theo dõi cập nhật pháp luật</h4>
+                  <p className="text-xs text-slate-700 mt-0.5">Hệ thống tạo candidate và policy draft. Luật mới không tự động áp dụng khi chưa được người có thẩm quyền phê duyệt.</p>
                 </div>
                 <button
                   onClick={() => void handleSyncLegal()}
                   disabled={isSyncingLegal}
-                  className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white text-xs font-bold"
+                  className="px-3.5 py-1.5 rounded-lg bg-slate-950 hover:bg-graphite disabled:opacity-50 text-parchment text-xs font-medium cursor-pointer"
                 >
                   {isSyncingLegal ? 'Đang kiểm tra...' : 'Kiểm tra nguồn pháp lý'}
                 </button>
               </div>
               {legalUpdates.length === 0 ? (
-                <div className="p-6 rounded-xl border border-slate-800 bg-slate-950/60 text-sm text-slate-400">
+                <div className="p-6 rounded-xl border border-slate-200 bg-white text-xs text-slate-500 text-center">
                   Chưa có candidate mới. Hãy cấu hình `LEGAL_UPDATE_FEED_URLS` bằng feed JSON từ nguồn chính thức rồi chạy đồng bộ.
                 </div>
               ) : (
                 <div className="space-y-3">
                   {legalUpdates.map((update) => (
-                    <div key={update.id} className="p-4 rounded-xl border border-slate-800 bg-slate-950/70 space-y-2">
+                    <div key={update.id} className="p-4 rounded-xl border border-slate-200 bg-white space-y-2 shadow-xs">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="font-mono text-cyan-300 text-sm">{update.documentCode}</span>
-                        <span className="text-[11px] px-2 py-1 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">{update.status}</span>
+                        <span className="font-mono text-slate-950 text-xs font-semibold">{update.documentCode}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">{update.status}</span>
                       </div>
-                      <h5 className="font-bold text-slate-100">{update.title}</h5>
-                      <p className="text-xs text-slate-300">{update.summary}</p>
-                      <pre className="whitespace-pre-wrap text-[11px] text-slate-400 bg-slate-900 p-3 rounded-lg max-h-40 overflow-auto">{update.diff}</pre>
+                      <h5 className="font-semibold text-xs text-slate-950">{update.title}</h5>
+                      <p className="text-xs text-slate-700">{update.summary}</p>
+                      <pre className="whitespace-pre-wrap text-[11px] text-slate-700 bg-slate-100/40 p-3 rounded-lg max-h-40 overflow-auto border border-slate-200">{update.diff}</pre>
                     </div>
                   ))}
                 </div>
@@ -748,60 +748,60 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
             </div>
           )}
 
-          {/* TAB 5: SỔ TIỀN LỆ DOANH NGHIỆP (CORPORATE PRECEDENT REGISTRY) */}
+          {/* TAB 5: SỔ TIỀN LỆ DOANH NGHIỆP */}
           {activeTab === 'PRECEDENTS' && (
-            <div className="space-y-6 animate-in fade-in duration-200">
-              <div className="p-4 bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-slate-950 border border-emerald-500/30 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <h4 className="text-base font-extrabold text-emerald-300 flex items-center gap-2">
-                    <BookmarkCheck className="w-5 h-5 text-emerald-400" />
-                    Sổ Tiền Lệ Doanh Nghiệp & Vòng Học Tự Động AI (Precedent Memory)
+            <div className="space-y-5 animate-in fade-in duration-200">
+              <div className="p-4 bg-slate-100/40 border border-slate-200 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <h4 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
+                    <BookmarkCheck className="w-4 h-4 text-slate-900" />
+                    Sổ Tiền Lệ Doanh Nghiệp (Precedent Memory)
                   </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                    Lưu trữ các phán quyết đặc cách từ CFO / KTT. Các hóa đơn tương lai từ cùng đối tác và nhóm rủi ro tương tự sẽ được AI đối soát và tự động thông qua Routine.
+                  <p className="text-xs text-slate-700 leading-relaxed max-w-2xl">
+                    Lưu trữ các phán quyết đặc cách từ CFO / KTT. Các hóa đơn tương lai từ cùng đối tác và nhóm rủi ro tương tự sẽ được AI tự động thông qua Routine.
                   </p>
                 </div>
                 <button
                   onClick={() => void loadPrecedents()}
                   disabled={isLoadingPrecedents}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all border border-slate-700 shrink-0"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:border-carbon text-slate-700 hover:text-slate-950 text-xs font-medium transition-all border border-slate-200 shrink-0 cursor-pointer shadow-xs"
                 >
-                  <RotateCcw className={`w-3.5 h-3.5 ${isLoadingPrecedents ? 'animate-spin' : ''}`} />
+                  <RotateCcw className={`w-3 h-3 ${isLoadingPrecedents ? 'animate-spin' : ''}`} />
                   <span>Làm mới</span>
                 </button>
               </div>
 
               {isLoadingPrecedents ? (
-                <div className="p-8 text-center text-sm text-slate-400">Đang tải sổ tiền lệ...</div>
+                <div className="p-8 text-center text-xs text-slate-500">Đang tải sổ tiền lệ...</div>
               ) : precedents.length === 0 ? (
-                <div className="p-8 rounded-2xl border border-slate-800 bg-slate-950/60 text-center space-y-2">
-                  <BookmarkCheck className="w-10 h-10 text-slate-600 mx-auto" />
-                  <p className="text-sm font-semibold text-slate-300">Chưa có tiền lệ nào được thiết lập</p>
-                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                <div className="p-8 rounded-2xl border border-dashed border-slate-200 bg-white text-center space-y-2">
+                  <BookmarkCheck className="w-8 h-8 text-mist mx-auto" />
+                  <p className="text-xs font-semibold text-slate-950">Chưa có tiền lệ nào được thiết lập</p>
+                  <p className="text-[11px] text-slate-500 max-w-md mx-auto">
                     Khi CFO hoặc KTT phê duyệt một hóa đơn ngoại lệ và tích chọn "Lưu làm tiền lệ cho doanh nghiệp", tiền lệ sẽ xuất hiện ở đây để tự động hóa các hóa đơn tương tự sau này.
                   </p>
                 </div>
               ) : (
-                <div className="grid gap-4">
+                <div className="grid gap-3">
                   {precedents.map((p) => (
                     <div
                       key={p.id}
-                      className="p-5 rounded-2xl border border-slate-800 bg-slate-950/80 hover:border-slate-700 transition space-y-3"
+                      className="p-4 rounded-xl border border-slate-200 bg-white hover:border-carbon/50 transition space-y-3 shadow-xs"
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <div className="p-1.5 rounded-lg bg-slate-100 text-slate-950">
                             <Building2 className="w-4 h-4" />
                           </div>
                           <div>
-                            <div className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                            <div className="text-xs font-semibold text-slate-950 flex items-center gap-2">
                               <span>MST: {p.supplierTaxCode}</span>
-                              <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px]">
+                              <span className="rounded bg-emerald-50 text-emerald-800 border border-emerald-200 px-1.5 py-0.2 text-[10px]">
                                 {p.status === 'ACTIVE' ? 'Đang hiệu lực' : 'Đã thu hồi'}
-                              </Badge>
+                              </span>
                             </div>
-                            <div className="text-xs text-slate-400 font-mono mt-0.5">
-                              ID: {p.id} · Ngày lập: {new Date(p.createdAt).toLocaleDateString('vi-VN')}
+                            <div className="text-[11px] text-slate-500 font-mono mt-0.5">
+                              ID: {p.id} · Ngày: {new Date(p.createdAt).toLocaleDateString('vi-VN')}
                             </div>
                           </div>
                         </div>
@@ -809,35 +809,35 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
                         {p.status === 'ACTIVE' && (
                           <button
                             onClick={() => void handleRevokePrecedent(p.id)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold transition"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 text-xs font-medium transition cursor-pointer"
                           >
-                            <Trash2 className="w-3.5 h-3.5" /> Thu hồi tiền lệ
+                            <Trash2 className="w-3 h-3" /> Thu hồi
                           </button>
                         )}
                       </div>
 
-                      <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                        <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
-                          <span className="text-slate-500 block text-[10px] uppercase font-bold">Mô hình rủi ro</span>
-                          <span className="text-slate-200 font-medium">{p.riskPattern}</span>
+                      <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                        <div className="bg-slate-100/40 p-2 rounded-lg border border-slate-200/80">
+                          <span className="text-slate-500 block text-[10px] uppercase font-mono">Mô hình rủi ro</span>
+                          <span className="text-slate-950 font-medium text-xs">{p.riskPattern}</span>
                         </div>
-                        <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
-                          <span className="text-slate-500 block text-[10px] uppercase font-bold">Phương án phê duyệt</span>
-                          <span className="text-emerald-400 font-bold">{p.approvedOption}</span>
+                        <div className="bg-slate-100/40 p-2 rounded-lg border border-slate-200/80">
+                          <span className="text-slate-500 block text-[10px] uppercase font-mono">Phương án phê duyệt</span>
+                          <span className="text-slate-950 font-semibold text-xs">{p.approvedOption}</span>
                         </div>
-                        <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
-                          <span className="text-slate-500 block text-[10px] uppercase font-bold">Người duyệt tiền lệ</span>
-                          <span className="text-slate-200 font-medium">{p.approvedBy}</span>
+                        <div className="bg-slate-100/40 p-2 rounded-lg border border-slate-200/80">
+                          <span className="text-slate-500 block text-[10px] uppercase font-mono">Người duyệt</span>
+                          <span className="text-slate-950 font-medium text-xs">{p.approvedBy}</span>
                         </div>
-                        <div className="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
-                          <span className="text-slate-500 block text-[10px] uppercase font-bold">Căn cứ SOP</span>
-                          <span className="text-sky-400 font-mono text-[11px]">{p.sopClause}</span>
+                        <div className="bg-slate-100/40 p-2 rounded-lg border border-slate-200/80">
+                          <span className="text-slate-500 block text-[10px] uppercase font-mono">Căn cứ SOP</span>
+                          <span className="text-slate-950 font-mono text-xs">{p.sopClause}</span>
                         </div>
                       </div>
 
-                      <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/80 text-xs">
-                        <span className="text-slate-400 font-bold block mb-1">Căn cứ giải trình & Phê duyệt của Lãnh đạo:</span>
-                        <p className="text-slate-300 leading-relaxed italic">"{p.rationale}"</p>
+                      <div className="bg-slate-100/30 p-2.5 rounded-lg border border-slate-200 text-xs">
+                        <span className="text-slate-500 font-mono text-[10px] uppercase block mb-0.5">Lý do giải trình:</span>
+                        <p className="text-slate-700 italic text-[11px]">"{p.rationale}"</p>
                       </div>
                     </div>
                   ))}
@@ -848,18 +848,18 @@ export const PolicyViewerModal: React.FC<PolicyViewerModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-slate-950/70">
-          <span className="text-xs text-slate-400 flex items-center gap-1.5">
-            <FileCheck2 className="w-4 h-4 text-emerald-400" />
-            Đồng bộ hóa 100% với Luật, Nghị định của Chính phủ niên độ 2025 - 2026.
+        <div className="flex items-center justify-between px-6 py-3.5 border-t border-slate-200 bg-slate-100/30">
+          <span className="text-xs text-slate-500 flex items-center gap-1.5 font-mono">
+            <FileCheck2 className="w-3.5 h-3.5 text-emerald-700" />
+            Đồng bộ 100% với Luật & Nghị định niên độ 2025 - 2026
           </span>
-          <Button
+          <button
             type="button"
             onClick={onClose}
-            className="bg-purple-600 hover:bg-purple-500 text-white font-bold"
+            className="rounded-lg bg-slate-950 hover:bg-graphite text-parchment px-4 py-1.5 text-xs font-medium cursor-pointer shadow-xs transition"
           >
             Đóng cửa sổ
-          </Button>
+          </button>
         </div>
       </DialogContent>
     </Dialog>

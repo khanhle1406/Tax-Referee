@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { extractInvoiceWithGemini } from '@/services/geminiService';
+import { extractInvoiceWithDeepSeek } from '@/services/deepseekService';
 import { DocumentExtractionSchema } from '@/lib/schemas';
 import { getDatabase, jsonNow } from '@/lib/server/db';
 
@@ -404,11 +404,11 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        const extracted = await extractInvoiceWithGemini(buffer.toString('base64'), mimeType);
+        const extracted = await extractInvoiceWithDeepSeek(buffer.toString('base64'), mimeType, file.name);
         rawData = (extracted || {}) as Record<string, unknown>;
-        initialWarnings.push('Dữ liệu OCR được đọc bởi AI; kế toán vui lòng kiểm tra lại trước khi thẩm định.');
-      } catch (geminiError) {
-        console.warn('Gemini extraction fallback:', geminiError);
+        initialWarnings.push('Dữ liệu OCR được đọc bởi DeepSeek Server Agent (Patchright); kế toán vui lòng kiểm tra lại trước khi thẩm định.');
+      } catch (aiError) {
+        console.warn('DeepSeek extraction fallback:', aiError);
         initialWarnings.push('Không thể nhận diện tự động qua AI. Vui lòng nhập thông tin chứng từ trên Form.');
       }
     }

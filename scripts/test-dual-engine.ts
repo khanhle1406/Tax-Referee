@@ -15,6 +15,9 @@ async function main() {
       RefereeDecisionSchema.parse(result.decision);
       passed++;
       console.log(`[PASS] ${row.id}: ${result.engineUsed} - ${result.decision.status}`);
+      if (result.engineUsed === 'DEEPSEEK_AI') {
+        await new Promise((r) => setTimeout(r, 1200));
+      }
     } catch (error) {
       console.error(`[FAIL] ${row.id}:`, error instanceof Error ? error.message : error);
     }

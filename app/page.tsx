@@ -2,7 +2,7 @@
 
 import React, { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, LockKeyhole, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Check } from 'lucide-react';
 import { ProductionWorkspace } from '@/components/ProductionWorkspace';
 
 type AppUser = { id: string; email: string; displayName: string; role: 'ACCOUNTANT' | 'CHIEF_ACCOUNTANT' | 'CFO' };
@@ -17,7 +17,7 @@ export default function HomePage() {
 
   useEffect(() => {
     fetch('/api/auth/me')
-      .then(async (response) => response.ok ? response.json() : null)
+      .then(async (res) => res.ok ? res.json() : null)
       .then((data) => setUser(data?.user || null))
       .catch(() => undefined)
       .finally(() => setChecking(false));
@@ -28,12 +28,16 @@ export default function HomePage() {
     setBusy(true);
     setError('');
     try {
-      const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Không thể đăng nhập');
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lỗi đăng nhập');
       setUser(data.user);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Không thể đăng nhập');
+      setError(err instanceof Error ? err.message : 'Lỗi đăng nhập');
     } finally {
       setBusy(false);
     }
@@ -44,96 +48,154 @@ export default function HomePage() {
     setUser(null);
   };
 
-  if (checking) return <div className="flex min-h-screen items-center justify-center bg-[#f5f7fb] text-sm text-slate-500">Đang mở Tax Referee...</div>;
-  if (user) return <ProductionWorkspace user={user} onLogout={() => void logout()} onRoleSwitched={(next) => setUser(next)} />;
+  if (checking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 text-slate-500 font-sans">
+        <div className="flex items-center gap-3">
+          <span className="h-3 w-3 rounded-full bg-brand-lime animate-ping" />
+          <span className="text-base font-medium text-slate-900">Đang khởi tạo Tax Referee...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (user) {
+    return (
+      <ProductionWorkspace
+        user={user}
+        onLogout={() => void logout()}
+        onRoleSwitched={(next) => setUser(next)}
+      />
+    );
+  }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f5f7fb] px-4 py-10">
-      <div className="grid w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl md:grid-cols-[1fr_0.9fr]">
-        <section className="hidden bg-slate-900 p-10 text-white md:block"><div className="flex items-center gap-3"><div className="rounded-xl bg-white/10 p-2.5"><ShieldCheck className="h-6 w-6" /></div><span className="text-xl font-bold">Tax Referee</span></div><div className="mt-24 max-w-sm"><p className="text-sm font-semibold text-sky-300">WORKSPACE TIỀN HẠCH TOÁN</p><h1 className="mt-3 text-4xl font-bold leading-tight">Xử lý đúng việc, đúng người, đúng thời điểm.</h1><p className="mt-5 text-sm leading-7 text-slate-300">Hệ thống kiểm tra chứng từ, dừng tự động hóa khi có rủi ro và lưu lại căn cứ cho từng quyết định.</p></div></section>
-        <section className="p-7 sm:p-10">
-          <div className="mb-8 md:hidden">
+    <main className="flex min-h-screen items-center justify-center bg-slate-100/80 px-4 py-8">
+      <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+        
+        {/* Header - To & Rõ ràng, Tối giản chữ */}
+        <div className="border-b border-slate-200 bg-white p-6 sm:p-8">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-slate-900 p-2.5 text-white">
-                <ShieldCheck className="h-5 w-5" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-brand-lime">
+                <ShieldCheck className="h-6 w-6" />
               </div>
-              <span className="text-xl font-bold">Tax Referee</span>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-950">Tax Referee</h1>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Tiền hạch toán thuế</p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              Online
+            </span>
+          </div>
+        </div>
+
+        {/* Content & Form */}
+        <div className="p-6 sm:p-8 space-y-6">
+          
+          {/* Chọn vai trò (Role tiles - To, Rõ, Ít chữ) */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">
+              Chọn vai trò
+            </label>
+            <div className="grid grid-cols-3 gap-2.5">
+              {[
+                { role: 'ACCOUNTANT', title: 'Kế toán viên', email: 'ke-toan@local', pass: 'accountant-local' },
+                { role: 'CHIEF_ACCOUNTANT', title: 'Kế toán trưởng', email: 'ktt@local', pass: 'ktt-local' },
+                { role: 'CFO', title: 'CFO', email: 'cfo@local', pass: 'cfo-local' }
+              ].map((r) => {
+                const isSelected = email === r.email;
+                return (
+                  <button
+                    key={r.role}
+                    type="button"
+                    onClick={() => {
+                      setEmail(r.email);
+                      setPassword(r.pass);
+                      setError('');
+                    }}
+                    className={`flex flex-col items-center justify-center p-3.5 rounded-xl border text-center transition cursor-pointer ${
+                      isSelected
+                        ? 'border-slate-950 bg-slate-950 text-white font-bold shadow-sm'
+                        : 'border-slate-200 bg-slate-50/70 hover:bg-slate-100 text-slate-700 font-semibold'
+                    }`}
+                  >
+                    <span className="text-sm tracking-tight">{r.title}</span>
+                    {isSelected && (
+                      <span className="mt-1 flex items-center gap-1 text-[11px] font-bold text-brand-lime">
+                        <Check className="h-3 w-3" /> Đã chọn
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-500">
-            <LockKeyhole className="h-4 w-4" /> Đăng nhập workspace vận hành
-          </div>
-          <h2 className="mt-2 text-2xl font-bold text-slate-950">Chọn vai trò đăng nhập</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">
-            Chuyển nhanh giữa 3 vai trò kế toán thực tế hoặc nhập tài khoản:
-          </p>
 
-          {/* Quick Role Switcher Buttons */}
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            {[
-              { role: 'ACCOUNTANT', title: 'Kế toán viên', email: 'ke-toan@local', pass: 'accountant-local', badge: 'Tiếp nhận / Routine' },
-              { role: 'CHIEF_ACCOUNTANT', title: 'Kế toán trưởng', email: 'ktt@local', pass: 'ktt-local', badge: 'Duyệt ngoại lệ' },
-              { role: 'CFO', title: 'CFO', email: 'cfo@local', pass: 'cfo-local', badge: 'Hạn mức cao / K' }
-            ].map((r) => {
-              const isSelected = email === r.email;
-              return (
-                <button
-                  key={r.role}
-                  type="button"
-                  onClick={() => {
-                    setEmail(r.email);
-                    setPassword(r.pass);
-                    setError('');
-                  }}
-                  className={`flex flex-col items-start p-3 rounded-xl border text-left transition ${
-                    isSelected
-                      ? 'border-sky-600 bg-sky-50/70 ring-2 ring-sky-500'
-                      : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100 hover:border-slate-300'
-                  }`}
-                >
-                  <span className="text-xs font-bold text-slate-900">{r.title}</span>
-                  <span className="text-[10px] text-slate-500 mt-0.5 leading-tight">{r.badge}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <form onSubmit={login} className="mt-5 space-y-3.5">
-            <label className="block text-xs font-semibold text-slate-700">
-              Email / Tài khoản
+          {/* Form */}
+          <form onSubmit={login} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                Tài khoản
+              </label>
               <input
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-base font-semibold text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
                 autoComplete="username"
               />
-            </label>
-            <label className="block text-xs font-semibold text-slate-700">
-              Mật khẩu
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                Mật khẩu
+              </label>
               <input
                 type="password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-base font-semibold text-slate-900 outline-none transition focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
                 autoComplete="current-password"
               />
-            </label>
-            {error && <p className="rounded-xl bg-rose-50 px-3 py-2 text-xs text-rose-700">{error}</p>}
+            </div>
+
+            {error && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700">
+                {error}
+              </div>
+            )}
+
+            {/* CTA Button: Ramp Accent Lime or Slate Ink, Big & Clear */}
             <button
+              type="submit"
               disabled={busy}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-slate-800 disabled:opacity-60 shadow-md"
+              className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-slate-950 hover:bg-slate-900 px-6 py-3.5 text-base font-bold text-white transition active:scale-[0.99] disabled:opacity-50 cursor-pointer shadow-sm"
             >
-              {busy ? 'Đang mở workspace...' : `Vào làm việc với quyền ${email === 'cfo@local' ? 'CFO' : email === 'ktt@local' ? 'Kế toán trưởng' : 'Kế toán viên'}`} <ArrowRight className="h-4 w-4" />
+              {busy ? (
+                'Đang xử lý...'
+              ) : (
+                <>
+                  <span>VÀO WORKSPACE</span>
+                  <ArrowRight className="h-4 w-4 text-brand-lime" />
+                </>
+              )}
             </button>
           </form>
 
-          <div className="mt-6 border-t border-slate-100 pt-4 flex items-center justify-between text-xs">
-            <span className="text-slate-500">Môi trường thi đấu / Benchmark:</span>
-            <Link href="/verify" className="inline-flex items-center gap-1 font-bold text-sky-700 hover:text-sky-900">
-              Mở Verify Harness public <ArrowRight className="h-3.5 w-3.5" />
+          {/* Footer link to verify */}
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-sm">
+            <span className="text-slate-500 font-medium">Bộ kiểm thử:</span>
+            <Link
+              href="/verify"
+              className="inline-flex items-center gap-1.5 font-bold text-slate-900 hover:text-slate-700 underline underline-offset-4"
+            >
+              Verify Harness & Benchmark <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-        </section>
+        </div>
+
       </div>
     </main>
   );

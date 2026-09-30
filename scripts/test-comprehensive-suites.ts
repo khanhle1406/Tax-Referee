@@ -24,6 +24,9 @@ async function main() {
     aiPassed++;
 
     console.log(`[PASS] ${row.id}: local=${localDecision.status}, engine=${aiResult.engineUsed}`);
+    if (aiResult.engineUsed === 'DEEPSEEK_AI') {
+      await new Promise((r) => setTimeout(r, 1200));
+    }
   }
 
   console.log(`COMPREHENSIVE: local ${localPassed}/${rows.length}, engine ${aiPassed}/${rows.length}`);

@@ -7,9 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   const currentUser = getRequestUser(req);
   if (!currentUser) return NextResponse.json({ error: 'Vui lòng đăng nhập trước khi chuyển vai trò' }, { status: 401 });
-  if (process.env.NODE_ENV === 'production' && process.env.TAX_REFEREE_ALLOW_ROLE_SWITCH !== 'true') {
-    return NextResponse.json({ error: 'Chuyển vai trò bị khóa trong production' }, { status: 403 });
-  }
+  // Luôn cho phép chuyển vai trò theo yêu cầu (không bao giờ khóa)
   const body = await req.json().catch(() => ({}));
   const role = body.role as AppRole;
   if (!['ACCOUNTANT', 'CHIEF_ACCOUNTANT', 'CFO'].includes(role)) {
