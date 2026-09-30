@@ -51,3 +51,12 @@ graphify-out/
 *.njsproj
 *.sln
 *.sw?
+
+# Python & DeepSeek Server Agent
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+deepseek_auth.json
+deepseek-agent/deepseek_auth.json
+deepseek-agent/*.log

@@ -1,85 +1,85 @@
 # RUNBOOK CUỘC THI TAX REFEREE
 
-## Yêu cầu
+## 1. Yêu Cầu Môi Trường
+- **Node.js:** `>= 20.0.0` (Khuyến nghị Node 20 hoặc 22/24).
+- **Python (Tùy chọn):** `>= 3.10` nếu muốn chạy DeepSeek Server Agent cục bộ.
+- **Trình duyệt:** Chrome, Edge, Safari hoặc Firefox.
 
-- Node.js >= 18.18.0, khuyến nghị Node 20 hoặc 22+.
-- Chrome, Edge, Safari hoặc Firefox.
-- Gemini API key nếu muốn chạy AI Q-Gen/OCR; local policy vẫn có fallback an toàn.
+---
 
-## Khởi động
+## 2. Khởi Động Nhanh (Quick Start)
 
+### Bước 1: Khởi chạy DeepSeek Server Agent (Tùy chọn)
+Nếu muốn kích hoạt Vision OCR và Q-Gen thông minh qua DeepSeek cục bộ (Cổng 8000):
 ```bash
+cd deepseek-agent
+pip install -r requirements.txt
+python -m patchright install chromium
+
+# Đăng nhập tạo session an toàn (chỉ làm lần đầu):
+python deepseek_login.py
+
+# Khởi chạy API server:
+python deepseek_server.py
+```
+*(Nếu bỏ qua bước này, hệ thống sẽ tự động fallback sang Google Gemini AI hoặc Policy Engine tất định mà không bị lỗi).*
+
+### Bước 2: Khởi chạy Ứng dụng Tax Referee
+Trong thư mục gốc của dự án:
+```bash
+# 1. Cài đặt dependencies
 npm install
+
+# 2. Tạo tệp môi trường
 cp .env.example .env.local
-npm run dev
-```
 
-Mở `http://localhost:3000`.
-
-## Chuẩn bị demo tái lập
-
-Reset dữ liệu invoice/artifact/evaluation nhưng giữ audit history:
-
-```bash
-npm run demo:reset
-```
-
-Sau đó đăng nhập và vào **Tiếp nhận**. Upload file thật từ `input-sample/` hoặc nhập một invoice mới. Không có preset hóa đơn hard-code trong runtime.
-
-## Kịch bản trình diễn
-
-1. Upload XML/PDF/ảnh thật.
-2. Kiểm tra trường đã parse và cảnh báo nguồn dữ liệu.
-3. Bấm thẩm định.
-4. Nếu Routine, Kế toán viên xác nhận.
-5. Nếu Escalated, chuyển đúng KTT/CFO và chọn phương án A/B.
-6. Mở Audit Trail và kiểm tra trạng thái audit.
-7. Xuất dossier JSON hoặc bản in.
-8. Mở bản nháp 01/GTGT từ **Báo cáo** hoặc 04/SS-HĐĐT từ hồ sơ đang chọn.
-
-Dossier và form thuế hiện là bản nội bộ/bản nháp; chưa thay thế file chính thức, chưa ký số và chưa nộp cơ quan thuế.
-
-## Regression
-
-Build và diagnostics:
-
-```bash
+# 3. Khởi chạy server production:
 npm run build
-```
+npm run start -- -p 3000
 
-Policy regression trên invoice đang lưu trong SQLite:
+# Hoặc khởi chạy chế độ phát triển:
+# npm run dev
+```
+Mở trình duyệt truy cập: **`http://localhost:3000`**.
+
+---
+
+## 3. Tài Khoản Đăng Nhập Mặc Định
+
+| Vai Trò | Email | Mật Khẩu | Chức Năng Chính |
+| :--- | :--- | :--- | :--- |
+| **Kế toán viên (KTV)** | `ke-toan@local` | `accountant-local` | Tiếp nhận chứng từ, duyệt hàng loạt hóa đơn thường quy (`ROUTINE`), xem định khoản Sổ cái kế toán. |
+| **Kế toán trưởng (KTT)** | `ktt@local` | `ktt-local` | Thẩm định ngoại lệ rủi ro (< 200M), xem Diff luật mới cào từ Cổng Chính phủ/TCT, đồng bộ ERP (MISA, FAST, XML TT99). |
+| **Giám đốc Tài chính (CFO)** | `cfo@local` | `cfo-local` | Phê duyệt ca vượt hạn mức (≥ 200M) và Vùng Đỏ K-factor, ban hành & thu hồi Tiền lệ đặc cách. |
+
+---
+
+## 4. Kịch Bản Trình Diễn Demo (Step-by-Step)
+
+1. **Khôi phục dữ liệu demo sạch:** Nhấn nút **"Khôi phục dữ liệu mẫu" (Reset Demo)** trên thanh điều hướng hoặc chạy lệnh:
+   ```bash
+   npm run demo:reset
+   ```
+2. **Tiếp nhận & Bóc tách chứng từ:** Vào mục **"Tiếp nhận"**, upload hóa đơn thực tế từ thư mục `input-sample/` (hỗ trợ XML, PDF và Ảnh thực tế).
+3. **Thẩm định tự động & Q-Gen:** Bấm **"Thẩm định rủi ro"**. 
+   - Nếu là ca thường quy (`ROUTINE`), KTV bấm xác nhận duyệt ngay vào Sổ cái.
+   - Nếu có rủi ro (`ESCALATION`), DeepSeek/Gemini AI sinh câu hỏi đóng ngữ cảnh hóa và 2 phương án đối ứng (Phương án A vs Phương án B) cho KTT/CFO.
+4. **Sổ cái Kế toán & Tích hợp ERP:** Sau khi duyệt, hóa đơn tự động sinh bút toán định khoản Nợ/Có theo Thông tư 99 và Thông tư 133, có thể xuất XML hoặc adapter MISA/FAST.
+5. **Trung tâm Thông báo & Giám sát Pháp lý:** Vào tab **"Thông báo"** để xem trạng thái Hệ số K an toàn và bấm nút **"Cào & Quét luật mới"** đối soát tự động từ các Cổng Chính phủ.
+6. **Lưu vết Kiểm toán (Audit Trail):** Mở bảng Audit Trail để xem chuỗi băm bảo mật SHA-256 (`previous_hash` -> `event_hash`) và xuất Hồ sơ Phòng vệ Thuế 1-Click.
+
+---
+
+## 5. Kiểm Thử Hệ Thống (CLI Tests)
 
 ```bash
-npm run test:real
-```
+# Kiểm thử định khoản Sổ cái Kế toán (Thông tư 99, 133, MISA, FAST):
+npx tsx scripts/test-ledger-integration.ts
 
-Dual-engine regression:
+# Kiểm thử 10 dạng hóa đơn đặc thù niên độ 2025 - 2026:
+npx tsx scripts/test-diverse-invoice-types.ts
 
-```bash
+# Kiểm thử kết nối Dual-Engine AI:
 npm run test:dual-engine
 ```
 
-Regression manifest có expected status/risk/authority:
-
-```bash
-npm run test:manifest
-```
-
-Manifest nằm tại `data/verification/manifest.json`. Cần upload các file nguồn trong manifest trước khi chạy; nếu thiếu artifact, test sẽ báo lỗi thay vì tự tạo dữ liệu.
-
-## Kiểm tra duplicate
-
-Vào **Báo cáo** để xem nhóm số hóa đơn trùng. KTT/CFO có thể giữ bản đầu và chuyển bản sau sang `ON_HOLD`. Thao tác được ghi vào audit.
-
-API báo cáo duplicate:
-
-```text
-GET /api/invoices/duplicates
-```
-
-## Giới hạn hiện tại
-
-- Artifact được lưu local tại `data/runtime/artifacts`.
-- Chữ ký số CA chưa được xác minh.
-- Form 01/GTGT và 04/SS-HĐĐT là bản nháp theo mapping, chưa phải file HTKK/eTax chính thức.
-- Khi Gemini hết quota, hệ thống hiển thị/fallback về local policy.
