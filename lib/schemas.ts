@@ -287,3 +287,16 @@ export const CorporatePrecedentSchema = z.object({
 });
 export type CorporatePrecedent = z.infer<typeof CorporatePrecedentSchema>;
 
+// 11. Schema Thông báo Hệ thống & Giám sát Pháp luật
+export const SystemNotificationSchema = z.object({
+  id: z.string(),
+  type: z.enum(['LEGAL_UPDATE', 'INVOICE_RISK', 'PRECEDENT', 'SYSTEM']),
+  title: z.string(),
+  message: z.string(),
+  link: z.string().optional().nullable(),
+  isRead: z.boolean().default(false),
+  metadata: z.record(z.unknown()).optional().default({}),
+  createdAt: z.string()
+});
+export type SystemNotification = z.infer<typeof SystemNotificationSchema>;
+

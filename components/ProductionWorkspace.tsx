@@ -23,13 +23,21 @@ import {
   Square,
   Sparkles,
   Building2,
-  RotateCcw
+  RotateCcw,
+  PanelLeftClose,
+  PanelLeftOpen,
+  SquarePen,
+  Search,
+  MessageSquare,
+  MoreHorizontal,
+  Bell
 } from 'lucide-react';
 import { InteractiveInputForm } from '@/components/InteractiveInputForm';
 import { PolicyViewerModal } from '@/components/PolicyViewerModal';
 import { LedgerSyncModal } from '@/components/LedgerSyncModal';
 import { DocumentViewer } from '@/components/DocumentViewer';
 import { InboxFilterToolbar, InboxFilterState, DEFAULT_FILTER_STATE } from '@/components/InboxFilterToolbar';
+import { NotificationCenterView } from '@/components/NotificationCenterView';
 import { ActionOption, InvoiceInput, MacroState, RefereeDecision, SystemPolicyConfig } from '@/lib/schemas';
 import { DEFAULT_POLICY_CONFIG, MACRO_DEFAULTS } from '@/lib/constants';
 import { formatVND } from '@/lib/utils';
@@ -40,7 +48,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
 type AppUser = { id: string; email: string; displayName: string; role: 'ACCOUNTANT' | 'CHIEF_ACCOUNTANT' | 'CFO' };
-type View = 'inbox' | 'receive' | 'approval' | 'dossier' | 'reports';
+type View = 'inbox' | 'receive' | 'approval' | 'dossier' | 'reports' | 'notifications';
 type InboxItem = {
   id: string;
   invoiceNumber: string;
@@ -126,6 +134,17 @@ export function ProductionWorkspace({
   const [isBulkConfirming, setIsBulkConfirming] = useState<boolean>(false);
   const [ledgerSyncOpen, setLedgerSyncOpen] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [unreadNotifCount, setUnreadNotifCount] = useState<number>(0);
+
+  const userInitials = useMemo(() => {
+    const name = user.displayName?.trim() || 'Khánh';
+    const parts = name.split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  }, [user.displayName]);
 
   const showToast = useCallback((message: string, type: 'info' | 'success' | 'error' = 'info') => {
     if (type === 'success') toast.success(message);
@@ -137,10 +156,11 @@ export function ProductionWorkspace({
     setLoading(true);
     setError('');
     try {
-      const [inboxRes, runtimeRes, dupRes] = await Promise.all([
+      const [inboxRes, runtimeRes, dupRes, notifRes] = await Promise.all([
         fetch('/api/inbox'),
         fetch('/api/runtime'),
-        fetch('/api/invoices/duplicates')
+        fetch('/api/invoices/duplicates'),
+        fetch('/api/notifications')
       ]);
       if (inboxRes.status === 401 || runtimeRes.status === 401) {
         onLogout();
@@ -157,6 +177,10 @@ export function ProductionWorkspace({
       if (dupRes.ok) {
         const dupData = await dupRes.json();
         setDuplicateGroups(dupData.groups || []);
+      }
+      if (notifRes.ok) {
+        const notifData = await notifRes.json();
+        if (typeof notifData.unreadCount === 'number') setUnreadNotifCount(notifData.unreadCount);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Không thể tải dữ liệu');
@@ -312,7 +336,8 @@ export function ProductionWorkspace({
     { id: 'receive', label: 'Tiếp nhận', icon: <FileText className="h-4 w-4" /> },
     { id: 'approval', label: 'Chờ duyệt', icon: <ClipboardCheck className="h-4 w-4" />, count: approvalItems.length },
     { id: 'dossier', label: 'Đã xử lý', icon: <CheckCircle2 className="h-4 w-4" /> },
-    { id: 'reports', label: 'Báo cáo', icon: <ShieldCheck className="h-4 w-4" /> }
+    { id: 'reports', label: 'Báo cáo', icon: <ShieldCheck className="h-4 w-4" /> },
+    { id: 'notifications', label: 'Thông báo', icon: <Bell className="h-4 w-4" />, count: unreadNotifCount }
   ];
 
   const visibleList = view === 'approval' ? approvalItems : view === 'dossier' ? items.filter((item) => ['APPROVED', 'REJECTED'].includes(item.status)) : items;
@@ -651,7 +676,6 @@ export function ProductionWorkspace({
 
   const switchRole = async (targetRole: AppUser['role']) => {
     try {
-      showToast('Đang chuyển vai trò...', 'info');
       const response = await fetch('/api/auth/switch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -668,259 +692,417 @@ export function ProductionWorkspace({
   };
 
   return (
-    <div className="relative min-h-screen bg-slate-50/70 text-slate-900 selection:bg-brand-lime selection:text-slate-950">
+    <div className="relative min-h-screen bg-slate-50/70 text-slate-900 selection:bg-brand-lime selection:text-slate-950 flex flex-col md:flex-row">
       
-      {/* Top Header - To & Rõ, Ít chữ */}
-      <header className="border-b border-slate-200 bg-white sticky top-0 z-30 shadow-subtle">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      {/* Collapsible Left Sidebar (Fixed Icon Coordinates & Persistent Slots) */}
+      <aside
+        id="stage-slideover-sidebar"
+        data-state={isSidebarCollapsed ? 'closed' : 'open'}
+        className={`sticky top-0 h-screen flex flex-col bg-[#f9f9f9] text-slate-900 border-r border-slate-200/80 transition-[width] duration-200 ease-out shrink-0 z-40 select-none overflow-hidden ${
+          isSidebarCollapsed ? 'w-[56px]' : 'w-[260px]'
+        }`}
+      >
+        <div className="relative flex h-full flex-col w-[260px]">
           
-          {/* Brand + Fast Role Switcher */}
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-950 text-brand-lime shadow-sm">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <div>
-                <span className="text-lg font-bold tracking-tight text-slate-950">Tax Referee</span>
-                <span className="ml-2 font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-1.5 py-0.5 rounded">
-                  SOP 2026
+          {/* ================= HEADER: LOGO + BRAND + CLOSE BUTTON ================= */}
+          <div className="h-[52px] px-2.5 flex items-center justify-between shrink-0 border-b border-slate-200/60 w-full overflow-hidden">
+            <div className="flex items-center gap-0 min-w-0">
+              {/* Logo slot: Luôn cố định tại x=10px, y=8px, size 36x36px */}
+              <button
+                type="button"
+                onClick={() => isSidebarCollapsed && setIsSidebarCollapsed(false)}
+                className={`group/logo flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                  isSidebarCollapsed ? 'hover:bg-black/5 cursor-e-resize' : 'cursor-default'
+                }`}
+                title={isSidebarCollapsed ? 'Mở thanh điều hướng' : 'Tax Referee'}
+                aria-label={isSidebarCollapsed ? 'Mở thanh điều hướng' : 'Tax Referee'}
+              >
+                <span className="grid place-items-center">
+                  <span className={`col-start-1 row-start-1 transition-opacity duration-150 flex h-7 w-7 items-center justify-center rounded-lg bg-slate-950 text-brand-lime shadow-xs ${
+                    isSidebarCollapsed ? 'group-hover/logo:opacity-0' : 'opacity-100'
+                  }`}>
+                    <ShieldCheck className="h-4 w-4" />
+                  </span>
+                  {isSidebarCollapsed && (
+                    <span className="col-start-1 row-start-1 opacity-0 transition-opacity duration-150 group-hover/logo:opacity-100 flex h-7 w-7 items-center justify-center rounded-lg bg-slate-200 text-slate-900">
+                      <PanelLeftOpen className="h-4 w-4" />
+                    </span>
+                  )}
+                </span>
+              </button>
+
+              {/* Brand Wordmark: Xuất hiện mượt mà khi mở rộng */}
+              <div className={`flex items-center gap-1.5 pl-2 whitespace-nowrap transition-opacity duration-150 ${
+                isSidebarCollapsed ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'
+              }`}>
+                <span className="font-semibold text-[15px] tracking-tight text-slate-900">Tax Referee</span>
+                <span className="font-mono text-[9px] font-bold text-slate-500 uppercase tracking-wider bg-slate-200/70 px-1 py-0.5 rounded">
+                  Beta
                 </span>
               </div>
             </div>
 
-            {/* Role Switcher - Luôn hiển thị, không bao giờ khóa */}
-            <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200">
-              {(['ACCOUNTANT', 'CHIEF_ACCOUNTANT', 'CFO'] as const).map((r) => {
-                const isActive = user.role === r;
-                return (
-                  <button
-                    key={r}
-                    onClick={() => void switchRole(r)}
-                    className={`rounded-lg px-2.5 sm:px-3 py-1 text-xs font-bold transition cursor-pointer ${
-                      isActive
-                        ? 'bg-slate-950 text-white shadow-sm'
-                        : 'text-slate-600 hover:text-slate-950'
-                    }`}
-                  >
-                    {roleLabels[r]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* User info, Benchmark link & logout */}
-          <div className="flex items-center gap-2.5">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLedgerSyncOpen(true)}
-              className="gap-1.5 text-xs font-bold text-slate-900 border-slate-300 hover:bg-slate-100 h-8 px-3"
-            >
-              <Building2 className="h-3.5 w-3.5 text-blue-600" />
-              Đồng Bộ Sổ Sách
-            </Button>
-
-            <Link
-              href="/verify"
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-900 transition h-8"
-            >
-              Verify Benchmark <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-
-            <div className="text-right hidden sm:block">
-              <div className="text-xs font-bold text-slate-950">{user.displayName}</div>
-              <div className="text-[11px] text-slate-500 font-mono">{user.email}</div>
-            </div>
-
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={onLogout}
-              className="h-8 w-8 text-slate-600 hover:text-slate-950"
-              title="Đăng xuất"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Workspace Body */}
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row">
-        
-        {/* Left Nav Tabs */}
-        <aside className="w-full shrink-0 lg:w-56 space-y-3">
-          <nav className="rounded-2xl border border-slate-200 bg-white p-2 shadow-subtle space-y-1">
-            {navItems.map((item) => (
+            {/* Nút thu nhỏ bên phải (chỉ hiện khi mở) */}
+            <div className={`shrink-0 transition-opacity duration-150 ${
+              isSidebarCollapsed ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'
+            }`}>
               <button
-                key={item.id}
-                onClick={() => { setView(item.id); if (item.id !== 'receive') setSelected(null); }}
-                className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-bold transition cursor-pointer ${
-                  view === item.id
-                    ? 'bg-slate-950 text-white shadow-sm'
-                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950'
+                type="button"
+                onClick={() => setIsSidebarCollapsed(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-black/5 transition-colors cursor-w-resize"
+                title="Thu gọn thanh điều hướng"
+                aria-label="Thu gọn thanh điều hướng"
+              >
+                <PanelLeftClose className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* ================= NAVIGATION ITEMS: VỊ TRÍ & KÍCH THƯỚC ICON CỐ ĐỊNH 100% ================= */}
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pt-3 px-2.5 space-y-1 w-full">
+            {navItems.map((item) => {
+              const isActive = view === item.id;
+              return (
+                <div key={item.id} className="relative group/navitem flex items-center h-9 w-[240px]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setView(item.id);
+                      if (item.id !== 'receive') setSelected(null);
+                    }}
+                    className={`flex h-9 items-center rounded-lg text-[13px] transition-all duration-200 cursor-pointer overflow-hidden ${
+                      isSidebarCollapsed ? 'w-9' : 'w-[240px]'
+                    } ${
+                      isActive
+                        ? 'bg-black/10 text-slate-950 font-semibold'
+                        : 'text-slate-700 hover:bg-black/5 hover:text-slate-950 font-medium'
+                    }`}
+                    aria-label={item.label}
+                  >
+                    {/* Icon Slot: Luôn giữ nguyên width=36px, height=36px, icon size=16px (h-4 w-4) tại left: 0 */}
+                    <div className="w-9 h-9 shrink-0 flex items-center justify-center relative">
+                      <span className="flex items-center justify-center h-4 w-4">
+                        {item.icon}
+                      </span>
+                      {/* Chấm đỏ thông báo khi thu gọn */}
+                      {isSidebarCollapsed && Boolean(item.count) && (
+                        <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-[#f9f9f9]" />
+                      )}
+                    </div>
+
+                    {/* Text Label + Badge số lượng (Chỉ hiện khi mở rộng, không chèn ép icon) */}
+                    <div className={`flex items-center justify-between flex-1 min-w-0 pr-2.5 whitespace-nowrap transition-opacity duration-150 ${
+                      isSidebarCollapsed ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'
+                    }`}>
+                      <span className="truncate">{item.label}</span>
+                      {Boolean(item.count) && (
+                        <span
+                          className={`inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1.5 text-[11px] font-mono font-bold shrink-0 ${
+                            isActive ? 'bg-black/10 text-slate-950' : 'bg-slate-200/80 text-slate-700'
+                          }`}
+                        >
+                          {item.count}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Floating Tooltip kiểu Radix UI khi thu gọn */}
+                  {isSidebarCollapsed && (
+                    <div className="pointer-events-none absolute left-[calc(100%+8px)] z-50 hidden rounded-md bg-slate-900/90 backdrop-blur-xs px-2.5 py-1 text-[11px] font-medium text-white shadow-lg group-hover/navitem:flex items-center gap-1 whitespace-nowrap animate-in fade-in-0 zoom-in-95 duration-100">
+                      <span>{item.label}</span>
+                      {Boolean(item.count) && (
+                        <span className="ml-1 px-1.5 py-0.2 rounded-full bg-rose-500/80 text-[10px] font-mono">
+                          {item.count}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Mục Cấu hình SOP (cho Kế toán trưởng & CFO) */}
+            {(user.role === 'CHIEF_ACCOUNTANT' || user.role === 'CFO') && (
+              <div className="relative group/navitem flex items-center h-9 w-[240px]">
+                <button
+                  type="button"
+                  onClick={() => setPolicyOpen(true)}
+                  className={`flex h-9 items-center rounded-lg text-[13px] font-medium text-slate-700 hover:bg-black/5 hover:text-slate-950 transition-all duration-200 cursor-pointer overflow-hidden ${
+                    isSidebarCollapsed ? 'w-9' : 'w-[240px]'
+                  }`}
+                  aria-label="Cấu hình SOP"
+                >
+                  <div className="w-9 h-9 shrink-0 flex items-center justify-center text-slate-500">
+                    <Settings2 className="h-4 w-4" />
+                  </div>
+                  <div className={`flex items-center flex-1 min-w-0 pr-2.5 whitespace-nowrap transition-opacity duration-150 ${
+                    isSidebarCollapsed ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'
+                  }`}>
+                    <span className="truncate">Cấu hình SOP</span>
+                  </div>
+                </button>
+
+                {isSidebarCollapsed && (
+                  <div className="pointer-events-none absolute left-[calc(100%+8px)] z-50 hidden rounded-md bg-slate-900/90 backdrop-blur-xs px-2.5 py-1 text-[11px] font-medium text-white shadow-lg group-hover/navitem:flex items-center whitespace-nowrap animate-in fade-in-0 zoom-in-95 duration-100">
+                    Cấu hình SOP
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ================= FOOTER: USER AVATAR CỐ ĐỊNH ================= */}
+          <div className="pb-3 px-2.5 pt-2 border-t border-slate-200/60 shrink-0 w-full overflow-hidden">
+            <div className="relative group/user flex items-center h-9 w-[240px]">
+              <div
+                onClick={() => isSidebarCollapsed && setIsSidebarCollapsed(false)}
+                className={`flex h-9 items-center rounded-lg transition-all duration-200 cursor-pointer overflow-hidden ${
+                  isSidebarCollapsed ? 'w-9 hover:bg-black/5' : 'w-[240px] hover:bg-black/5'
                 }`}
               >
-                <span className="flex items-center gap-2.5">
-                  {item.icon}
-                  {item.label}
-                </span>
-                {Boolean(item.count) && (
-                  <span
-                    className={`inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1.5 text-[11px] font-mono font-bold ${
-                      view === item.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-900'
-                    }`}
-                  >
-                    {item.count}
-                  </span>
-                )}
-              </button>
-            ))}
-          </nav>
+                {/* Avatar Slot: Giữ nguyên vị trí x=10px, y cố định, size h-7 w-7 */}
+                <div className="w-9 h-9 shrink-0 flex items-center justify-center">
+                  <div className="h-7 w-7 rounded-full bg-rose-500 text-white font-bold text-xs flex items-center justify-center shadow-xs transition hover:ring-2 hover:ring-rose-300">
+                    {userInitials}
+                  </div>
+                </div>
 
-          {(user.role === 'CHIEF_ACCOUNTANT' || user.role === 'CFO') && (
-            <Card className="p-3 shadow-subtle">
-              <button
-                onClick={() => setPolicyOpen(true)}
-                className="flex items-center gap-2 text-xs font-bold text-slate-800 hover:text-slate-950 cursor-pointer w-full transition"
+                {/* Tên & Vai trò: Hiện khi mở rộng */}
+                <div className={`flex flex-col min-w-0 pr-2.5 whitespace-nowrap transition-opacity duration-150 ${
+                  isSidebarCollapsed ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'
+                }`}>
+                  <span className="text-[13px] font-semibold text-slate-900 truncate leading-tight">
+                    {user.displayName}
+                  </span>
+                  <span className="text-[11px] text-slate-500 truncate leading-tight">
+                    {roleLabels[user.role]}
+                  </span>
+                </div>
+              </div>
+
+              {/* Floating Tooltip khi thu gọn */}
+              {isSidebarCollapsed && (
+                <div className="pointer-events-none absolute left-[calc(100%+8px)] z-50 hidden rounded-md bg-slate-900/90 backdrop-blur-xs px-2.5 py-1 text-[11px] font-medium text-white shadow-lg group-hover/user:flex flex-col whitespace-nowrap animate-in fade-in-0 zoom-in-95 duration-100">
+                  <span className="font-semibold text-white">{user.displayName}</span>
+                  <span className="text-[10px] text-slate-300">{roleLabels[user.role]}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Right Content Area: Top Header + Main Workspace */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        
+        {/* Top Header */}
+        <header className="border-b border-slate-200 bg-white sticky top-0 z-30 shadow-subtle shrink-0">
+          <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3 sm:px-6">
+            
+            {/* Left: Role Switcher (Không có nút PanelLeftOpen thừa) */}
+            <div className="flex items-center gap-3">
+              {/* Role Switcher - Luôn hiển thị, không bao giờ khóa */}
+              <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200">
+                {(['ACCOUNTANT', 'CHIEF_ACCOUNTANT', 'CFO'] as const).map((r) => {
+                  const isActive = user.role === r;
+                  return (
+                    <button
+                      key={r}
+                      onClick={() => void switchRole(r)}
+                      className={`rounded-lg px-2.5 sm:px-3 py-1 text-xs font-bold transition cursor-pointer ${
+                        isActive
+                          ? 'bg-slate-950 text-white shadow-sm'
+                          : 'text-slate-600 hover:text-slate-950'
+                      }`}
+                    >
+                      {roleLabels[r]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right: Actions, Benchmark link & logout */}
+            <div className="flex items-center gap-2.5">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLedgerSyncOpen(true)}
+                className="gap-1.5 text-xs font-bold text-slate-900 border-slate-300 hover:bg-slate-100 h-8 px-3"
               >
-                <Settings2 className="h-4 w-4 text-slate-600" />
-                <span>Cấu hình SOP</span>
-              </button>
-            </Card>
-          )}
-        </aside>
+                <Building2 className="h-3.5 w-3.5 text-blue-600" />
+                Đồng Bộ Sổ Sách
+              </Button>
+
+              <Link
+                href="/verify"
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-900 transition h-8"
+              >
+                Verify Benchmark <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+
+              <div className="text-right hidden sm:block">
+                <div className="text-xs font-bold text-slate-950">{user.displayName}</div>
+                <div className="text-[11px] text-slate-500 font-mono">{user.email}</div>
+              </div>
+
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={onLogout}
+                className="h-8 w-8 text-slate-600 hover:text-slate-950"
+                title="Đăng xuất"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </header>
 
         {/* Center Workspace Content */}
-        <main className="min-w-0 flex-1 space-y-5">
-          
-          {/* Action & Refresh Bar */}
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-950">
-                {view === 'receive' ? 'Tiếp Nhận Chứng Từ' : view === 'approval' ? 'Hồ Sơ Chờ Duyệt' : view === 'dossier' ? 'Hồ Sơ Đã Xử Lý' : view === 'reports' ? 'Báo Cáo Thuế' : 'Bàn Làm Việc Kế Toán'}
-              </h1>
+        {view === 'notifications' ? (
+          <NotificationCenterView
+            onOpenPolicyModal={(tab) => {
+              setPolicyOpen(true);
+            }}
+            onNavigateView={(nextView) => {
+              setView(nextView as View);
+            }}
+            onUnreadChange={(count) => {
+              setUnreadNotifCount(count);
+            }}
+          />
+        ) : (
+          <main className="flex-1 p-4 sm:p-6 max-w-[1440px] w-full mx-auto space-y-5">
+            
+            {/* Action & Reset Bar */}
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-950">
+                  {view === 'receive' ? 'Tiếp Nhận Chứng Từ' : view === 'approval' ? 'Hồ Sơ Chờ Duyệt' : view === 'dossier' ? 'Hồ Sơ Đã Xử Lý' : view === 'reports' ? 'Báo Cáo Thuế' : 'Bàn Làm Việc Kế Toán'}
+                </h1>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void handleResetWorkspace()}
+                disabled={isResetting}
+                className="font-bold text-xs h-9 px-3 text-rose-700 hover:text-rose-800 hover:bg-rose-50 border-rose-200"
+                title="Reset về trạng thái chưa có hóa đơn nào được gửi lên"
+              >
+                <RotateCcw className={`h-3.5 w-3.5 mr-1.5 ${isResetting ? 'animate-spin' : ''}`} />
+                <span>{isResetting ? 'Đang reset...' : 'Reset'}</span>
+              </Button>
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => void handleResetWorkspace()}
-              disabled={isResetting}
-              className="font-bold text-xs h-9 px-3 text-rose-700 hover:text-rose-800 hover:bg-rose-50 border-rose-200"
-              title="Reset về trạng thái chưa có hóa đơn nào được gửi lên"
-            >
-              <RotateCcw className={`h-3.5 w-3.5 mr-1.5 ${isResetting ? 'animate-spin' : ''}`} />
-              <span>{isResetting ? 'Đang reset...' : 'Reset'}</span>
-            </Button>
-          </div>
 
-          {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-bold text-rose-700">{error}</div>}
-          
-          {loading && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-sm font-bold text-slate-500 shadow-subtle">
-              Đang tải dữ liệu...
-            </div>
-          )}
-
-          {/* 4 Stat Metric Cards (To, Rõ số liệu, Cực ít chữ) */}
-          {!loading && view !== 'receive' && view !== 'reports' && (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-subtle">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Cần xử lý</span>
-                <div className="text-3xl font-extrabold font-numeric text-slate-950 mt-1">{pendingCount}</div>
+            {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-bold text-rose-700">{error}</div>}
+            
+            {loading && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-sm font-bold text-slate-500 shadow-subtle">
+                Đang tải dữ liệu...
               </div>
-              <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-subtle">
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Routine</span>
-                <div className="text-3xl font-extrabold font-numeric text-emerald-700 mt-1">{counts.ROUTINE_PROPOSED || 0}</div>
-              </div>
-              <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-subtle">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-700">Chờ KTT</span>
-                <div className="text-3xl font-extrabold font-numeric text-amber-700 mt-1">{counts.WAITING_CHIEF_ACCOUNTANT || 0}</div>
-              </div>
-              <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-subtle">
-                <span className="text-xs font-bold uppercase tracking-wider text-rose-700">Chờ CFO</span>
-                <div className="text-3xl font-extrabold font-numeric text-rose-700 mt-1">{counts.WAITING_CFO || 0}</div>
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* Receive Form View */}
-          {!loading && view === 'receive' && (
-            <Card className="p-6 sm:p-8 shadow-card">
-              <InteractiveInputForm onEvaluateResult={handleEvaluateResult} dynamicConfig={config} />
-            </Card>
-          )}
-
-          {/* Reports View */}
-          {!loading && view === 'reports' && (
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card className="p-6">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Chính sách hiện hành</span>
-                <p className="mt-2 text-2xl font-extrabold text-slate-950 font-mono">{policyVersion}</p>
-                <Button size="sm" variant="outline" onClick={() => setPolicyOpen(true)} className="mt-4 font-bold">
-                  Quản trị quy tắc SOP →
-                </Button>
-              </Card>
-
-              <Card className="p-6">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Hệ số K (MacroState)</span>
-                <div className="mt-2 flex items-baseline justify-between">
-                  <span className="font-mono text-3xl font-extrabold text-slate-950">{macro.kFactor.toFixed(2)}</span>
-                  <Badge variant={macro.zone === 'SAFE_GREEN' ? 'success' : 'warning'}>
-                    {macro.zone === 'SAFE_GREEN' ? 'An toàn' : 'Cảnh báo'}
-                  </Badge>
+            {/* 4 Stat Metric Cards (To, Rõ số liệu, Cực ít chữ) */}
+            {!loading && view !== 'receive' && view !== 'reports' && (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-subtle">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Cần xử lý</span>
+                  <div className="text-3xl font-extrabold font-numeric text-slate-950 mt-1">{pendingCount}</div>
                 </div>
-              </Card>
+                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-subtle">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Routine</span>
+                  <div className="text-3xl font-extrabold font-numeric text-emerald-700 mt-1">{counts.ROUTINE_PROPOSED || 0}</div>
+                </div>
+                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-subtle">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-700">Chờ KTT</span>
+                  <div className="text-3xl font-extrabold font-numeric text-amber-700 mt-1">{counts.WAITING_CHIEF_ACCOUNTANT || 0}</div>
+                </div>
+                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-subtle">
+                  <span className="text-xs font-bold uppercase tracking-wider text-rose-700">Chờ CFO</span>
+                  <div className="text-3xl font-extrabold font-numeric text-rose-700 mt-1">{counts.WAITING_CFO || 0}</div>
+                </div>
+              </div>
+            )}
 
-              <Card className="p-6 md:col-span-2">
-                <h3 className="text-base font-bold text-slate-950 mb-2">Bản nháp tờ khai thuế</h3>
-                <Button variant="default" onClick={() => openTaxFormDraft('01/GTGT')} className="font-bold">
-                  Mở tờ khai 01/GTGT
-                </Button>
+            {/* Receive Form View */}
+            {!loading && view === 'receive' && (
+              <Card className="p-6 sm:p-8 shadow-card">
+                <InteractiveInputForm onEvaluateResult={handleEvaluateResult} dynamicConfig={config} />
               </Card>
-            </div>
-          )}
+            )}
 
-          {/* Main List & Review Grid */}
-          {!loading && view !== 'receive' && view !== 'reports' && (
-            selected && showDocumentPreview ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-subtle">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setShowDocumentPreview(false)}
-                    className="font-bold text-xs"
-                  >
-                    ← Quay lại danh sách
+            {/* Reports View */}
+            {!loading && view === 'reports' && (
+              <div className="grid gap-4 md:grid-cols-2">
+                <Card className="p-6">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Chính sách hiện hành</span>
+                  <p className="mt-2 text-2xl font-bold tracking-tight text-slate-950">{policyVersion}</p>
+                  <Button size="sm" variant="outline" onClick={() => setPolicyOpen(true)} className="mt-4 font-bold">
+                    Quản trị quy tắc SOP →
                   </Button>
-                  <span className="font-mono text-xs font-bold text-slate-950">
-                    HĐ #{selected.invoice.invoiceNumber || selected.id}
-                  </span>
-                </div>
+                </Card>
 
-                <div className="grid gap-6 xl:grid-cols-2 items-start">
-                  <DocumentViewer invoice={selected.invoice} onClose={() => setShowDocumentPreview(false)} />
+                <Card className="p-6">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Hệ số K (MacroState)</span>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-3xl font-bold tracking-tight text-slate-950">{macro.kFactor.toFixed(2)}</span>
+                    <Badge variant={macro.zone === 'SAFE_GREEN' ? 'success' : 'warning'}>
+                      {macro.zone === 'SAFE_GREEN' ? 'An toàn' : 'Cảnh báo'}
+                    </Badge>
+                  </div>
+                </Card>
+
+                <Card className="p-6 md:col-span-2">
+                  <h3 className="text-base font-bold text-slate-950 mb-2">Bản nháp tờ khai thuế</h3>
+                  <Button variant="default" onClick={() => openTaxFormDraft('01/GTGT')} className="font-bold">
+                    Mở tờ khai 01/GTGT
+                  </Button>
+                </Card>
+              </div>
+            )}
+
+            {/* Main List & Review Grid */}
+            {!loading && view !== 'receive' && view !== 'reports' && (
+              selected && showDocumentPreview ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-subtle">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowDocumentPreview(false)}
+                      className="font-bold text-xs"
+                    >
+                      ← Quay lại danh sách
+                    </Button>
+                    <span className="font-mono text-xs font-bold text-slate-950">
+                      HĐ #{selected.invoice.invoiceNumber || selected.id}
+                    </span>
+                  </div>
+
+                  <div className="grid gap-6 xl:grid-cols-2 items-start">
+                    <DocumentViewer invoice={selected.invoice} onClose={() => setShowDocumentPreview(false)} />
+                    <div>{renderReview()}</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]">
+                  <div className="space-y-3">
+                    <InboxFilterToolbar
+                      filters={filters}
+                      onChange={setFilters}
+                      totalCount={visibleList.length}
+                      filteredCount={filteredList.length}
+                    />
+                    {renderList(filteredList)}
+                  </div>
                   <div>{renderReview()}</div>
                 </div>
-              </div>
-            ) : (
-              <div className="grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]">
-                <div className="space-y-3">
-                  <InboxFilterToolbar
-                    filters={filters}
-                    onChange={setFilters}
-                    totalCount={visibleList.length}
-                    filteredCount={filteredList.length}
-                  />
-                  {renderList(filteredList)}
-                </div>
-                <div>{renderReview()}</div>
-              </div>
-            )
-          )}
-        </main>
+              )
+            )}
+          </main>
+        )}
       </div>
 
       {/* Floating Bulk Action Bar (1-Click Approve Routine) */}

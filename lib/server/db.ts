@@ -117,6 +117,14 @@ function applyMigrations(db: Database.Database): void {
     `);
     record.run(6, now());
   }
+
+  if (!applied.has(7)) {
+    db.exec(`
+      DELETE FROM system_notifications WHERE type = 'LEGAL_UPDATE';
+      DELETE FROM legal_update_candidates;
+    `);
+    record.run(7, now());
+  }
 }
 
 function initializeDatabase(db: Database.Database): void {
@@ -291,11 +299,25 @@ function initializeDatabase(db: Database.Database): void {
       created_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS system_notifications (
+      id TEXT PRIMARY KEY,
+      type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      link TEXT,
+      is_read INTEGER NOT NULL DEFAULT 0,
+      metadata_json TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_precedents_supplier 
     ON corporate_precedents(supplier_tax_code, status);
 
     CREATE INDEX IF NOT EXISTS idx_invoices_dup_check 
     ON invoices(supplier_tax_code, invoice_number);
+
+    CREATE INDEX IF NOT EXISTS idx_notifications_read
+    ON system_notifications(is_read, created_at);
   `);
 
   applyMigrations(db);
@@ -309,6 +331,27 @@ function initializeDatabase(db: Database.Database): void {
     ['mof', 'Cổng thông tin Bộ Tài chính', 'https://mof.gov.vn'],
     ['tax-gov', 'Cổng thông tin Thuế', 'https://www.gdt.gov.vn']
   ].forEach(([id, name, baseUrl]) => seedSource.run({ id, name, baseUrl }));
+
+  const notifCount = db.prepare('SELECT COUNT(*) as count FROM system_notifications').get() as { count: number };
+  if (notifCount.count === 0) {
+    const insertNotif = db.prepare(`
+      INSERT INTO system_notifications (id, type, title, message, link, is_read, metadata_json, created_at)
+      VALUES (@id, @type, @title, @message, @link, @isRead, @metadataJson, @createdAt)
+    `);
+    const seedNotifications = [
+      {
+        id: 'notif-risk-k-factor',
+        type: 'INVOICE_RISK',
+        title: 'Giám sát Hệ số K: An toàn (Công văn 2392/TCT-QLRR)',
+        message: 'Tỷ lệ chi phí mua vào/doanh thu lũy kế đang ở mức an toàn (K = 1.20, Vùng Xanh).',
+        link: 'reports',
+        isRead: 1,
+        metadataJson: JSON.stringify({ kFactor: 1.2, zone: 'SAFE_GREEN' }),
+        createdAt: now()
+      }
+    ];
+    seedNotifications.forEach((n) => insertNotif.run(n));
+  }
 
   const macro = db.prepare('SELECT id FROM macro_state WHERE id = 1').get();
   if (!macro) {
