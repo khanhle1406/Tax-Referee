@@ -85,3 +85,4 @@ deepseek-agent/*.log
 
 # Thư mục gom hồ sơ nộp bài (có video, tải lên Drive)
 /NOP-BAI-*/
+/NOP-BAI-*.zip
