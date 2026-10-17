@@ -7,7 +7,7 @@ import { evaluateWorkflow } from '../../services/workflowService';
 import { challengeCases, demoCompanyTaxCode } from '../../data/verification/challengeCases';
 import { GET as readInvoice } from '../../app/api/invoices/[id]/route';
 import { containImage } from '../../lib/imageViewport';
-import { readInboxFilters, writeInboxFilters, invoiceIdForPath, invoiceReturnPath, readInvoiceTab, viewForPath } from '../../lib/workspaceNavigation';
+import { readInboxFilters, writeInboxFilters, invoiceIdForPath, invoiceReturnPath, readInvoiceTab, viewForPath, workspaceHomeForRole } from '../../lib/workspaceNavigation';
 
 async function main():Promise<void> {
   assert.deepEqual(containImage({width:1000,height:2400},{width:600,height:500}),{width:1000*500/2400,height:500});
@@ -22,6 +22,10 @@ async function main():Promise<void> {
   assert.equal(invoiceReturnPath(new URLSearchParams('from=https://outside.test&search=0000123')),'/workspace/inbox?search=0000123');
   assert.equal(readInvoiceTab(new URLSearchParams('tab=invalid')),'review');
   assert.equal(viewForPath('/workspace/approvals'),'approval');
+  assert.equal(viewForPath('/workspace/dashboard'),'dashboard');
+  assert.equal(workspaceHomeForRole('ACCOUNTANT'),'/workspace/inbox');
+  assert.equal(workspaceHomeForRole('CHIEF_ACCOUNTANT'),'/workspace/dashboard');
+  assert.equal(workspaceHomeForRole('CFO'),'/workspace/dashboard');
   console.log('PASS typed route/query round trip, invalid input and safe return navigation');
   await runIsolated(async()=>{
     const db=getDatabase();const policy=getActivePolicy();policy.config.companyTaxCode=demoCompanyTaxCode;

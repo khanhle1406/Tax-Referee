@@ -1,31 +1,18 @@
-import { SHOPAIKEY_GEMINI_API_CONFIG } from '@/lib/constants';
+import { DEV_LLM_API_CONFIG } from '@/lib/constants';
 import { normalizeTaxCodeFormat, validateTaxCode } from '@/lib/taxCode';
 import { SupplierIdentity, SupplierIdentitySource } from '@/lib/schemas';
 import { extractCleanJson } from './geminiService';
 import { resolveSupplierIdentity, SupplierIdentityQuery } from './supplierIdentityResolver';
+import { fetchOfficialSourceText, officialTextSupportsIdentity } from '@/lib/server/officialSourceEvidence';
 
 const OFFICIAL_HOSTS = [
   'gdt.gov.vn',
   'tracuunnt.gdt.gov.vn',
   'dangkykinhdoanh.gov.vn'
 ] as const;
-const GOOGLE_GROUNDING_REDIRECT_HOST = 'vertexaisearch.cloud.google.com';
-const GOOGLE_GROUNDING_REDIRECT_PATH = '/grounding-api-redirect/';
-const MAX_REDIRECT_HOPS = 5;
-
-type GroundingChunk = { web?: { uri?: unknown; title?: unknown } };
-type GroundingSupport = {
-  segment?: { text?: unknown };
-  groundingChunkIndices?: unknown;
-};
-
 function normalizeName(value: string): string {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().replace(/đ/g, 'd').replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
-}
-
-function digits(value: string): string {
-  return value.replace(/\D/g, '');
 }
 
 function isOfficialHost(hostname: string): boolean {
@@ -48,107 +35,15 @@ function directOfficialSource(url: string, title: unknown): SupplierIdentitySour
   }
 }
 
-async function resolveGroundingRedirect(url: string, title: unknown): Promise<SupplierIdentitySource | null> {
-  const deadline = Date.now() + 5500;
-  let currentUrl: URL;
-  try {
-    currentUrl = new URL(url);
-  } catch {
-    return null;
-  }
-  if (currentUrl.protocol !== 'https:'
-    || currentUrl.hostname.toLowerCase() !== GOOGLE_GROUNDING_REDIRECT_HOST
-    || !currentUrl.pathname.startsWith(GOOGLE_GROUNDING_REDIRECT_PATH)) return null;
-
-  for (let hop = 0; hop < MAX_REDIRECT_HOPS; hop++) {
-    const remaining = deadline - Date.now();
-    if (remaining <= 0) return null;
-    try {
-      const response = await fetch(currentUrl, {
-        method: 'HEAD',
-        redirect: 'manual',
-        cache: 'no-store',
-        signal: AbortSignal.timeout(Math.min(3500, remaining))
-      });
-      if ([301, 302, 303, 307, 308].includes(response.status)) {
-        const location = response.headers.get('location');
-        if (!location) return null;
-        const destination = new URL(location, currentUrl);
-        // Once Google's signed link resolves, only follow HTTPS government hosts.
-        if (destination.protocol !== 'https:' || !isOfficialHost(destination.hostname)) return null;
-        currentUrl = destination;
-        continue;
-      }
-      if (!response.ok || !isOfficialHost(currentUrl.hostname)) return null;
-      return {
-        title: typeof title === 'string' && title.trim() ? title.trim() : currentUrl.hostname,
-        url: currentUrl.toString()
-      };
-    } catch {
-      return null;
-    }
-  }
-  return null;
-}
-
-async function officialSource(chunk: GroundingChunk): Promise<SupplierIdentitySource | null> {
-  const uri = typeof chunk.web?.uri === 'string' ? chunk.web.uri : '';
-  const direct = directOfficialSource(uri, chunk.web?.title);
-  if (direct) return direct;
-
-  try {
-    const parsed = new URL(uri);
-    const isSearchRedirect = parsed.protocol === 'https:'
-      && ['www.google.com', 'google.com'].includes(parsed.hostname.toLowerCase()) && parsed.pathname === '/url';
-    const targets = (isSearchRedirect ? [parsed.searchParams.get('url'), parsed.searchParams.get('q')] : [])
-      .filter((value): value is string => Boolean(value));
-    for (const target of targets) {
-      const source = directOfficialSource(target, chunk.web?.title);
-      if (source) return source;
-    }
-    return resolveGroundingRedirect(uri, chunk.web?.title);
-  } catch {
-    return null;
-  }
-}
-
-async function candidateEvidence(
+async function fetchOfficialCandidateEvidence(
   candidate: { legalName: string; taxCode: string },
   invoiceName: string,
-  officialSources: Array<SupplierIdentitySource | null>,
-  supports: GroundingSupport[]
-): Promise<SupplierIdentitySource[]> {
-  const candidateName = normalizeName(candidate.legalName);
-  const invoiceNameNormalized = normalizeName(invoiceName);
-  const taxDigits = digits(candidate.taxCode);
-  const nameSources = new Map<string, SupplierIdentitySource>();
-  const taxSources = new Map<string, SupplierIdentitySource>();
-  const invoiceNameSources = new Map<string, SupplierIdentitySource>();
-
-  for (const support of supports.slice(0, 50)) {
-    const text = typeof support.segment?.text === 'string' ? support.segment.text : '';
-    const normalizedText = normalizeName(text);
-    const citedTaxCodes = [...text.matchAll(/\b\d{10}(?:-\d{3})?\b|\b\d{12,13}\b/g)]
-      .map(match => normalizeTaxCodeFormat(match[0]));
-    const indices = Array.isArray(support.groundingChunkIndices)
-      ? support.groundingChunkIndices.filter((index): index is number => Number.isInteger(index) && index >= 0)
-      : [];
-    for (const index of indices) {
-      const source = officialSources[index];
-      if (!source) continue;
-      if (candidateName && normalizedText.includes(candidateName)) nameSources.set(source.url, source);
-      if (taxDigits.length >= 10 && citedTaxCodes.includes(candidate.taxCode)) taxSources.set(source.url, source);
-      if (invoiceNameNormalized && normalizedText.includes(invoiceNameNormalized)) invoiceNameSources.set(source.url, source);
-    }
-  }
-
-  const sameRecordSupported = [...nameSources.keys()].some(url => taxSources.has(url));
-  const invoiceNameRelated = !invoiceNameNormalized || candidateName.includes(invoiceNameNormalized)
-    || [...invoiceNameSources.keys()].some(url => taxSources.has(url));
-  if (!sameRecordSupported || !invoiceNameRelated) return [];
-
-  const sourceUrls = new Set([...nameSources.keys(), ...taxSources.keys(), ...invoiceNameSources.keys()]);
-  return [...sourceUrls].map(url => nameSources.get(url) || taxSources.get(url) || invoiceNameSources.get(url)!);
+  sourceUrl: string
+): Promise<SupplierIdentitySource | null> {
+  const source = directOfficialSource(sourceUrl, undefined);
+  if (!source) return null;
+  const text = await fetchOfficialSourceText(source.url);
+  return text && officialTextSupportsIdentity(text, candidate.legalName, candidate.taxCode, invoiceName) ? source : null;
 }
 
 function unavailable(message = 'Không thể truy cập dịch vụ tra cứu chính thống.') : SupplierIdentity {
@@ -156,12 +51,11 @@ function unavailable(message = 'Không thể truy cập dịch vụ tra cứu ch
 }
 
 /**
- * Resolve a supplier only from ShopAIKey Gemini Search grounding citations
- * that point to Vietnamese government domains, tax authority sites or the national business registry.
- * Search output is treated as untrusted until its cited text supports both
- * the legal name and tax code.
+ * Resolve a supplier through the configured LLM API. Model-provided candidates
+ * and URLs remain untrusted until an official source page contains both the
+ * legal name and tax code.
  */
-/** Ngân sách tra cứu có grounding: tối đa 2 lần gọi (lần 2 là truy vấn sắc hơn) trong 18 giây; kết quả chỉ nhận nguồn chính thống. */
+/** Ngân sách tra cứu: tối đa 2 lần gọi trong 18 giây, rồi kiểm chứng trang nguồn chính thức ở máy chủ. */
 export const GROUNDING_BUDGET_MS = 18_000;
 export const GROUNDING_MAX_CALLS = 2;
 
@@ -174,50 +68,46 @@ export async function searchOfficialSupplierIdentity(input: {
   const printedTaxCode = (input.supplierTaxCode || '').trim().slice(0, 32);
   const address = (input.address || '').trim().slice(0, 320);
   if (!supplierName && !printedTaxCode) return { status: 'NOT_FOUND', sources: [], message: 'Thiếu tên hoặc MST để tra cứu.' };
-  const { API_KEY, BASE_URL, MODEL } = SHOPAIKEY_GEMINI_API_CONFIG;
-  if (!API_KEY) return unavailable('Chưa cấu hình SHOPAIKEY_API_KEY.');
+  const { API_KEY, ENDPOINT, MODEL } = DEV_LLM_API_CONFIG;
+  if (!API_KEY || !ENDPOINT || !MODEL) return unavailable('Chưa cấu hình DEV_LLM_BASE_URL, DEV_LLM_API_KEY và DEV_LLM_MODEL.');
 
   const searchQuery = printedTaxCode
     ? `site:gov.vn ${JSON.stringify(supplierName)} ${JSON.stringify(printedTaxCode)}`
     : `site:gov.vn ${JSON.stringify(supplierName)} mã số thuế`;
-  const prompt = `Perform live Google Search using this exact query: ${searchQuery}. Find official Vietnamese government documents that connect this seller name to its legal name and tax code. If a tax number is provided, search it exactly. The seller name may be a brand or former name. Cite the official source title and result in your answer; do not rely on memory or private directories.
+  const prompt = `Find Vietnamese official government records that connect this seller name to its legal name and tax code. Search query: ${searchQuery}. If a tax number is provided, search it exactly. The seller name may be a brand or former name. Do not rely on memory or private directories. Return a source URL for each candidate; the server will fetch and validate the page.
 Seller name from invoice: ${JSON.stringify(supplierName || null)}
 Seller tax code from invoice: ${JSON.stringify(printedTaxCode || null)}
 Seller address clue: ${JSON.stringify(address || null)}
 
-First state the official source title, legal company name and tax code with an actual Google Search citation. Then finish with JSON: {"decision":"MATCH|AMBIGUOUS|NO_MATCH","selectedTaxCode":string|null,"candidates":[{"legalName":string,"taxCode":string}]}. Return candidates only when official sources support both name and tax code. Never invent a tax code.`;
+Return only JSON: {"decision":"MATCH|AMBIGUOUS|NO_MATCH","selectedTaxCode":string|null,"candidates":[{"legalName":string,"taxCode":string,"sourceUrl":string}]}. Include candidates only when a specific official source page visibly contains both name and tax code. Never invent a tax code or URL.`;
 
   try {
-    const endpoint = new URL(`${BASE_URL}/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`);
-    endpoint.searchParams.set('key', API_KEY);
-    let candidate: {
-      content?: { parts?: Array<{ text?: unknown }> };
-      groundingMetadata?: { groundingChunks?: GroundingChunk[]; groundingSupports?: GroundingSupport[] };
-      finishReason?: string;
-    } | undefined;
     let lastError: 'network' | 'http' | null = null;
+    let answer: { decision?: unknown; selectedTaxCode?: unknown; candidates?: unknown } | undefined;
     const searchDeadline = Date.now() + GROUNDING_BUDGET_MS;
-    // ShopAIKey may return a text answer without structured grounding metadata
-    // on the first attempt. Retry once with a sharper search request; never
-    // accept the answer unless the returned grounding citation validates.
+    // Retry once with a narrower query; every result still requires a fetched
+    // official page that independently supports both fields.
     const alternateQuery = printedTaxCode
       ? `site:gov.vn ${JSON.stringify(printedTaxCode)}`
       : `site:gov.vn ${JSON.stringify(supplierName)} "${normalizeName(supplierName).split(' ').filter(Boolean).join(' ')}"`;
-    for (const searchPrompt of [prompt, `Perform a fresh live Google Search using this exact query: ${alternateQuery}. Find an official Vietnamese government document with the seller's legal name and tax code. Cite the actual result link, then finish with JSON {"decision":"MATCH|AMBIGUOUS|NO_MATCH","selectedTaxCode":string|null,"candidates":[{"legalName":string,"taxCode":string}]}. Do not cite private directories or invent facts.`]) {
+    for (const searchPrompt of [prompt, `Find an official Vietnamese government record for query ${alternateQuery}. Return only JSON {"decision":"MATCH|AMBIGUOUS|NO_MATCH","selectedTaxCode":string|null,"candidates":[{"legalName":string,"taxCode":string,"sourceUrl":string}]}. Do not cite private directories or invent facts.`]) {
       const remaining = searchDeadline - Date.now();
       if (remaining <= 0) break;
       let response: Response;
       try {
-        response = await fetch(endpoint, {
+        response = await fetch(ENDPOINT, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${API_KEY}`
           },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: searchPrompt }] }],
-            tools: [{ google_search: {} }],
-            generationConfig: { temperature: 0, maxOutputTokens: 1800 }
+            model: MODEL,
+            messages: [{ role: 'user', content: searchPrompt }],
+            response_format: { type: 'json_object' },
+            temperature: 0,
+            max_tokens: 1800,
+            stream: false
           }),
           signal: AbortSignal.timeout(Math.min(12000, remaining)),
           cache: 'no-store'
@@ -231,40 +121,25 @@ First state the official source title, legal company name and tax code with an a
         lastError = 'http';
         continue;
       }
-      const payload = await response.json() as {
-      candidates?: Array<{
-        content?: { parts?: Array<{ text?: unknown }> };
-        groundingMetadata?: { groundingChunks?: GroundingChunk[]; groundingSupports?: GroundingSupport[] };
-        finishReason?: string;
-      }>;
-      };
-      candidate = payload.candidates?.[0];
-      const grounding = candidate?.groundingMetadata;
-      if (grounding?.groundingChunks?.length && grounding.groundingSupports?.length) break;
+      const content = (await response.json())?.choices?.[0]?.message?.content;
+      if (typeof content !== 'string' || !content.trim()) continue;
+      try { answer = extractCleanJson(content) as typeof answer; } catch { continue; }
+      if (Array.isArray(answer?.candidates) && answer.candidates.length) break;
     }
-    if (!candidate?.groundingMetadata?.groundingChunks?.length || !candidate.groundingMetadata.groundingSupports?.length) {
+    if (!answer) {
       if (lastError === 'network' || lastError === 'http') return unavailable('Dịch vụ tra cứu chính thống đang lỗi hoặc không phản hồi.');
-      return { status: 'NOT_FOUND', sources: [], message: 'Kết quả tìm kiếm chưa có trích dẫn kiểm chứng được.' };
+      return { status: 'NOT_FOUND', sources: [], message: 'Không tìm thấy ứng viên có nguồn chính thống kiểm chứng được.' };
     }
-    if (!candidate || ['MAX_TOKENS', 'LENGTH'].includes(candidate.finishReason || '')) return unavailable('Kết quả tra cứu chưa đầy đủ.');
-    const rawText = (candidate.content?.parts || []).map(part => typeof part.text === 'string' ? part.text : '').join('').trim();
-    const answer = extractCleanJson(rawText) as {
-      decision?: unknown;
-      selectedTaxCode?: unknown;
-      candidates?: unknown;
-    };
-    const chunks = candidate.groundingMetadata?.groundingChunks || [];
-    const supports = candidate.groundingMetadata?.groundingSupports || [];
-    const officialSources = await Promise.all(chunks.slice(0, 12).map(chunk => officialSource(chunk)));
-    const supported = await Promise.all((Array.isArray(answer.candidates) ? answer.candidates.slice(0, 10) : []).flatMap((rawCandidate) => {
+    const supported = await Promise.all((Array.isArray(answer.candidates) ? answer.candidates.slice(0, 5) : []).flatMap((rawCandidate) => {
       if (!rawCandidate || typeof rawCandidate !== 'object') return [];
       const row = rawCandidate as Record<string, unknown>;
       const legalName = typeof row.legalName === 'string' ? row.legalName.trim() : '';
       const rawTaxCode = typeof row.taxCode === 'string' ? row.taxCode.trim() : '';
+      const sourceUrl = typeof row.sourceUrl === 'string' ? row.sourceUrl.trim() : '';
       const taxCode = normalizeTaxCodeFormat(rawTaxCode);
-      if (!legalName || !taxCode || !validateTaxCode(taxCode).isValid) return [];
-      return [candidateEvidence({ legalName, taxCode }, supplierName, officialSources, supports).then(sources =>
-        sources.length ? { legalName, taxCode, sources } : null
+      if (!legalName || !taxCode || !sourceUrl || !validateTaxCode(taxCode).isValid) return [];
+      return [fetchOfficialCandidateEvidence({ legalName, taxCode }, supplierName, sourceUrl).then(source =>
+        source ? { legalName, taxCode, sources: [source] } : null
       )];
     })).then(rows => rows.filter((row): row is NonNullable<typeof row> => row !== null));
 

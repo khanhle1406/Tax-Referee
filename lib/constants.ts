@@ -1,40 +1,22 @@
-export const JEV_API_CONFIG = {
-  ENDPOINT: 'https://api.typesafe.ai/v1/systemone',
-  API_KEY: process.env.TYPESAFE_API_KEY || '',
-  MODEL: 'jev-latest'
+const devLlmBaseUrl = (process.env.DEV_LLM_BASE_URL || 'https://nlt9router-oracle.tail3abf4e.ts.net/v1').replace(/\/+$/, '');
+const devLlmEndpoint = devLlmBaseUrl ? `${devLlmBaseUrl}/chat/completions` : '';
+const devLlmApiKey = process.env.DEV_LLM_API_KEY || '';
+const devLlmModel = process.env.DEV_LLM_MODEL || 'ag/gemini-3-flash';
+
+/** The single OpenAI-compatible LLM provider used by local development. */
+export const DEV_LLM_API_CONFIG = {
+  ENDPOINT: devLlmEndpoint,
+  BASE_URL: devLlmBaseUrl,
+  API_KEY: devLlmApiKey,
+  MODEL: devLlmModel
 };
 
-export const GEMINI_API_CONFIG = {
-  ENDPOINT: (process.env.SHOPAIKEY_BASE_URL || process.env.AI_BASE_URL || process.env.OPENROUTER_BASE_URL || 'https://api.shopaikey.com/v1') + '/chat/completions',
-  BASE_URL: process.env.SHOPAIKEY_BASE_URL || process.env.AI_BASE_URL || process.env.OPENROUTER_BASE_URL || 'https://api.shopaikey.com/v1',
-  API_KEY: process.env.SHOPAIKEY_API_KEY || process.env.AI_API_KEY || process.env.OPENROUTER_API_KEY || '',
-  MODEL: process.env.SHOPAIKEY_MODEL || process.env.AI_MODEL || process.env.OPENROUTER_MODEL || 'gemini-2.5-flash'
-};
-
-// Gemini Vision and Google Search grounding are routed through ShopAIKey. Keep
-// this config strict so a key for another provider is never sent to ShopAIKey.
-export const SHOPAIKEY_GEMINI_API_CONFIG = {
-  BASE_URL: (process.env.SHOPAIKEY_BASE_URL || 'https://api.shopaikey.com')
-    .replace(/\/+$/, '')
-    .replace(/\/v1(?:beta)?$/i, ''),
-  API_KEY: process.env.SHOPAIKEY_API_KEY || '',
-  MODEL: process.env.SHOPAIKEY_MODEL || 'gemini-2.5-flash'
-};
-
-export const OPENROUTER_API_CONFIG = {
-  ENDPOINT: (process.env.OPENROUTER_BASE_URL || GEMINI_API_CONFIG.BASE_URL) + '/chat/completions',
-  BASE_URL: process.env.OPENROUTER_BASE_URL || GEMINI_API_CONFIG.BASE_URL,
-  API_KEY: process.env.OPENROUTER_API_KEY || GEMINI_API_CONFIG.API_KEY,
-  MODEL: process.env.OPENROUTER_MODEL || GEMINI_API_CONFIG.MODEL
-};
-
-export const QWEN_API_CONFIG = {
-  ENDPOINT: (process.env.QWEN_BASE_URL || GEMINI_API_CONFIG.BASE_URL) + '/chat/completions',
-  BASE_URL: process.env.QWEN_BASE_URL || GEMINI_API_CONFIG.BASE_URL,
-  API_KEY: process.env.QWEN_API_KEY || GEMINI_API_CONFIG.API_KEY,
-  MODEL: process.env.QWEN_MODEL || GEMINI_API_CONFIG.MODEL,
-  FAST_MODEL: GEMINI_API_CONFIG.MODEL
-};
+// Keep the legacy export names as aliases so existing workflows and tests keep
+// the same interfaces while every LLM request uses the configured local API.
+export const GEMINI_API_CONFIG = DEV_LLM_API_CONFIG;
+export const SHOPAIKEY_GEMINI_API_CONFIG = DEV_LLM_API_CONFIG;
+export const OPENROUTER_API_CONFIG = DEV_LLM_API_CONFIG;
+export const QWEN_API_CONFIG = { ...DEV_LLM_API_CONFIG, FAST_MODEL: devLlmModel };
 
 export const MACRO_DEFAULTS = {
   TOTAL_SALES: 15_000_000_000,        // 15 tỷ VNĐ doanh thu bán ra

@@ -26,7 +26,7 @@ async function main() {
         PORT: port,
         HOSTNAME: '127.0.0.1',
         NODE_ENV: 'production',
-        SHOPAIKEY_API_KEY: '',
+        DEV_LLM_API_KEY: '',
         LOCAL_OCR_URL: 'http://127.0.0.1:9',
         TAX_REFEREE_DATA_DIR: runtime,
         TAX_REFEREE_DB_PATH: path.join(runtime, 'internal.sqlite')
@@ -103,9 +103,9 @@ async function main() {
       method: 'POST', headers: authHeaders, body: JSON.stringify({ artifactId })
     });
     assert.equal(parsed.response.status, 502);
-    assert.match((parsed.body as { error: string }).error, /SHOPAIKEY_API_KEY/);
+    assert.match((parsed.body as { error: string }).error, /Thiếu cấu hình API/);
     const failed = await request(`/api/capture-sessions/${id}`, {
-      method: 'PATCH', headers: authHeaders, body: JSON.stringify({ status: 'FAILED', error: 'Chưa cấu hình SHOPAIKEY_API_KEY' })
+      method: 'PATCH', headers: authHeaders, body: JSON.stringify({ status: 'FAILED', error: 'Thiếu cấu hình API đọc chứng từ' })
     });
     assert.equal(failed.response.status, 200);
 

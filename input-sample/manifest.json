@@ -1,69 +1,9 @@
 {
-  "version": "2026-10-10.v2",
-  "purpose": "Vietnamese incoming invoice extraction benchmark",
-  "accuracyContract": "100% of fields with source evidence; absent or unreadable fields remain absent",
-  "licensePolicy": "Only items marked REDISTRIBUTABLE may be used for public accuracy claims",
+  "version": "2026-10-17.public-demo.v3",
+  "purpose": "Chứng từ công khai phục vụ demo đọc và rà soát hóa đơn; không phải tập đánh giá độc lập",
+  "accuracyContract": "Chỉ điền trường có bằng chứng nguồn; trường thiếu, mâu thuẫn hoặc không đọc được phải giữ chưa xác định. Không công bố độ chính xác thực tế từ bộ demo.",
+  "licensePolicy": "Nguồn công khai không đồng nghĩa có quyền tái phân phối. Chỉ mẫu REDISTRIBUTABLE có nhãn độc lập mới đủ điều kiện công bố accuracy; các mẫu hiện tại chưa đáp ứng.",
   "items": [
-    {
-      "id": "xml-viettel-01",
-      "file": "01_real_viettel_sinvoice.xml",
-      "kind": "XML",
-      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/viettel_invoice.xml",
-      "licenseStatus": "UNVERIFIED",
-      "truthStatus": "PENDING_INDEPENDENT_LABEL",
-      "sha256": "524404372cf830b9627b293b4b711eab8ceec8f388e9f67ea31132fc61238f34",
-      "retrievedAt": "2026-10-10"
-    },
-    {
-      "id": "xml-misa-02",
-      "file": "02_real_misa_meinvoice.xml",
-      "kind": "XML",
-      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/misa_invoice.xml",
-      "licenseStatus": "UNVERIFIED",
-      "truthStatus": "PENDING_INDEPENDENT_LABEL",
-      "sha256": "d59a332b90dc7b381719d1e8b4d9f10a687902d8dc3f8d96edb5413edb956bea",
-      "retrievedAt": "2026-10-10"
-    },
-    {
-      "id": "xml-vnpt-03",
-      "file": "03_real_vnpt_einvoice.xml",
-      "kind": "XML",
-      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/vnpt_invoice.xml",
-      "licenseStatus": "UNVERIFIED",
-      "truthStatus": "PENDING_INDEPENDENT_LABEL",
-      "sha256": "b215367f1d00025069528457480bae0e3973571c1fca2d9e97ef399f6e28a630",
-      "retrievedAt": "2026-10-10"
-    },
-    {
-      "id": "xml-fpt-04",
-      "file": "04_real_fpt_einvoice.xml",
-      "kind": "XML",
-      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/fpt_invoice.xml",
-      "licenseStatus": "UNVERIFIED",
-      "truthStatus": "PENDING_INDEPENDENT_LABEL",
-      "sha256": "c87fc629adbcc19600976c66caccda94c966f60ea7cc7c1732a8a34d01c916fc",
-      "retrievedAt": "2026-10-10"
-    },
-    {
-      "id": "xml-tct-05",
-      "file": "05_real_tct_invoice.xml",
-      "kind": "XML",
-      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/tct_invoice.xml",
-      "licenseStatus": "UNVERIFIED",
-      "truthStatus": "PENDING_INDEPENDENT_LABEL",
-      "sha256": "43a4fb2889b39397f441d4c013263653426653dab07a58099073234de60115d0",
-      "retrievedAt": "2026-10-10"
-    },
-    {
-      "id": "pdf-vinhlong-06",
-      "file": "06_real_einvoice_vinhlong.pdf",
-      "kind": "PDF_TEXT_OR_SCAN",
-      "sourceUrl": "https://raw.githubusercontent.com/thuyetbao/einvoice-lens/master/tests/data/sample-sale-invoice.pdf",
-      "licenseStatus": "UNVERIFIED",
-      "truthStatus": "PENDING_INDEPENDENT_LABEL",
-      "sha256": "fe55ee74a965c00c3a976110d236aa5abd3f11ded0f17305ab311dc876526576",
-      "retrievedAt": "2026-10-10"
-    },
     {
       "id": "camera-circlek-07",
       "file": "07_real_bill_circle_k.jpg",
@@ -118,6 +58,94 @@
       "truthFile": "ground-truth/camera-truth.json",
       "sha256": "d7d9a29455c26818ca96490ab7e6128cec97942ed04cbd99c93ebf3ad3904d64",
       "retrievedAt": "2026-10-10"
+    },
+    {
+      "id": "public-haiphong-waste-12",
+      "file": "12_public_hai_phong_waste.pdf",
+      "kind": "PDF_TEXT_OR_SCAN",
+      "sourceUrl": "https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf#page=98",
+      "sourceDocumentUrl": "https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf",
+      "sourcePage": 98,
+      "sourceDocumentSha256": "fdd5d25bb4b4cd438d8a5b6e670b16e531fac2edead4d17ddb03411767385d52",
+      "derivation": "Trích nguyên một trang PDF bằng PyMuPDF; không đổi tên/MST/số tiền/ngày trên chứng từ. File trích trang không bảo toàn chữ ký số của tệp nguồn.",
+      "licenseStatus": "UNVERIFIED",
+      "truthStatus": "MANUALLY_TRANSCRIBED",
+      "truthMethod": "Đối chiếu lớp chữ và ảnh render nguyên trang; chưa có gán nhãn nghiệp vụ độc lập.",
+      "observedFields": {
+        "invoiceNumber": "00033167",
+        "invoiceDate": "2025-07-30",
+        "preTaxAmount": 7658182,
+        "taxAmount": 612655,
+        "totalAmount": 8270837,
+        "supplierTaxCode": "0200534908",
+        "buyerTaxCode": "0200461255",
+        "taxRate": 8,
+        "uncertainFields": [
+          "paymentMethod"
+        ]
+      },
+      "sha256": "a746ba098bad712ddc130457d0c05b3e5b37ec40e0829e3ef2998c36bc3f1eb2",
+      "retrievedAt": "2026-10-17",
+      "note": "Trích một trang hóa đơn trong phụ lục báo cáo công khai của doanh nghiệp trên cổng Hải Phòng; giữ nguyên nội dung, chưa kiểm chứng chữ ký số, trạng thái hoạt động hoặc tính hợp pháp giao dịch."
+    },
+    {
+      "id": "public-haiphong-water-13",
+      "file": "13_public_hai_phong_water.pdf",
+      "kind": "PDF_TEXT_OR_SCAN",
+      "sourceUrl": "https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf#page=131",
+      "sourceDocumentUrl": "https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf",
+      "sourcePage": 131,
+      "sourceDocumentSha256": "fdd5d25bb4b4cd438d8a5b6e670b16e531fac2edead4d17ddb03411767385d52",
+      "derivation": "Trích nguyên một trang PDF bằng PyMuPDF; không đổi tên/MST/số tiền/ngày trên chứng từ. File trích trang không bảo toàn chữ ký số của tệp nguồn.",
+      "licenseStatus": "UNVERIFIED",
+      "truthStatus": "MANUALLY_TRANSCRIBED",
+      "truthMethod": "Đối chiếu lớp chữ và ảnh render nguyên trang; chưa có gán nhãn nghiệp vụ độc lập.",
+      "observedFields": {
+        "invoiceNumber": "72265",
+        "invoiceDate": "2026-01-04",
+        "preTaxAmount": 33200592,
+        "taxAmount": 1797411,
+        "totalAmount": 34998003,
+        "supplierTaxCode": "0200171274",
+        "buyerTaxCode": "0200461255",
+        "uncertainFields": [
+          "paymentMethod",
+          "taxRate"
+        ]
+      },
+      "sha256": "5350dceb39af057e5968324eda736180cd8a080f41f39e59f8562a6f431d8b82",
+      "retrievedAt": "2026-10-17",
+      "note": "Trích một trang hóa đơn trong phụ lục báo cáo công khai của doanh nghiệp trên cổng Hải Phòng; giữ nguyên nội dung, chưa kiểm chứng chữ ký số, trạng thái hoạt động hoặc tính hợp pháp giao dịch. Hóa đơn có thuế suất 5% và 8%; không gán một thuế suất chung."
+    },
+    {
+      "id": "public-haiphong-electricity-14",
+      "file": "14_public_hai_phong_electricity.pdf",
+      "kind": "PDF_TEXT_OR_SCAN",
+      "sourceUrl": "https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf#page=138",
+      "sourceDocumentUrl": "https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf",
+      "sourcePage": 138,
+      "sourceDocumentSha256": "fdd5d25bb4b4cd438d8a5b6e670b16e531fac2edead4d17ddb03411767385d52",
+      "derivation": "Trích nguyên một trang PDF bằng PyMuPDF; không đổi tên/MST/số tiền/ngày trên chứng từ. File trích trang không bảo toàn chữ ký số của tệp nguồn.",
+      "licenseStatus": "UNVERIFIED",
+      "truthStatus": "MANUALLY_TRANSCRIBED",
+      "truthMethod": "Đối chiếu lớp chữ và ảnh render nguyên trang; chưa có gán nhãn nghiệp vụ độc lập.",
+      "observedFields": {
+        "invoiceNumber": "24681",
+        "invoiceDate": "2026-03-03",
+        "preTaxAmount": 37542585,
+        "taxAmount": 3003407,
+        "totalAmount": 40545992,
+        "supplierTaxCode": "0100100417-069",
+        "buyerTaxCode": "0200461255",
+        "taxRate": 8,
+        "uncertainFields": [
+          "paymentMethod"
+        ]
+      },
+      "sha256": "a7a56e5db7683dc5e1d58f64a2e1cd4d13c3de5a0a161715400c798e4f231986",
+      "retrievedAt": "2026-10-17",
+      "note": "Trích một trang hóa đơn trong phụ lục báo cáo công khai của doanh nghiệp trên cổng Hải Phòng; giữ nguyên nội dung, chưa kiểm chứng chữ ký số, trạng thái hoạt động hoặc tính hợp pháp giao dịch."
     }
-  ]
+  ],
+  "legacyFixtureLocation": "tests/fixtures/legacy-invoices/manifest.json"
 }

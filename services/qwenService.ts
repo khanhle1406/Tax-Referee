@@ -1,4 +1,4 @@
-import { QWEN_API_CONFIG, OPENROUTER_API_CONFIG } from '@/lib/constants';
+import { DEV_LLM_API_CONFIG } from '@/lib/constants';
 import { InvoiceInput, ActionOptionSchema, RiskGroup } from '@/lib/schemas';
 import { z } from 'zod';
 import {
@@ -89,8 +89,8 @@ export async function extractInvoiceWithQwenVision(
 export async function extractInvoiceWithQwenOcrText(
   lines: Array<{ text: string; confidence: number; bbox?: { x: number; y: number; w: number; h: number } }>
 ): Promise<Partial<InvoiceInput>> {
-  const apiKey = OPENROUTER_API_CONFIG.API_KEY;
-  if (!apiKey) throw new Error('Chưa cấu hình OPENROUTER_API_KEY để xác minh OCR.');
+  const apiKey = DEV_LLM_API_CONFIG.API_KEY;
+  if (!apiKey) throw new Error('Chưa cấu hình DEV_LLM_API_KEY để xác minh OCR.');
   const transcript = lines
     .map((line, index) => `${index + 1}. [conf=${line.confidence.toFixed(2)}] ${line.text}`)
     .join('\n');
@@ -99,8 +99,8 @@ Khóa: n=invoice number, d=date YYYY-MM-DD, s=seller tax code, v=seller name, b=
 Chỉ sao chép thông tin nhìn thấy trong transcript; không suy ra, không sửa số, không lấy số điện thoại làm MST, không tính thuế từ tổng tiền. Nếu trường không rõ hoặc mâu thuẫn thì bỏ trường đó. Tiền phải là số nguyên VND. Dòng có confidence thấp là bằng chứng yếu và cần bỏ qua nếu không có dòng khác xác nhận.
 OCR TRANSCRIPT:
 ${transcript}`;
-  const model = OPENROUTER_API_CONFIG.MODEL;
-  const res = await fetch(OPENROUTER_API_CONFIG.ENDPOINT, {
+  const model = DEV_LLM_API_CONFIG.MODEL;
+  const res = await fetch(DEV_LLM_API_CONFIG.ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -113,7 +113,8 @@ ${transcript}`;
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
       max_tokens: 512,
-      temperature: 0
+      temperature: 0,
+      stream: false
     }),
     signal: AbortSignal.timeout(Number(process.env.LOCAL_OCR_AI_TIMEOUT_MS || 1800))
   });

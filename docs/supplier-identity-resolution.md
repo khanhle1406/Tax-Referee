@@ -6,7 +6,7 @@
 2. Tìm bản ghi còn hiệu lực theo MST chính xác, tên pháp lý chuẩn hóa hoặc alias đã có bằng chứng. Bỏ qua master nhập tay. Không rút MST chi nhánh về MST công ty mẹ.
 3. Nếu có MST hợp lệ nhưng chưa có bản ghi, gọi adapter dữ liệu thuế. Chỉ chấp nhận mã trả về trùng chính xác, tên có dữ liệu, nguồn còn mới. Nếu tên ảnh không khớp tên/alias thì vẫn cần chứng minh liên hệ qua tra cứu.
 4. Nếu thiếu MST và có khóa tìm doanh nghiệp, tìm ứng viên theo tên; kết quả tìm kiếm chỉ là manh mối. Trùng tên/chi nhánh phải được phân biệt bằng bằng chứng, không dùng độ giống tên hoặc confidence của AI để tự chọn.
-5. ShopAIKey Google Search grounding hỗ trợ các ca thương hiệu, tên sai hoặc tên cũ. Kiểm tra URL chính thức cuối cùng, citation hỗ trợ tên và MST trong cùng nguồn; liên hệ với tên trên ảnh phải được citation hỗ trợ nếu không nằm trong tên pháp lý.
+5. API LLM dùng chung có thể gợi ý URL nguồn cho các ca thương hiệu, tên sai hoặc tên cũ. Máy chủ chỉ chấp nhận URL HTTPS thuộc cơ quan nhà nước, tự tải trang và xác nhận tên pháp lý cùng MST xuất hiện trên chính trang đó; gợi ý của AI không được coi là bằng chứng.
 6. Chỉ kết quả VERIFIED mới điền tên/MST. CONFLICT, AMBIGUOUS, NOT_FOUND hoặc SOURCE_UNAVAILABLE giữ thông tin ảnh. Nguồn và trạng thái lưu trong extraction review và workflow review.
 
 ## Lưu và hiệu năng
@@ -20,13 +20,13 @@
 
 ## Cấu hình nguồn
 
-Vision và fallback web dùng khóa `SHOPAIKEY_API_KEY` hiện tại.
+Vision, sinh câu hỏi và gợi ý tra cứu dùng chung `DEV_LLM_BASE_URL`, `DEV_LLM_API_KEY`, `DEV_LLM_MODEL` qua API tương thích OpenAI. Mọi yêu cầu LLM đều gửi `stream: false` để nhận JSON chuẩn.
 
 Adapter tra MST Xinvoice dùng `XINVOICE_CLIENT_ID` và `XINVOICE_API_KEY` theo [tài liệu chính thức](https://xinvoice.vn/docs/api-tich-hop/api-tra-mst/). API này phục vụ tra theo MST, không thay thế API tìm theo tên.
 
 Adapter tìm ứng viên dùng `DOANHNGHIEP_API_KEY` theo [tài liệu nhà cung cấp](https://doanhnghiep.vn/api/docs). Nguồn này không được coi là cơ quan thuế; ứng viên phải được đối chiếu dữ liệu thuế trước khi tự điền.
 
-Không có khóa trả phí vẫn có kho cục bộ và grounding qua ShopAIKey. Không coi câu trả lời AI không có citation là kết quả tra cứu. Grounding có thể trả nguồn thiếu hoặc không tìm được; để bảo đảm luồng dữ liệu có cấu trúc cần cấu hình nguồn tương ứng.
+Không có khóa API vẫn có kho cục bộ và dữ liệu tra cứu thuế có cấu trúc. Nếu mô hình không tìm được trang nguồn hoặc trang không thể tải/không chứa cả tên và MST thì hệ thống giữ nguyên dữ liệu ảnh, không tự điền danh tính.
 
 ## Kiểm thử
 

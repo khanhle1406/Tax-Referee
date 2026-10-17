@@ -737,9 +737,11 @@ export function jsonNow(): string {
 }
 
 
-const databaseContext = new AsyncLocalStorage<{ db: Database.Database; sandbox: boolean; id: string }>();
+const databaseContext = new AsyncLocalStorage<{ db: Database.Database; sandbox: boolean; id: string; demoSession?: boolean }>();
 const demoDatabases = new Map<string, { db: Database.Database; touched: number; inflight: number }>();
 export function isSandbox(): boolean { return databaseContext.getStore()?.sandbox === true; }
+/** Chỉ phiên demo thật; không bật dữ liệu chuẩn bị demo trong DB nội bộ hoặc runner độc lập. */
+export function isDemoSession(): boolean { return databaseContext.getStore()?.demoSession === true; }
 /** Dấu vân tay ngắn của DB đang dùng (phiên demo / DB thử cô lập / nội bộ) — chứng minh cách ly mà không lộ id hay đường dẫn. */
 export function databaseFingerprint(): string { return crypto.createHash('sha256').update(databaseContext.getStore()?.id || 'internal').digest('hex').slice(0, 10); }
 export function artifactRoot(): string { return path.join(dataDirectory, 'artifacts', databaseContext.getStore()?.id || 'internal'); }
@@ -774,7 +776,7 @@ export async function withDemoDatabase<T>(id: string, fn: () => Promise<T>): Pro
   entry.touched = Date.now();
   const current = entry;
   current.inflight++;
-  try { return await databaseContext.run({ db: current.db, sandbox: true, id }, fn); }
+  try { return await databaseContext.run({ db: current.db, sandbox: true, id, demoSession: true }, fn); }
   finally { current.inflight--; current.touched = Date.now(); }
 }
 /** Phiên demo đã được tạo qua /api/demo/session (đang mở hoặc còn file trên đĩa). */

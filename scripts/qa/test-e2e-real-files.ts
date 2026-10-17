@@ -5,7 +5,7 @@ const BASE_URL = 'http://localhost:3000';
 
 async function main() {
   console.log('================================================================');
-  console.log(' TEST THỰC TẾ END-TO-END VỚI CÁC TỆP HÓA ĐƠN THẬT (XML, PDF, ẢNH)');
+  console.log(' SMOKE TEST END-TO-END VỚI FIXTURE XML/PDF VÀ ẢNH CHỨNG TỪ');
   console.log('================================================================\n');
 
   // Bước 1: Đăng nhập với vai trò Kế toán trưởng (KTT)
@@ -25,25 +25,25 @@ async function main() {
   const sessionCookie = setCookie.split(';')[0];
   console.log('   => Đăng nhập thành công! Cookie:', sessionCookie.slice(0, 30) + '...\n');
 
-  // Danh sách các tệp mẫu thật cần test
+  // XML/PDF là fixture tổng hợp lưu riêng; ảnh chụp nằm trong thư mục chuẩn bị demo.
   const sampleFiles = [
     {
-      type: 'XML Hóa đơn điện tử Viettel SInvoice',
+      type: 'Fixture XML tổng hợp định dạng Viettel SInvoice',
       fileName: '01_real_viettel_sinvoice.xml',
       mimeType: 'application/xml',
-      path: path.join(process.cwd(), 'input-sample', '01_real_viettel_sinvoice.xml')
+      path: path.join(process.cwd(), 'tests/fixtures/legacy-invoices', '01_real_viettel_sinvoice.xml')
     },
     {
-      type: 'XML Hóa đơn điện tử MISA meInvoice',
+      type: 'Fixture XML tổng hợp định dạng MISA meInvoice',
       fileName: '02_real_misa_meinvoice.xml',
       mimeType: 'application/xml',
-      path: path.join(process.cwd(), 'input-sample', '02_real_misa_meinvoice.xml')
+      path: path.join(process.cwd(), 'tests/fixtures/legacy-invoices', '02_real_misa_meinvoice.xml')
     },
     {
-      type: 'PDF Hóa đơn điện tử Hộ kinh doanh Vĩnh Long',
+      type: 'Fixture PDF tổng hợp Vĩnh Long',
       fileName: '06_real_einvoice_vinhlong.pdf',
       mimeType: 'application/pdf',
-      path: path.join(process.cwd(), 'input-sample', '06_real_einvoice_vinhlong.pdf')
+      path: path.join(process.cwd(), 'tests/fixtures/legacy-invoices', '06_real_einvoice_vinhlong.pdf')
     },
     {
       type: 'Ảnh chụp Bill Nhà Hàng Tiếp Khách (JPG)',
@@ -101,7 +101,7 @@ async function main() {
     console.log(`      • Thuế GTGT: ${(invoice.taxAmount || 0).toLocaleString('vi-VN')} đ (Thuế suất: ${invoice.taxRate}%)`);
     console.log(`      • Tổng thanh toán: ${(invoice.totalAmount || 0).toLocaleString('vi-VN')} đ`);
 
-    // B. Chuẩn hóa để Evaluate nếu thiếu trường bắt buộc
+    // B. Bổ sung dữ kiện tổng hợp để smoke-test workflow; không dùng kết quả này đo độ chính xác trích xuất.
     const completeInvoice = {
       id: invoice.id || `inv_${Date.now()}_${testCount}`,
       invoiceNumber: invoice.invoiceNumber || `000000${testCount}`,
@@ -197,8 +197,8 @@ async function main() {
   console.log(`   => Tải tệp CSV thành công (${csvText.length.toLocaleString()} ký tự, Dòng đầu: ${csvText.slice(1, 45)}...)`);
 
   console.log('\n================================================================');
-  console.log(` TỔNG KẾT: ${passedCount}/${testCount} TỆP HÓA ĐƠN THẬT ĐÃ ĐƯỢC TEST END-TO-END!`);
-  console.log(' MỌI KHÂU: PARSE FILE -> EVALUATE -> ĐỊNH KHOẢN NỢ/CÓ -> XUẤT TỆP ĐỀU HOÀN HẢO!');
+  console.log(` TỔNG KẾT: ${passedCount}/${testCount} TỆP MẪU ĐÃ CHẠY QUA PARSE VÀ EVALUATE.`);
+  console.log(' Smoke test có bổ sung dữ kiện tổng hợp, không phải đánh giá độ chính xác trên hóa đơn thực tế.');
   console.log('================================================================\n');
 }
 

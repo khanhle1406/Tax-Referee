@@ -32,7 +32,10 @@ async function main() {
 
   // 2. Quét các file thực tế trong input-sample/
   const inputDir = path.resolve(process.cwd(), 'input-sample');
-  const files = fs.readdirSync(inputDir).filter(f => !f.endsWith('.md')).sort();
+  const files = fs.readdirSync(inputDir, { withFileTypes: true })
+    .filter(entry => entry.isFile() && /\.(xml|pdf|png|jpe?g|webp)$/i.test(entry.name))
+    .map(entry => entry.name)
+    .sort();
   console.log(`>>> Bước 2: Tìm thấy ${files.length} hóa đơn thực tế trong input-sample/:\n`);
 
   const activePolicy = getActivePolicy();

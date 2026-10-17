@@ -85,7 +85,7 @@ Dữ liệu: [`data/verification/challengeCases.ts`](data/verification/challenge
 
 ## Tính năng chính
 
-- **Đọc đúng hóa đơn điện tử Việt Nam** — XML của Viettel, MISA, VNPT, FPT, Tổng cục Thuế (chặn DOCTYPE/ENTITY chống XXE); PDF có lớp chữ; ảnh và PDF scan qua Gemini Vision.
+- **Đọc hóa đơn điện tử Việt Nam** — XML của Viettel, MISA, VNPT, FPT, Tổng cục Thuế (chặn DOCTYPE/ENTITY chống XXE); ảnh và PDF gốc qua Vision, bổ sung lớp chữ PDF khi có để đối chiếu.
 - **25 quy tắc tất định, căn cứ theo ngày lập** — công khai tại [`/sop`](https://limegreen-salamander-517622.hostingersite.com/sop) (24 do engine kiểm, 1 do workflow thêm khi dữ liệu chưa xác minh); danh mục loại trừ thuế suất 8% đúng từng kỳ (NQ 204/2025: xăng, than, hóa chất, CNTT được 8% từ 01/7/2025), khung hóa đơn TT 78/2021 → TT 32/2025 → NĐ 254/2026 + TT 91/2026 (số hiệu và hiệu lực theo nguồn thứ cấp, chưa đọc toàn văn; [`lib/legalBasis.ts`](lib/legalBasis.ts)).
 - **Một câu hỏi, đúng người** — có số tiền và VAT chờ quyết định; mỗi đáp án có hệ quả thật; người nhận theo thẩm quyền (KTT/CFO).
 - **Con người nắm quyền kiểm soát** — người nhập không tự duyệt hay tự xác minh; ca từng cần CFO không hạ thẩm quyền khi sửa số tiền; hoàn tác không nới lỏng kiểm soát người khác đặt; công tắc dừng toàn hệ thống.
@@ -119,13 +119,13 @@ flowchart LR
 | Bằng chứng | Nhật ký chỉ ghi thêm, HMAC, điểm neo | [`lib/server/audit.ts`](lib/server/audit.ts) |
 | Định danh và cách ly | Phiên, vai trò, mỗi phiên demo một SQLite | [`lib/server/auth.ts`](lib/server/auth.ts), [`lib/server/db.ts`](lib/server/db.ts), [`middleware.ts`](middleware.ts) |
 
-**Không có vòng lặp agent.** Mỗi lượt đánh giá chạy một lần qua quy tắc — đường quyết định **0 lần gọi LLM**. AI chỉ ở khâu nạp chứng từ: đọc ảnh/PDF scan (tối đa 1 lần, timeout 35 giây, chỉ nhận 14 trường nhìn thấy) và tra cứu danh tính bên bán có grounding (tối đa 2 lần trong 18 giây), cả hai có ngân sách gọi. Diễn đạt câu hỏi bằng AI tắt mặc định; nếu bật `QGEN_AI=1` thì timeout 3,5 giây và bị guard chặn khi thêm số liệu hoặc đổi người nhận/phương án. Lượt đánh giá có hạn; quá hạn → `ON_HOLD`, kết quả trễ bị loại. Dữ liệu nằm trên SQLite WAL bền qua khởi động lại (`npm run test:recovery`).
+**Không có vòng lặp agent.** Mỗi lượt đánh giá chạy một lần qua quy tắc — đường quyết định **0 lần gọi LLM**. AI chỉ ở khâu nạp chứng từ: đọc ảnh/PDF qua `DEV_LLM_*` (tối đa 1 lần, timeout 35 giây, chỉ nhận 14 trường nhìn thấy) và gợi ý tra cứu danh tính bên bán (tối đa 2 lần trong 18 giây). PDF được gửi nguyên tệp, đủ các trang, kèm lớp chữ tham chiếu nếu có; không dùng bộ dò văn bản tự chọn MST/số hóa đơn/tổng tiền. Trường mơ hồ như “TM/CK” giữ trạng thái chưa xác định. Máy chủ chỉ xác minh nhà cung cấp khi tự tải được trang HTTPS chính thức có cả tên pháp lý và MST; câu trả lời của AI không phải bằng chứng. Diễn đạt câu hỏi bằng AI tắt mặc định; nếu bật `QGEN_AI=1` thì timeout 3,5 giây và bị guard chặn khi thêm số liệu hoặc đổi người nhận/phương án. Lượt đánh giá có hạn; quá hạn → `ON_HOLD`, kết quả trễ bị loại. Dữ liệu nằm trên SQLite WAL bền qua khởi động lại (`npm run test:recovery`).
 
 | Thành phần | Thật / giả lập |
 |---|---|
 | Quy tắc, câu hỏi, workflow, nhật ký, SQLite | **Thật**, chạy trên live |
 | Parser XML (Viettel, MISA, VNPT, FPT, TCT) | **Thật**; file mẫu là XML công khai, MST thử nghiệm |
-| Đọc ảnh/PDF scan | **Thật** qua Gemini 2.5 Flash (proxy ShopAIKey) khi có khóa |
+| Đọc ảnh/PDF | **Thật** qua API tương thích OpenAI được cấu hình bằng `DEV_LLM_*`; PDF có lớp chữ và PDF scan đều dùng AI đọc tệp gốc |
 | Dữ liệu Verify và bộ hồi quy | **Tổng hợp**, nhãn viết theo SOP; không phải đánh giá độc lập |
 | Ngân hàng, đối soát TCT, ERP, báo cáo thuế (nhóm **Mở rộng · beta**) | **Một phần giả lập**, ngoài phạm vi Đề A |
 | Vai trò Kế toán viên / KTT / CFO trong demo | **Mô phỏng**, trong database riêng của phiên |
@@ -153,9 +153,11 @@ Phân tích đầy đủ (mô hình mối đe dọa, STRIDE, lỗi tự phát hi
 git clone https://github.com/khanhle1406/Tax-Referee.git
 cd Tax-Referee
 npm ci
-cp .env.example .env.local    # khóa AI chỉ cần cho đọc ảnh; Verify và test không cần
+cp .env.example .env.local    # khóa AI cần cho đọc ảnh/PDF; Verify và test không cần
 npm run dev                   # http://localhost:3000
 ```
+
+Development chỉ lắng nghe `127.0.0.1:3000`; nếu cổng đã dùng thì lệnh dừng thay vì mở server khác. Cấu hình AI riêng cho local có thể đặt trong `.env.development.local` (Git bỏ qua). Cache development nằm ở `.next-dev`, còn build production ở `.next`, tránh hai tiến trình ghi đè tệp của nhau.
 
 | Lệnh | Mục đích |
 |---|---|
@@ -173,7 +175,7 @@ Sao chép [`.env.example`](.env.example) thành `.env.local`. Không commit file
 
 | Biến | Bắt buộc | Ý nghĩa |
 |---|---|---|
-| `SHOPAIKEY_API_KEY`, `SHOPAIKEY_BASE_URL`, `SHOPAIKEY_MODEL` | Chỉ khi đọc ảnh | Gemini Vision và tra cứu có grounding qua proxy |
+| `DEV_LLM_BASE_URL`, `DEV_LLM_API_KEY`, `DEV_LLM_MODEL` | Khi dùng tính năng AI | Một API OpenAI-compatible dùng chung cho sinh câu hỏi, đọc ảnh và hỗ trợ tra cứu; nguồn pháp lý vẫn phải được máy chủ xác minh |
 | `TAX_REFEREE_DATA_DIR` / `TAX_REFEREE_DB_PATH` | Không | Thư mục dữ liệu bền (SQLite, chứng từ, khóa audit tự sinh) |
 | `TAX_REFEREE_AUDIT_KEY` | Không | Khóa HMAC nhật ký (≥ 32 ký tự); production không đặt thì tự sinh file `.audit-key` (quyền 600) cạnh database |
 | `TAX_REFEREE_AUDIT_SIGNED_SINCE` | Không | Mốc ISO: từ đó mọi sự kiện phải có chữ ký (chống hạ cấp) |

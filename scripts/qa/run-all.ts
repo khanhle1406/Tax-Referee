@@ -17,10 +17,10 @@ import {ensureQaFixtures} from './qa-fixtures';
 
 type Suite = {name: string; files: string[]; minChecks: number; env?: Record<string, string>; memoryDb?: boolean};
 
-const MOCK_AI = {OPENROUTER_API_KEY: 'qa-mocked-only', QWEN_API_KEY: 'qa-mocked-only'};
+const MOCK_AI = {DEV_LLM_API_KEY: 'qa-mocked-only', DEV_LLM_BASE_URL: 'https://llm.qa.test/v1', DEV_LLM_MODEL: 'qa-vision'};
 
 export const suites: Suite[] = [
-  {name: 'unit', files: [], minChecks: 111},
+  {name: 'unit', files: [], minChecks: 146},
   {name: 'manifest', files: ['scripts/qa/test-regression-manifest.ts'], minChecks: 4},
   {name: 'referee-core', files: ['scripts/qa/test-referee-core.ts'], minChecks: 14},
   {name: 'redteam', files: ['scripts/qa/test-redteam.ts'], minChecks: 1},
@@ -51,6 +51,7 @@ function run(suite: Suite) {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), `tax-referee-${suite.name}-`));
   const env: NodeJS.ProcessEnv = {
     ...process.env,
+    DEV_LLM_API_KEY: '',
     NODE_ENV: 'test',
     TAX_REFEREE_DATA_DIR: dataDir,
     TAX_REFEREE_DB_PATH: suite.memoryDb ? ':memory:' : path.join(dataDir, 'tax-referee.sqlite'),

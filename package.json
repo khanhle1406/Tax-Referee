@@ -26,7 +26,7 @@
     "node": ">=20.19"
   },
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev --turbo --hostname 127.0.0.1 --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -41,6 +41,7 @@
     "test:comprehensive": "tsx scripts/qa/test-comprehensive-suites.ts",
     "test:manifest": "tsx scripts/qa/test-regression-manifest.ts",
     "demo:reset": "tsx scripts/ops/reset-demo-data.ts",
+    "demo:suppliers": "tsx scripts/ops/seed-demo-suppliers.ts",
     "referee:snapshot": "tsx scripts/qa/referee-snapshot.ts --write",
     "referee:diff": "tsx scripts/qa/referee-snapshot.ts",
     "live:check": "python scripts/ops/check-live.py",

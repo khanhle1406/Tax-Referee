@@ -14,8 +14,8 @@ export function pdfChildEnv(env: NodeJS.ProcessEnv): Record<string, string> {
 }
 
 /**
- * Trích xuất text trực tiếp từ Digital PDF (hóa đơn điện tử PDF vector).
- * Tốc độ thực thi cực nhanh (< 30ms), hoàn toàn không cần qua OCR hình ảnh.
+ * Đọc lớp chữ có sẵn trong PDF theo thứ tự hiển thị, giữ ranh giới trang.
+ * Không dùng OCR; lớp chữ hỗ trợ AI đối chiếu với bố cục PDF gốc.
  */
 
 export function extractTextFromPdfBuffer(pdfBuffer: Buffer): string | null {
@@ -32,14 +32,14 @@ text = ""
 try:
     import fitz
     doc = fitz.open(sys.argv[1])
-    for page in doc:
-        text += page.get_text() + "\\n"
+    for index, page in enumerate(doc):
+        text += "[Trang " + str(index + 1) + "]\\n" + page.get_text(sort=True) + "\\n"
 except Exception:
     try:
         from pypdf import PdfReader
         reader = PdfReader(sys.argv[1])
-        for page in reader.pages:
-            text += (page.extract_text() or "") + "\\n"
+        for index, page in enumerate(reader.pages):
+            text += "[Trang " + str(index + 1) + "]\\n" + (page.extract_text() or "") + "\\n"
     except Exception:
         pass
 sys.stdout.write(text.strip())

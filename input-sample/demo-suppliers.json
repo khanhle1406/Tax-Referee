@@ -1,0 +1,127 @@
+[
+  {
+    "id": "sample-vincommerce",
+    "name": "CÔNG TY CỔ PHẦN DỊCH VỤ THƯƠNG MẠI TỔNG HỢP VINCOMMERCE",
+    "taxCode": "0104918404",
+    "aliases": [
+      "VinCommerce",
+      "Vinmart",
+      "Vinmart+"
+    ],
+    "files": [
+      "07_real_bill_circle_k.jpg",
+      "09_real_bill_retail_store.jpg",
+      "10_real_bill_restaurant.jpg"
+    ],
+    "sourceKind": "WEB_CONTEXT",
+    "note": "MST pháp nhân tham chiếu từ website VinMart; ba bill không in MST. Chưa xác minh MST chi nhánh/điểm bán.",
+    "sources": [
+      {
+        "title": "VinMart: tên pháp nhân và mã số doanh nghiệp",
+        "url": "https://vinmart.com/"
+      }
+    ]
+  },
+  {
+    "id": "sample-coop-kpark",
+    "name": "Co.op Food HN THE K-PARK",
+    "taxCode": "0309129418-115",
+    "aliases": [
+      "Saigon Co.op Co.op Food HN THE K-PARK",
+      "Saigon Co.op",
+      "Co.op Food"
+    ],
+    "files": [
+      "08_real_bill_coopfood.jpg"
+    ],
+    "sourceKind": "RECEIPT",
+    "note": "Giữ đúng MST chi nhánh in trên bill; tên cửa hàng chưa được xác minh thành tên pháp lý.",
+    "sources": [
+      {
+        "title": "Ảnh gốc Co.op Food HN THE K-PARK",
+        "url": "https://raw.githubusercontent.com/huyhoang17/KIE_invoice_minimal/master/images/mcocr_val_145115alcfe.jpg"
+      }
+    ]
+  },
+  {
+    "id": "sample-nshop",
+    "name": "CÔNG TY TNHH THƯƠNG MẠI NSHOP",
+    "taxCode": "0316713247",
+    "aliases": [
+      "nShop",
+      "nShop - Game & Hobby",
+      "Game & Hobby",
+      "nShop Game Hobby"
+    ],
+    "files": [
+      "11_real_invoice_photo.jpg"
+    ],
+    "sourceKind": "WEB_CONTEXT",
+    "note": "Tên/MST pháp nhân từ website nShop; bill không in MST. Chưa xác minh MST chi nhánh.",
+    "sources": [
+      {
+        "title": "nShop: thông tin đăng ký và hệ thống cửa hàng",
+        "url": "https://www.nshop.com.vn/pages/gioi-thieu-nshop"
+      }
+    ]
+  },
+  {
+    "id": "public-haiphong-waste-12",
+    "name": "CÔNG TY CỔ PHẦN CÔNG TRÌNH CÔNG CỘNG VÀ DỊCH VỤ DU LỊCH HẢI PHÒNG",
+    "taxCode": "0200534908",
+    "aliases": [
+      "Công ty CP Công trình công cộng và Dịch vụ du lịch Hải Phòng"
+    ],
+    "files": [
+      "12_public_hai_phong_waste.pdf"
+    ],
+    "sourceKind": "PDF_SAMPLE",
+    "note": "Trích một trang hóa đơn trong phụ lục báo cáo công khai của doanh nghiệp trên cổng Hải Phòng; giữ nguyên nội dung, chưa kiểm chứng chữ ký số, trạng thái hoạt động hoặc tính hợp pháp giao dịch.",
+    "sources": [
+      {
+        "title": "Hóa đơn công khai trong phụ lục báo cáo trên cổng Hải Phòng, trang 98",
+        "url": "https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf#page=98"
+      }
+    ]
+  },
+  {
+    "id": "public-haiphong-water-13",
+    "name": "CÔNG TY CỔ PHẦN CẤP NƯỚC HẢI PHÒNG",
+    "taxCode": "0200171274",
+    "aliases": [
+      "Hai Phong Water Joint Stock Company",
+      "Công ty CP Cấp nước Hải Phòng"
+    ],
+    "files": [
+      "13_public_hai_phong_water.pdf"
+    ],
+    "sourceKind": "PDF_SAMPLE",
+    "note": "Trích một trang hóa đơn trong phụ lục báo cáo công khai của doanh nghiệp trên cổng Hải Phòng; giữ nguyên nội dung, chưa kiểm chứng chữ ký số, trạng thái hoạt động hoặc tính hợp pháp giao dịch. Hóa đơn có thuế suất 5% và 8%; không gán một thuế suất chung.",
+    "sources": [
+      {
+        "title": "Hóa đơn công khai trong phụ lục báo cáo trên cổng Hải Phòng, trang 131",
+        "url": "https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf#page=131"
+      }
+    ]
+  },
+  {
+    "id": "public-haiphong-electricity-14",
+    "name": "CÔNG TY ĐIỆN LỰC HẢI PHÒNG - CHI NHÁNH TỔNG CÔNG TY ĐIỆN LỰC MIỀN BẮC",
+    "taxCode": "0100100417-069",
+    "aliases": [
+      "Công ty Điện lực Hải Phòng",
+      "Điện lực Hải Phòng"
+    ],
+    "files": [
+      "14_public_hai_phong_electricity.pdf"
+    ],
+    "sourceKind": "PDF_SAMPLE",
+    "note": "Trích một trang hóa đơn trong phụ lục báo cáo công khai của doanh nghiệp trên cổng Hải Phòng; giữ nguyên nội dung, chưa kiểm chứng chữ ký số, trạng thái hoạt động hoặc tính hợp pháp giao dịch.",
+    "sources": [
+      {
+        "title": "Hóa đơn công khai trong phụ lục báo cáo trên cổng Hải Phòng, trang 138",
+        "url": "https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf#page=138"
+      }
+    ]
+  }
+]

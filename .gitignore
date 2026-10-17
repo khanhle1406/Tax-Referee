@@ -88,3 +88,9 @@ deepseek-agent/*.log
 
 # Claude Code: cấu hình cá nhân không commit
 .claude/settings.local.json
+
+# Local relay installer, credentials and received invoices
+/relay-kit.tar.gz
+/relay-kit/
+/relay-inbox/
+relay-kit.env

@@ -12,7 +12,7 @@ function main():void{
  fs.writeFileSync(draft,JSON.stringify({status:'AWAITING_HUMAN_LABELS',companyTaxCode:'0102030405',cases}));
  const scripts:Record<string,string>={'labels:lock':'lock-referee-labels.ts','evaluate:independent':'evaluate-independent.ts','score:referee-questions':'score-referee-questions.ts'};
  const tsxCli=path.join(process.cwd(),'node_modules','tsx','dist','cli.mjs');
- const run=(name:string,args:string[]):string=>execFileSync(process.execPath,[tsxCli,path.join('scripts','qa',scripts[name]),...args],{encoding:'utf8',env:{...process.env,SHOPAIKEY_API_KEY:'',AI_API_KEY:'',OPENROUTER_API_KEY:'',TAX_REFEREE_DB_PATH:':memory:'},stdio:['ignore','pipe','pipe']});
+ const run=(name:string,args:string[]):string=>execFileSync(process.execPath,[tsxCli,path.join('scripts','qa',scripts[name]),...args],{encoding:'utf8',env:{...process.env,DEV_LLM_API_KEY:'',TAX_REFEREE_DB_PATH:':memory:'},stdio:['ignore','pipe','pipe']});
  assert.match(run('labels:lock',[draft,locked]),/Đã khóa 20 nhãn/);assert.ok(fs.existsSync(locked+'.sha256'));
  assert.throws(()=>run('labels:lock',[draft,locked]));
  const report=path.join(directory,'evaluation.json');run('evaluate:independent',[locked,'--out',report]);

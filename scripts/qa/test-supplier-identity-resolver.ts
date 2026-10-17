@@ -9,6 +9,7 @@ import { evaluateWorkflow, readRecord } from '../../services/workflowService';
 import { challengeCases } from '../../data/verification/challengeCases';
 import { POST as parseDocument } from '../../app/api/documents/parse/route';
 import { SHOPAIKEY_GEMINI_API_CONFIG } from '../../lib/constants';
+import { mockLlmCompletion } from '../../tests/helpers/llm';
 
 const A = '0104918404';
 const B = '0100109106';
@@ -161,23 +162,23 @@ async function main() {
     let visionCalls = 0; let searchCalls = 0;
     let unavailable = false;
     globalThis.fetch = async (_input, init) => {
+      if (String(_input).startsWith('https://gdt.gov.vn/record/')) {
+        return new Response(`${LEGAL} MST ${A}`, {headers: {'Content-Type': 'text/plain'}});
+      }
       const request = JSON.parse(String(init?.body));
-      if (request.contents[0].parts.some((part: any) => part.inlineData)) {
+      if (Array.isArray(request.messages[0].content)) {
         visionCalls++;
-        return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify({
+        return mockLlmCompletion({
           documentType: 'INVOICE', invoice: { supplierName: 'VinCommerce', invoiceNumber: 'A001',
             invoiceDate: '2026-10-12', itemName: 'Văn phòng phẩm', preTaxAmount: 100000,
             totalAmount: 100000, taxAmount: 0, taxRate: 0 }
-        }) }] } }] }));
+        });
       }
       searchCalls++;
-      return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify({
+      return mockLlmCompletion({
         decision: unavailable ? 'NO_MATCH' : 'MATCH', selectedTaxCode: unavailable ? null : A,
-        candidates: unavailable ? [] : [{ legalName: LEGAL, taxCode: A }]
-      }) }] }, groundingMetadata: {
-        groundingChunks: [{ web: { uri: 'https://gdt.gov.vn/record/' + A, title: 'Hồ sơ chính thức' } }],
-        groundingSupports: [{ segment: { text: `${LEGAL} MST ${A}` }, groundingChunkIndices: [0] }]
-      } }] }));
+        candidates: unavailable ? [] : [{ legalName: LEGAL, taxCode: A, sourceUrl: 'https://gdt.gov.vn/record/' + A }]
+      });
     };
     try {
       const session = switchRole('ACCOUNTANT')!;

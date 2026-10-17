@@ -19,6 +19,7 @@ import { parseTctExport } from '../../lib/reconciliation/tctParser';
 import { visionRequestOptions, expandVisionFields } from '../../services/qwenService';
 import { optimizeImageBuffer } from '../../lib/server/pdfToImage';
 import { GEMINI_API_CONFIG, SHOPAIKEY_GEMINI_API_CONFIG, OPENROUTER_API_CONFIG } from '../../lib/constants';
+import { mockLlmCompletion } from '../../tests/helpers/llm';
 
 let checks=0;
 function pass(name:string) { checks++; console.log('PASS '+name); }
@@ -95,10 +96,11 @@ async function main() {
   pass('Namespace-aware XML fallback preserves seller/buyer and totals');
   const fetchOriginal=globalThis.fetch;
   globalThis.fetch=async(input,init)=>{
-   const visionUrl=new URL(String(input));assert.equal(visionUrl.hostname,'api.shopaikey.com');assert.match(visionUrl.pathname,/^\/v1beta\/models\//);assert.equal(visionUrl.searchParams.get('key'),'qa-mocked-only');
+   const visionUrl=new URL(String(input));assert.equal(visionUrl.toString(),SHOPAIKEY_GEMINI_API_CONFIG.ENDPOINT);assert.equal(visionUrl.searchParams.get('key'),null);
    const requestBody=JSON.parse(String(init?.body));
-   assert.ok(requestBody.contents?.[0]?.parts?.some((part:any)=>part.inlineData));
-   return new Response(JSON.stringify({candidates:[{content:{parts:[{text:JSON.stringify({documentType:'INVOICE',invoice:{preTaxAmount:0,taxAmount:0,totalAmount:0,taxRate:0,isImageBlurry:false}})}]}}]}),{status:200});
+   assert.equal(requestBody.stream,false);
+   assert.ok(requestBody.messages?.[0]?.content?.some((part:any)=>part.image_url));
+   return mockLlmCompletion({documentType:'INVOICE',invoice:{preTaxAmount:0,taxAmount:0,totalAmount:0,taxRate:0,isImageBlurry:false}});
   };
   try { const result=await upload('blurred.jpg',fs.readFileSync('docs/qa-2026-10-10/fixtures/blurred.jpg'),'image/jpeg');assert.equal(result.status,200);const parsed=await result.json();assert.equal(parsed.needsReview,true);assert.ok(parsed.uncertainFields.includes('totalAmount'));assert.ok(parsed.confidence.totalAmount<0.85);pass('Gemini Vision balanced zeros require source review with low confidence'); } finally {globalThis.fetch=fetchOriginal;}
   const nexOptions=visionRequestOptions('nex-agi/nex-n2.5-mini') as any;assert.equal(nexOptions.response_format,undefined);assert.deepEqual(nexOptions.provider.only,['nex-agi']);assert.equal(nexOptions.reasoning.enabled,false);
@@ -106,12 +108,12 @@ async function main() {
   for(const id of ['HD198735','HD-00001','HB_001']) assert.equal(sanitizeInvoice({invoiceNumber:id}).invoice.invoiceNumber,id);assert.equal(sanitizeInvoice({invoiceNumber:'HĐ: 00180477'}).invoice.invoiceNumber,'00180477');pass('Document normalization preserves invoice identifier prefixes and zeros');
   const wire=expandVisionFields({n:'HD-00001',s:'0100000001',b:'0100109106',p:0,r:0,a:0,blur:true,unknown:'ignored',v:null});assert.equal(wire.invoiceNumber,'HD-00001');assert.equal(wire.preTaxAmount,0);assert.equal(wire.buyerTaxCode,'0100109106');assert.equal(wire.isImageBlurry,true);assert.ok(!('supplierName' in wire));assert.throws(()=>expandVisionFields([]));pass('Compact Vision preserves source values, missing fields and zero');
   const cached=await (await upload('blurred.jpg',fs.readFileSync('docs/qa-2026-10-10/fixtures/blurred.jpg'),'image/jpeg')).json();assert.equal(cached.performance.cacheHit,true);assert.equal(cached.needsReview,true);assert.ok(cached.uncertainFields.includes('totalAmount'));pass('Scoped persisted cache preserves Vision uncertainty');
-  let providerCalls=0;globalThis.fetch=async(input)=>{providerCalls++;return new Response(JSON.stringify({candidates:[{content:{parts:[{text:JSON.stringify({documentType:'INVOICE',invoice:{isImageBlurry:true}})}]}}]}));};
+  let providerCalls=0;globalThis.fetch=async(input)=>{providerCalls++;return mockLlmCompletion({documentType:'INVOICE',invoice:{isImageBlurry:true}});};
   try {await withDemoDatabase('00000000-0000-4000-8000-000000000124',async()=>{
     const fresh=switchRole('CFO')!;const result=await (await upload('blurred.jpg',fs.readFileSync('docs/qa-2026-10-10/fixtures/blurred.jpg'),'image/jpeg',fresh.token)).json();assert.equal(result.performance.cacheHit,false);assert.equal(providerCalls,1);
   });pass('Another session never receives extraction cache or artifact');}finally{globalThis.fetch=fetchOriginal;}
   const small=fs.readFileSync('docs/qa-2026-10-10/fixtures/clear.png');const optimized=await optimizeImageBuffer(small,'image/png');assert.equal(optimized.mimeType,'image/png');assert.deepEqual(optimized.buffer,small);pass('Image optimizer preserves small source legibility');
-  globalThis.fetch=async()=>new Response(JSON.stringify({candidates:[{finishReason:'MAX_TOKENS',content:{parts:[]}}]}));
+  globalThis.fetch=async()=>mockLlmCompletion({documentType:'INVOICE',invoice:{invoiceNumber:'TRUNCATED'}},'length');
   const previousConsole=console.error;console.error=()=>{};
   try {assert.equal((await upload('clear.jpg',fs.readFileSync('docs/qa-2026-10-10/fixtures/clear.jpg'),'image/jpeg')).status,502);pass('Truncated Vision response cannot be accepted as complete extraction');} finally {globalThis.fetch=fetchOriginal;console.error=previousConsole;}
   assert.equal(OPENROUTER_API_CONFIG.MODEL,GEMINI_API_CONFIG.MODEL);pass('Vision config uses the current provider/model fallback');

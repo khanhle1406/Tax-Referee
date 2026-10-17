@@ -1,0 +1,65 @@
+{
+  "purpose": "Legacy synthetic XML and illustrative PDF fixtures; not real-transaction demo input",
+  "items": [
+    {
+      "id": "xml-viettel-01",
+      "file": "01_real_viettel_sinvoice.xml",
+      "kind": "XML",
+      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/viettel_invoice.xml",
+      "licenseStatus": "UNVERIFIED",
+      "truthStatus": "PENDING_INDEPENDENT_LABEL",
+      "sha256": "524404372cf830b9627b293b4b711eab8ceec8f388e9f67ea31132fc61238f34",
+      "retrievedAt": "2026-10-10"
+    },
+    {
+      "id": "xml-misa-02",
+      "file": "02_real_misa_meinvoice.xml",
+      "kind": "XML",
+      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/misa_invoice.xml",
+      "licenseStatus": "UNVERIFIED",
+      "truthStatus": "PENDING_INDEPENDENT_LABEL",
+      "sha256": "d59a332b90dc7b381719d1e8b4d9f10a687902d8dc3f8d96edb5413edb956bea",
+      "retrievedAt": "2026-10-10"
+    },
+    {
+      "id": "xml-vnpt-03",
+      "file": "03_real_vnpt_einvoice.xml",
+      "kind": "XML",
+      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/vnpt_invoice.xml",
+      "licenseStatus": "UNVERIFIED",
+      "truthStatus": "PENDING_INDEPENDENT_LABEL",
+      "sha256": "b215367f1d00025069528457480bae0e3973571c1fca2d9e97ef399f6e28a630",
+      "retrievedAt": "2026-10-10"
+    },
+    {
+      "id": "xml-fpt-04",
+      "file": "04_real_fpt_einvoice.xml",
+      "kind": "XML",
+      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/fpt_invoice.xml",
+      "licenseStatus": "UNVERIFIED",
+      "truthStatus": "PENDING_INDEPENDENT_LABEL",
+      "sha256": "c87fc629adbcc19600976c66caccda94c966f60ea7cc7c1732a8a34d01c916fc",
+      "retrievedAt": "2026-10-10"
+    },
+    {
+      "id": "xml-tct-05",
+      "file": "05_real_tct_invoice.xml",
+      "kind": "XML",
+      "sourceUrl": "https://raw.githubusercontent.com/rezonia/invoice-processor/main/internal/parser/xml/testdata/tct_invoice.xml",
+      "licenseStatus": "UNVERIFIED",
+      "truthStatus": "PENDING_INDEPENDENT_LABEL",
+      "sha256": "43a4fb2889b39397f441d4c013263653426653dab07a58099073234de60115d0",
+      "retrievedAt": "2026-10-10"
+    },
+    {
+      "id": "pdf-vinhlong-06",
+      "file": "06_real_einvoice_vinhlong.pdf",
+      "kind": "PDF_TEXT_OR_SCAN",
+      "sourceUrl": "https://raw.githubusercontent.com/thuyetbao/einvoice-lens/master/tests/data/sample-sale-invoice.pdf",
+      "licenseStatus": "UNVERIFIED",
+      "truthStatus": "PENDING_INDEPENDENT_LABEL",
+      "sha256": "fe55ee74a965c00c3a976110d236aa5abd3f11ded0f17305ab311dc876526576",
+      "retrievedAt": "2026-10-10"
+    }
+  ]
+}

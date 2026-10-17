@@ -1,4 +1,6 @@
 import crypto from 'node:crypto';
+import { DEV_LLM_API_CONFIG } from '@/lib/constants';
+import { fetchOfficialSourceText, officialTextSupportsIdentity } from '@/lib/server/officialSourceEvidence';
 import { getDatabase, jsonNow } from '@/lib/server/db';
 import { validateTaxCode } from '@/lib/taxCode';
 import { getSupplier, upsertSupplier } from './supplierService';
@@ -338,19 +340,15 @@ type OnlineCompanyCandidate = {
   sourceUrl?: string;
 };
 
-type GroundedBusinessSearchResult = {
+type OfficialSourceBusinessSearchResult = {
   candidates: Array<{ taxCode: string; name: string; address?: string; sourceUrl: string }>;
 };
 
-function shopAiCredentials(): { apiKey: string; baseUrl: string; model: string } | null {
+function devLlmCredentials(): { apiKey: string; baseUrl: string; model: string } | null {
   if (process.env.SUPPLIER_ONLINE_IDENTITY_LOOKUP_ENABLED !== 'true') return null;
-  // Do not send credentials for OCR or OpenRouter to ShopAIKey. This lookup
-  // currently uses ShopAIKey's OpenAI-compatible endpoint and needs its own key.
-  const apiKey = process.env.SHOPAIKEY_API_KEY?.trim();
-  if (!apiKey) return null;
-  const baseUrl = (process.env.SHOPAIKEY_BASE_URL || 'https://api.shopaikey.com').replace(/\/+$/, '');
-  const model = process.env.SHOPAIKEY_MODEL || 'gemini-2.5-flash';
-  return { apiKey, baseUrl: baseUrl.replace(/\/v1(?:beta)?$/i, ''), model };
+  const { API_KEY: apiKey, BASE_URL: baseUrl, MODEL: model } = DEV_LLM_API_CONFIG;
+  if (!apiKey || !baseUrl || !model) return null;
+  return { apiKey, baseUrl, model };
 }
 
 function isOfficialRegistryUrl(value: string): boolean {
@@ -363,16 +361,6 @@ function isOfficialRegistryUrl(value: string): boolean {
   }
 }
 
-function officialRegistryDomain(value: string): string | null {
-  try {
-    const host = new URL(value).hostname.toLowerCase();
-    return ['dangkykinhdoanh.gov.vn', 'gdt.gov.vn', 'tracuunnt.gdt.gov.vn']
-      .find((domain) => host === domain || host.endsWith(`.${domain}`)) || null;
-  } catch {
-    return null;
-  }
-}
-
 function parseModelJson<T>(value: string): T | null {
   const unwrapped = value.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
   try { return JSON.parse(unwrapped) as T; } catch { /* model may wrap JSON in a short preamble */ }
@@ -382,50 +370,14 @@ function parseModelJson<T>(value: string): T | null {
   try { return JSON.parse(unwrapped.slice(start, end + 1)) as T; } catch { return null; }
 }
 
-function groundedBusinessNameIsCited(name: string, supportText: string): boolean {
-  const normalizedName = normalizeCompanyNameForSimilarity(normalizeCompanyName(name));
-  const normalizedSupport = normalizeCompanyNameForSimilarity(supportText);
-  if (!normalizedName || !normalizedSupport) return false;
-  if (normalizedSupport.includes(normalizedName)) return true;
-
-  const genericTerms = new Set([
-    'cong', 'ty', 'trach', 'nhiem', 'huu', 'han', 'mot', 'thanh', 'vien', 'co', 'phan',
-    'joint', 'stock', 'limited', 'liability', 'company', 'corporation', 'corp', 'ltd', 'jsc', 'llc'
-  ]);
-  const distinctiveTokens = normalizedName.split(' ').filter((token) => token.length >= 2 && !genericTerms.has(token));
-  const citedTokens = new Set(normalizedSupport.split(' '));
-  return distinctiveTokens.length > 0 && distinctiveTokens.every((token) => citedTokens.has(token));
-}
-
-function groundedCandidateTaxCodeIsCited(
+async function groundedCandidateTaxCodeIsCited(
   taxCode: string,
   businessName: string,
-  sourceUrl: string,
-  metadata: any
-): boolean {
+  sourceUrl: string
+): Promise<boolean> {
   if (!isOfficialRegistryUrl(sourceUrl)) return false;
-  const chunks = Array.isArray(metadata?.groundingChunks) ? metadata.groundingChunks : [];
-  const supports = Array.isArray(metadata?.groundingSupports) ? metadata.groundingSupports : [];
-  const sourceDomain = officialRegistryDomain(sourceUrl);
-  if (!sourceDomain) return false;
-  const chunkIndices = chunks.flatMap((chunk: any, index: number) => {
-    const citedUrl = typeof chunk?.web?.uri === 'string' ? chunk.web.uri : '';
-    const title = typeof chunk?.web?.title === 'string' ? chunk.web.title.toLowerCase() : '';
-    const directOfficialMatch = citedUrl && isOfficialRegistryUrl(citedUrl)
-      && officialRegistryDomain(citedUrl) === sourceDomain;
-    // Gemini Search citation URLs may be Google redirect links; in those
-    // responses the provider's citation title carries the source host.
-    const groundedOfficialTitle = title.includes(sourceDomain);
-    return directOfficialMatch || groundedOfficialTitle ? [index] : [];
-  });
-  return chunkIndices.length > 0 && supports.some((support: any) => {
-    const citedSegments = Array.isArray(support?.groundingChunkIndices)
-      && support.groundingChunkIndices.some((index: number) => chunkIndices.includes(index));
-    const text = typeof support?.segment?.text === 'string' ? support.segment.text : '';
-    return citedSegments
-      && text.replace(/\D/g, '').includes(taxCode)
-      && groundedBusinessNameIsCited(businessName, text);
-  });
+  const text = await fetchOfficialSourceText(sourceUrl);
+  return Boolean(text && officialTextSupportsIdentity(text, businessName, taxCode));
 }
 
 async function discoverGroundedCompanyCandidates(
@@ -434,17 +386,16 @@ async function discoverGroundedCompanyCandidates(
   limit: number,
   supplierSearchContext?: string
 ): Promise<OnlineCompanyCandidate[]> {
-  const credentials = shopAiCredentials();
+  const credentials = devLlmCredentials();
   if (!credentials) return [];
   const prompt = `Tra cứu doanh nghiệp Việt Nam dựa trên tên bên bán in trên hóa đơn và địa chỉ OCR nếu có.
-Tìm ưu tiên tại dangkykinhdoanh.gov.vn, gdt.gov.vn và tracuunnt.gdt.gov.vn. Chỉ dùng kết quả tìm kiếm web từ các nguồn chính thức này. Không dùng kiến thức nhớ sẵn, không tự tạo mã số thuế, không chọn kết quả chỉ vì tên gần giống. Mỗi ứng viên phải có mã số thuế được hiển thị trực tiếp trong nguồn chính thức đã được trích dẫn.
+Tìm ưu tiên tại dangkykinhdoanh.gov.vn, gdt.gov.vn và tracuunnt.gdt.gov.vn. Không dùng kiến thức nhớ sẵn, không tự tạo mã số thuế, không chọn kết quả chỉ vì tên gần giống. Mỗi ứng viên phải có URL nguồn chính thức cụ thể; máy chủ sẽ tải trang và kiểm tra MST, tên.
 Nếu không có nguồn chính thức chứng minh rõ mã số thuế, trả candidates rỗng. Nếu có nhiều chi nhánh/pháp nhân khả dĩ, trả tất cả ứng viên liên quan để bước xác minh tiếp theo phân biệt; tối đa ${limit} ứng viên.
 Tên OCR: ${JSON.stringify(name)}
 Địa chỉ OCR: ${JSON.stringify(address || '')}
 Ngữ cảnh OCR giới hạn ở phần đầu bên bán (chỉ là manh mối tìm kiếm, không phải bằng chứng pháp lý): ${JSON.stringify((supplierSearchContext || '').slice(0, 1200))}
 Chỉ trả JSON theo schema với candidates gồm taxCode, name, address (nếu thấy), sourceUrl (URL chính thức trích dẫn).`;
-  const url = new URL(`${credentials.baseUrl}/v1beta/models/${encodeURIComponent(credentials.model)}:generateContent`);
-  url.searchParams.set('key', credentials.apiKey);
+  const url = `${credentials.baseUrl}/chat/completions`;
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -454,36 +405,31 @@ Chỉ trả JSON theo schema với candidates gồm taxCode, name, address (nế
         Authorization: `Bearer ${credentials.apiKey}`
       },
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        tools: [{ google_search: {} }],
-        generationConfig: {
-          temperature: 0,
-          maxOutputTokens: 900
-        }
+        model: credentials.model,
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        temperature: 0,
+        max_tokens: 900,
+        stream: false
       }),
       signal: AbortSignal.timeout(Number(process.env.SUPPLIER_LOOKUP_AI_TIMEOUT_MS || 12000)),
       cache: 'no-store'
     });
     if (!response.ok) {
-      console.warn(`[TaxLookup] Gemini Search API trả HTTP ${response.status}.`);
+      console.warn(`[TaxLookup] DEV_LLM API trả HTTP ${response.status}.`);
       return [];
     }
     const payload = await response.json();
-    const candidate = payload?.candidates?.[0];
-    const rawText = (candidate?.content?.parts || [])
-      .map((part: any) => typeof part?.text === 'string' ? part.text : '')
-      .join('')
-      .trim();
-    if (!rawText || candidate?.finishReason === 'MAX_TOKENS') return [];
-    const parsed = parseModelJson<GroundedBusinessSearchResult>(rawText);
+    const rawText = payload?.choices?.[0]?.message?.content;
+    if (typeof rawText !== 'string' || !rawText.trim()) return [];
+    const parsed = parseModelJson<OfficialSourceBusinessSearchResult>(rawText);
     if (!parsed) return [];
     if (!Array.isArray(parsed?.candidates)) return [];
-    const metadata = candidate?.groundingMetadata;
     const unique = new Map<string, OnlineCompanyCandidate>();
     for (const item of parsed.candidates) {
       if (!item || typeof item.taxCode !== 'string' || typeof item.name !== 'string' || typeof item.sourceUrl !== 'string') continue;
       const valid = validateTaxCode(item.taxCode);
-      if (!valid.isValid || !groundedCandidateTaxCodeIsCited(valid.normalized, item.name, item.sourceUrl, metadata)) continue;
+      if (!valid.isValid || !await groundedCandidateTaxCodeIsCited(valid.normalized, item.name, item.sourceUrl)) continue;
       unique.set(valid.normalized, {
         taxCode: valid.normalized,
         name_vi: item.name,
@@ -493,7 +439,7 @@ Chỉ trả JSON theo schema với candidates gồm taxCode, name, address (nế
     }
     return [...unique.values()].slice(0, limit);
   } catch (error: any) {
-    console.warn(`[TaxLookup] Gemini Search không khả dụng (${error?.name || 'error'}).`);
+    console.warn(`[TaxLookup] DEV_LLM không khả dụng (${error?.name || 'error'}).`);
     return [];
   }
 }
@@ -589,9 +535,9 @@ async function selectVerifiedSupplierWithAI(
   directPrintedTaxCode = false,
   supplierSearchContext?: string
 ): Promise<SupplierLookupResult | null> {
-  const credentials = shopAiCredentials();
+  const credentials = devLlmCredentials();
   if (!credentials || !candidates.length) return null;
-  const url = `${credentials.baseUrl}/v1/chat/completions`;
+  const url = `${credentials.baseUrl}/chat/completions`;
   const records = candidates.map((candidate) => {
     const discovery = discoveryCandidates.find((item) => item.taxCode === candidate.taxCode);
     return {
@@ -633,7 +579,8 @@ async function selectVerifiedSupplierWithAI(
         messages,
         response_format: { type: 'json_object' },
         temperature: 0,
-        max_tokens: 350
+        max_tokens: 350,
+        stream: false
       }),
       signal: AbortSignal.timeout(Number(process.env.SUPPLIER_LOOKUP_AI_TIMEOUT_MS || 12000)),
       cache: 'no-store'
@@ -658,7 +605,7 @@ async function selectVerifiedSupplierWithAI(
 }
 
 /**
- * Ask a business-search API or Gemini's grounded Google Search for candidates,
+ * Ask a business-search API or the configured LLM for official-source candidates,
  * verify every returned tax code against GDT, then let AI compare the invoice
  * name/address with those official records. Model-suggested codes are never
  * accepted without the GDT lookup.

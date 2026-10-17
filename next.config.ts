@@ -18,7 +18,8 @@ const nextConfig: NextConfig = {
   },
   outputFileTracingRoot: process.cwd(),
   outputFileTracingExcludes:{'/*':['./data/runtime/**','./data/uploads/**','./.env*','./.codex-finalizer/**']},
-  distDir:process.env.NEXT_BUILD_DIR || '.next',
+  // Development and production must never overwrite each other's manifests.
+  distDir:process.env.NEXT_BUILD_DIR || (process.env.NODE_ENV === 'development' ? '.next-dev' : '.next'),
   eslint: {
     ignoreDuringBuilds: true,
   },

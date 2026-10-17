@@ -3,6 +3,7 @@ import { getDatabase } from '@/lib/server/db';
 import { allowGroundingCall } from '@/lib/server/aiBudget';
 import { SupplierIdentity, SupplierIdentitySchema } from '@/lib/schemas';
 import { normalizeTaxCodeFormat, validateTaxCode } from '@/lib/taxCode';
+import { lookupDemoSupplier } from '@/lib/server/demoSupplierCatalog';
 import { lookupByTaxCode, normalizeCompanyName, SupplierLookupResult } from './taxLookupService';
 
 export type SupplierIdentityQuery = { supplierName?: string; supplierTaxCode?: string; address?: string };
@@ -193,6 +194,8 @@ export async function resolveSupplierIdentity(input: SupplierIdentityQuery, sear
   };
   const originals = { originalSupplierName: query.supplierName, originalSupplierTaxCode: query.supplierTaxCode };
   if (!query.supplierName && !query.supplierTaxCode) return { status: 'NOT_FOUND', sources: [], ...originals };
+  const demo = lookupDemoSupplier(query);
+  if (demo) return {...demo, ...originals};
   const db = getDatabase();
   const local = readLocal(db, query);
   if (local) return { ...local, ...originals };

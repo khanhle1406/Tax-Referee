@@ -1,6 +1,7 @@
 import type { InboxFilterState } from '@/components/InboxFilterToolbar';
 
 export const workspaceRoutes = {
+  dashboard: { path: '/workspace/dashboard', label: 'Tổng quan' },
   inbox: { path: '/workspace/inbox', label: 'Thẩm định' },
   receive: { path: '/workspace/receive', label: 'Tiếp nhận' },
   approval: { path: '/workspace/approvals', label: 'Chờ duyệt' },
@@ -15,6 +16,10 @@ export const workspaceRoutes = {
 } as const;
 export type WorkspaceView = keyof typeof workspaceRoutes;
 export type InvoiceTab = 'review' | 'source' | 'history';
+
+export function workspaceHomeForRole(role: 'ACCOUNTANT' | 'CHIEF_ACCOUNTANT' | 'CFO'): string {
+  return role === 'ACCOUNTANT' ? workspaceRoutes.inbox.path : workspaceRoutes.dashboard.path;
+}
 
 export function viewForPath(pathname: string): WorkspaceView {
   return (Object.keys(workspaceRoutes) as WorkspaceView[]).find(key => workspaceRoutes[key].path === pathname) || 'inbox';

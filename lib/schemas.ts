@@ -243,7 +243,7 @@ export const SupplierIdentitySourceSchema = z.object({
 export type SupplierIdentitySource = z.infer<typeof SupplierIdentitySourceSchema>;
 
 export const SupplierIdentitySchema = z.object({
-  status: z.enum(['VERIFIED', 'AMBIGUOUS', 'NOT_FOUND', 'SOURCE_UNAVAILABLE', 'CONFLICT']),
+  status: z.enum(['VERIFIED', 'DEMO_MATCH', 'AMBIGUOUS', 'NOT_FOUND', 'SOURCE_UNAVAILABLE', 'CONFLICT']),
   legalName: z.string().trim().min(1).optional(),
   supplierTaxCode: z.string().trim().min(1).optional(),
   originalSupplierName: z.string().optional(),
@@ -251,7 +251,7 @@ export const SupplierIdentitySchema = z.object({
   address: z.string().optional(),
   verifiedAt: z.string().datetime().optional(),
   sourceUpdatedAt: z.string().datetime().optional(),
-  lookupMethod: z.enum(['LOCAL_VERIFIED', 'TAX_REGISTRY', 'SEARCH_GROUNDING']).optional(),
+  lookupMethod: z.enum(['LOCAL_VERIFIED', 'DEMO_CATALOG', 'TAX_REGISTRY', 'SEARCH_GROUNDING']).optional(),
   sources: z.array(SupplierIdentitySourceSchema).default([]),
   message: z.string().trim().optional()
 });

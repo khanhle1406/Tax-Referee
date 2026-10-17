@@ -13,6 +13,7 @@ import {listAuditEventsForEntity} from '../../lib/server/audit';
 import {assertArtifactCapacity} from '../../lib/server/artifactQuota';
 import {extractInvoiceWithHybridPipeline} from '../../services/aiCoordinator';
 import {SHOPAIKEY_GEMINI_API_CONFIG} from '../../lib/constants';
+import {mockLlmCompletion} from '../../tests/helpers/llm';
 
 const cfo={id:'cfo-test',role:'CFO' as const,email:'cfo@test',displayName:'CFO kiểm thử'};
 const importer={...cfo,id:'importer-test',role:'ACCOUNTANT' as const};
@@ -75,23 +76,23 @@ async function main(){await runIsolated(async()=>{
   globalThis.fetch=async(input,init)=>{
    calls++;
    const url=new URL(String(input));
-   assert.equal(url.hostname,'api.shopaikey.com');
-   assert.match(url.pathname,/^\/v1beta\/models\//);
-   assert.equal(url.searchParams.get('key'),'qa-mocked-only');
+   assert.equal(url.toString(),SHOPAIKEY_GEMINI_API_CONFIG.ENDPOINT);
+   assert.equal(url.searchParams.get('key'),null);
    assert.equal(new Headers(init?.headers).get('authorization'),'Bearer qa-mocked-only');
    const body=JSON.parse(String(init?.body));
-   assert.ok(body.contents?.[0]?.parts?.some((part:any)=>part.inlineData?.data==='AA=='));
-   return new Response(JSON.stringify({candidates:[{content:{parts:[{text:JSON.stringify({documentType:'INVOICE',invoice:{invoiceNumber:'HD12345',supplierTaxCode:'0100109106',totalAmount:11500}})}]}}]}),{status:200});
+   assert.equal(body.model,SHOPAIKEY_GEMINI_API_CONFIG.MODEL);assert.equal(body.stream,false);
+   assert.ok(body.messages?.[0]?.content?.some((part:any)=>part.image_url?.url==='data:image/png;base64,AA=='));
+   return mockLlmCompletion({documentType:'INVOICE',invoice:{invoiceNumber:'HD12345',supplierTaxCode:'0100109106',totalAmount:11500}});
   };
   const extraction=await extractInvoiceWithHybridPipeline({fileBase64:'AA==',mimeType:'image/png'});
   check('Ảnh được gửi trực tiếp tới Gemini Vision mà không gọi worker OCR',()=>{assert.equal(calls,1);assert.equal(extraction.engineUsed,'GEMINI_AI');assert.equal(extraction.documentType,'INVOICE');assert.equal(extraction.data.invoiceNumber,'HD12345');});
-  globalThis.fetch=async()=>new Response(JSON.stringify({candidates:[{content:{parts:[{text:JSON.stringify({documentType:'NOT_INVOICE',invoice:{}})}]}}]}),{status:200});
+  globalThis.fetch=async()=>mockLlmCompletion({documentType:'NOT_INVOICE',invoice:{}});
   const notInvoice=await extractInvoiceWithHybridPipeline({fileBase64:'AA==',mimeType:'image/png'});
   check('Gemini trả trạng thái ảnh không phải hóa đơn để UI báo bằng toaster',()=>{assert.equal(notInvoice.documentType,'NOT_INVOICE');assert.deepEqual(notInvoice.data,{});});
   globalThis.fetch=async(input,init)=>{
    const body=JSON.parse(String(init?.body));
-   assert.ok(body.contents?.[0]?.parts?.some((part:any)=>part.inlineData?.mimeType==='application/pdf'));
-   return new Response(JSON.stringify({candidates:[{content:{parts:[{text:JSON.stringify({documentType:'INVOICE',invoice:{invoiceNumber:'PDF-001'}})}]}}]}),{status:200});
+   assert.ok(body.messages?.[0]?.content?.some((part:any)=>part.image_url?.url==='data:application/pdf;base64,JVBERi0='));
+   return mockLlmCompletion({documentType:'INVOICE',invoice:{invoiceNumber:'PDF-001'}});
   };
   const scannedPdf=await extractInvoiceWithHybridPipeline({fileBase64:'JVBERi0=',mimeType:'application/pdf',fileName:'scan.pdf'});
   check('PDF scan được gửi trực tiếp cho Gemini Vision, không chuyển qua OCR',()=>{assert.equal(scannedPdf.documentType,'INVOICE');assert.equal(scannedPdf.data.invoiceNumber,'PDF-001');});

@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { DEV_LLM_API_CONFIG } from '../../lib/constants';
+import { mockLlmCompletion } from '../../tests/helpers/llm';
 import { autoEnrichSupplierData, companyNameMatches, lookupByName, lookupByTaxCode, normalizeCompanyName, recordConfirmedSupplierAlias, validateTaxCode } from '../../services/taxLookupService';
 import { getDatabase, runIsolated } from '../../lib/server/db';
 import { parseReceiptEntities } from '../../lib/receiptEntityParser';
@@ -16,31 +18,21 @@ let latestSupplierGroundingPrompt = '';
 
 function mockSupplierIdentityAi(input: RequestInfo | URL, init?: RequestInit): Response | null {
   const url = new URL(typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url);
-  if (url.hostname !== 'api.shopaikey.com') return null;
+  if (url.hostname === 'www.dangkykinhdoanh.gov.vn') {
+    const text = latestSupplierGroundingPrompt.includes('Tên không được trích dẫn') ? '0198765430' : 'Công ty TNHH Tìm qua Google — MST 0198765430';
+    return new Response(text, {headers: {'Content-Type': 'text/plain'}});
+  }
+  if (url.origin !== new URL(DEV_LLM_API_CONFIG.ENDPOINT).origin) return null;
   const body = JSON.parse(String(init?.body || '{}'));
-  if (url.pathname.includes('/v1beta/models/')) {
+  if (body.messages?.length === 1) {
     supplierGroundingMockCalls += 1;
-    assert.equal(body?.generationConfig?.responseMimeType, undefined,
-      'Gemini 2.5 Search grounding uses JSON instructions without unsupported structured-output mode');
-    const searchPrompt = String(body?.contents?.[0]?.parts?.[0]?.text || '');
+    assert.equal(body.stream, false);
+    const searchPrompt = String(body?.messages?.[0]?.content || '');
     latestSupplierGroundingPrompt = searchPrompt;
-    const unsupportedNameCitation = searchPrompt.includes('Tên không được trích dẫn');
     const candidate = searchPrompt.includes('Tên không chính thức')
       ? { taxCode: '0198765430', name: 'Công ty TNHH Tên không chính thức', sourceUrl: 'https://masothue.com/0198765430' }
       : { taxCode: '0198765430', name: 'Công ty TNHH Tìm qua Google', address: 'Số 123 Đường Lê Lợi, Hà Nội', sourceUrl: 'https://www.dangkykinhdoanh.gov.vn/doanh-nghiep/0198765430' };
-    return new Response(JSON.stringify({
-      candidates: [{ content: { parts: [{ text: JSON.stringify({ candidates: [candidate] }) }] },
-        groundingMetadata: {
-          groundingChunks: [{ web: {
-            uri: candidate.sourceUrl.includes('masothue.com') ? candidate.sourceUrl : 'https://vertexaisearch.cloud.google.com/grounding-api-redirect/qa',
-            title: candidate.sourceUrl.includes('masothue.com') ? 'masothue.com' : 'dangkykinhdoanh.gov.vn'
-          } }],
-          groundingSupports: [{ segment: {
-            text: unsupportedNameCitation ? candidate.taxCode : `${candidate.name} — MST ${candidate.taxCode}`
-          }, groundingChunkIndices: [0] }]
-        }
-      }]
-    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    return mockLlmCompletion({candidates: [candidate]});
   }
   if (!url.pathname.endsWith('/v1/chat/completions')) return null;
 
@@ -282,8 +274,8 @@ async function main() {
 
   const originalFetch = globalThis.fetch;
   const originalFetchDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
-  const previousShopAiKey = process.env.SHOPAIKEY_API_KEY;
-  const previousShopAiBaseUrl = process.env.SHOPAIKEY_BASE_URL;
+  const previousShopAiKey = DEV_LLM_API_CONFIG.API_KEY;
+  const previousShopAiBaseUrl = DEV_LLM_API_CONFIG.BASE_URL;
   const previousGeminiKey = process.env.GEMINI_API_KEY;
   const previousXinvoiceClientId = process.env.XINVOICE_CLIENT_ID;
   const previousXinvoiceApiKey = process.env.XINVOICE_API_KEY;
@@ -454,19 +446,19 @@ async function main() {
 
   process.env.SUPPLIER_ONLINE_IDENTITY_LOOKUP_ENABLED = 'true';
   process.env.GEMINI_API_KEY = 'unrelated-vision-key';
-  delete process.env.SHOPAIKEY_API_KEY;
+  DEV_LLM_API_CONFIG.API_KEY = '';
   delete process.env.DOANHNGHIEP_API_KEY;
   let unsupportedCredentialCalls = 0;
   globalThis.fetch = async () => {
     unsupportedCredentialCalls += 1;
     throw new Error('A vision key must not be sent to the supplier-search provider');
   };
-  assert.equal(await lookupByName('Nhà cung cấp cần ShopAIKey'), null);
-  assert.equal(unsupportedCredentialCalls, 0, 'GEMINI_API_KEY riêng cho OCR không được nhầm làm ShopAIKey');
+  assert.equal(await lookupByName('Nhà cung cấp cần API LLM'), null);
+  assert.equal(unsupportedCredentialCalls, 0, 'Khóa GEMINI cũ không được dùng thay DEV_LLM_API_KEY');
 
   process.env.SUPPLIER_ONLINE_IDENTITY_LOOKUP_ENABLED = 'true';
-  process.env.SHOPAIKEY_API_KEY = 'qa-mocked-only';
-  process.env.SHOPAIKEY_BASE_URL = 'https://api.shopaikey.com';
+  DEV_LLM_API_CONFIG.API_KEY = 'qa-mocked-only';
+  DEV_LLM_API_CONFIG.BASE_URL = 'https://nlt9router-oracle.tail3abf4e.ts.net/v1';
   process.env.DOANHNGHIEP_API_KEY = 'qa-mocked-only';
   const registryAddress = 'Số 123 Đường Lê Lợi, Phường 1, TP. Hà Nội';
   globalThis.fetch = async (input) => {
@@ -868,10 +860,10 @@ async function main() {
 
   if (previousBusinessApiKey === undefined) delete process.env.DOANHNGHIEP_API_KEY;
   else process.env.DOANHNGHIEP_API_KEY = previousBusinessApiKey;
-  if (previousShopAiKey === undefined) delete process.env.SHOPAIKEY_API_KEY;
-  else process.env.SHOPAIKEY_API_KEY = previousShopAiKey;
-  if (previousShopAiBaseUrl === undefined) delete process.env.SHOPAIKEY_BASE_URL;
-  else process.env.SHOPAIKEY_BASE_URL = previousShopAiBaseUrl;
+  if (previousShopAiKey === undefined) DEV_LLM_API_CONFIG.API_KEY = '';
+  else DEV_LLM_API_CONFIG.API_KEY = previousShopAiKey;
+  if (previousShopAiBaseUrl === undefined) DEV_LLM_API_CONFIG.BASE_URL = '';
+  else DEV_LLM_API_CONFIG.BASE_URL = previousShopAiBaseUrl;
   if (previousGeminiKey === undefined) delete process.env.GEMINI_API_KEY;
   else process.env.GEMINI_API_KEY = previousGeminiKey;
   if (previousXinvoiceClientId === undefined) delete process.env.XINVOICE_CLIENT_ID;

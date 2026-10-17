@@ -23,7 +23,7 @@ async function handleGET(req: NextRequest) {
     }
 
     const identity = await lookupOfficialSupplierIdentity({ supplierName: name, supplierTaxCode: taxCode, address });
-    if (identity.status === 'VERIFIED') {
+    if (identity.status === 'VERIFIED' || identity.status === 'DEMO_MATCH') {
       return NextResponse.json({
         found: true,
         lookupStatus: identity.status,
@@ -32,7 +32,8 @@ async function handleGET(req: NextRequest) {
           taxCode: identity.supplierTaxCode,
           legalName: identity.legalName,
           supplierName: identity.legalName,
-          isVerified: true,
+          isVerified: identity.status === 'VERIFIED',
+          isDemo: identity.status === 'DEMO_MATCH',
           sources: identity.sources
         }
       }, { headers: { 'Cache-Control': 'no-store' } });

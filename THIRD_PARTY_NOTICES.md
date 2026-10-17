@@ -8,10 +8,11 @@ Các file được tải từ kho công khai để thử parser và luồng đ�
 
 | File | Nguồn | `licenseStatus` |
 |---|---|---|
-| `01`–`05_*.xml` (Viettel, MISA, VNPT, FPT, TCT) | [rezonia/invoice-processor](https://github.com/rezonia/invoice-processor) — dữ liệu test, MST thử nghiệm | `UNVERIFIED` |
-| `06_real_einvoice_vinhlong.pdf` | [thuyetbao/einvoice-lens](https://github.com/thuyetbao/einvoice-lens) — dữ liệu test | `UNVERIFIED` |
+| `tests/fixtures/legacy-invoices/01`–`05_*.xml` | [rezonia/invoice-processor](https://github.com/rezonia/invoice-processor) — fixture giả lập đã tách khỏi bộ demo | `UNVERIFIED` |
+| `tests/fixtures/legacy-invoices/06_real_einvoice_vinhlong.pdf` | [thuyetbao/einvoice-lens](https://github.com/thuyetbao/einvoice-lens) — PDF minh họa đã tách khỏi bộ demo | `UNVERIFIED` |
 | `07`–`10_real_bill_*.jpg` | Bộ dữ liệu MC-OCR 2021 qua [huyhoang17/KIE_invoice_minimal](https://github.com/huyhoang17/KIE_invoice_minimal) | `RESEARCH_ONLY_OR_UNVERIFIED` |
 | `11_real_invoice_photo.jpg` | [TranThanh159/Doc_Hoa_Don](https://github.com/TranThanh159/Doc_Hoa_Don) | `UNVERIFIED` |
+| `12`–`14_public_hai_phong_*.pdf` | [Báo cáo công khai trên cổng Hải Phòng](https://cdn.haiphong.gov.vn/gov-hpg/1/tintuc/2026/5/bc-cap-gpmt639134816288045391.pdf), trích nguyên trang 98/131/138. Nguồn, số trang và SHA-256 ghi trong manifest; bản trích không bảo toàn chữ ký số | `UNVERIFIED` |
 
 - Chỉ dùng cho nghiên cứu, thử nghiệm và trình diễn. Không dùng để công bố độ chính xác: theo `licensePolicy` của manifest, chỉ mẫu `REDISTRIBUTABLE` mới được dùng cho tuyên bố công khai về độ chính xác. Hiện không mẫu nào có trạng thái này.
 - Nếu bạn là chủ sở hữu và muốn gỡ một file, hãy mở issue hoặc liên hệ maintainer (xem [SECURITY.md](SECURITY.md)); đội sẽ gỡ khỏi bản mới.
@@ -34,4 +35,4 @@ Logo TR và các favicon trong `public/` do đội tạo bằng công cụ sinh 
 
 ## Dịch vụ bên ngoài
 
-Khi có khóa API, ảnh và PDF scan được gửi tới Gemini 2.5 Flash (model mặc định) qua proxy ShopAIKey để đọc chứng từ. Tra cứu danh tính bên bán có thể gửi MST tới API công khai VietQR (`api.vietqr.io`, không cần khóa), gửi tên/MST tới cùng proxy (grounding) và, nếu đặt khóa `XINVOICE_*` hoặc `DOANHNGHIEP_API_KEY`, tới các API dữ liệu doanh nghiệp tương ứng (`services/taxLookupService.ts`). Việc dùng các dịch vụ này theo điều khoản của nhà cung cấp; không gửi dữ liệu thật của doanh nghiệp lên bản demo.
+Khi có cấu hình `DEV_LLM_BASE_URL`, `DEV_LLM_API_KEY`, `DEV_LLM_MODEL`, ảnh và PDF được gửi tới dịch vụ AI đó để đọc chứng từ. Tra cứu danh tính có thể gửi MST tới API công khai VietQR hoặc API doanh nghiệp được cấu hình; tên/MST có thể gửi tới dịch vụ AI cấu hình để tìm nguồn. Danh mục local chuẩn bị trước chỉ phục vụ demo, không là bằng chứng xác minh chính thống. Việc dùng dịch vụ theo điều khoản của nhà cung cấp; bộ demo chỉ dùng chứng từ đã công bố công khai, không tải tài liệu nội bộ của người khác khi chưa được phép.
