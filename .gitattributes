@@ -1,0 +1,15 @@
+# Chuẩn hóa xuống dòng LF trong repo (index đã toàn LF); Windows vẫn checkout theo core.autocrlf.
+* text=auto eol=lf
+
+# Tệp nhị phân: không so sánh/chuyển đổi xuống dòng
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.pdf binary
+*.pptx binary
+*.docx binary
+*.zip binary
+*.woff2 binary

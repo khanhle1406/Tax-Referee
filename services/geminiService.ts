@@ -1,4 +1,4 @@
-import { GEMINI_API_CONFIG, SHOPAIKEY_GEMINI_API_CONFIG } from '@/lib/constants';
+import { GEMINI_API_CONFIG, SHOPAIKEY_GEMINI_API_CONFIG, devLlmConfig } from '@/lib/constants';
 import { InvoiceInput, ActionOptionSchema, RiskGroup,EscalatedDecision } from '@/lib/schemas';
 import { z } from 'zod';
 import crypto from 'node:crypto';
@@ -95,7 +95,7 @@ export interface GeminiVisionExtraction {
   droppedKeys: string[];
   provenance: VisionProvenance;
 }
-export interface VisionProvenance { principal: string; provider: 'shopaikey'; model: string; promptSha256: string; latencyMs: number; finishReason: string | null }
+export interface VisionProvenance { principal: string; provider: 'shopaikey' | `dev-llm:${string}`; model: string; promptSha256: string; latencyMs: number; finishReason: string | null }
 
 /** Ngân sách thời gian của các agent AI (một nguồn số liệu cho mã, /api/health và trang /trust). */
 export const VISION_TIMEOUT_MS = 35_000;
@@ -151,6 +151,8 @@ export async function extractInvoiceImageWithGeminiVision(
   // Giữ tham số để không đổi nơi gọi; tên file KHÔNG được đưa vào prompt.
   _fileName?: string
 ): Promise<GeminiVisionExtraction> {
+  const dev = devLlmConfig();
+  if (dev) return extractWithDevLlm(dev, fileBase64, mimeType);
   const { API_KEY: apiKey, BASE_URL, MODEL } = SHOPAIKEY_GEMINI_API_CONFIG;
   if (!apiKey) throw new Error('Chưa cấu hình SHOPAIKEY_API_KEY trong .env.local để đọc ảnh hóa đơn.');
   const prompt = buildVisionPrompt();
@@ -203,6 +205,40 @@ export async function extractInvoiceImageWithGeminiVision(
     data: documentType === 'NOT_INVOICE' ? {} : data,
     droppedKeys,
     provenance: { principal: `agent:vision@${MODEL}#${VISION_PROMPT_SHA256.slice(0, 12)}`, provider: 'shopaikey', model: MODEL, promptSha256: VISION_PROMPT_SHA256, latencyMs: Date.now() - started, finishReason: candidate?.finishReason ?? null }
+  };
+}
+
+/**
+ * Đọc ảnh qua LLM DEMO (chuẩn OpenAI, có công tắc DEV_LLM_ENABLED). Cùng prompt cố định, cùng bộ lọc 14 trường và cùng
+ * timeout như đường chính; danh tính agent ghi rõ provider 'dev-llm' và tên máy chủ (không bao giờ ghi key).
+ */
+async function extractWithDevLlm(dev: NonNullable<ReturnType<typeof devLlmConfig>>, fileBase64: string, mimeType: string): Promise<GeminiVisionExtraction> {
+  const prompt = buildVisionPrompt();
+  const started = Date.now();
+  const response = await fetch(`${dev.baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${dev.apiKey}` },
+    body: JSON.stringify({ model: dev.model, temperature: 0, max_tokens: 2048,
+      messages: [{ role: 'user', content: [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: `data:${mimeType || 'image/jpeg'};base64,${fileBase64}` } }] }] }),
+    signal: AbortSignal.timeout(VISION_TIMEOUT_MS),
+    cache: 'no-store',
+  });
+  if (!response.ok) throw new Error(`[LLM demo ${dev.host}] Lỗi HTTP ${response.status}`);
+  const payload = await response.json();
+  const choice = payload?.choices?.[0];
+  if (choice?.finish_reason === 'length') throw new Error('LLM demo trả về kết quả bị cắt; không chấp nhận dữ liệu chưa hoàn chỉnh.');
+  const content = choice?.message?.content;
+  const rawContent = (typeof content === 'string' ? content : Array.isArray(content) ? content.map((p: { text?: unknown }) => typeof p.text === 'string' ? p.text : '').join('') : '').trim();
+  if (!rawContent) throw new Error('[LLM demo] Không nhận được nội dung từ mô hình');
+  const parsed = extractCleanJson(rawContent) as Record<string, unknown>;
+  const documentType: GeminiVisionDocumentType = parsed.documentType === 'INVOICE' ? 'INVOICE' : parsed.documentType === 'NOT_INVOICE' ? 'NOT_INVOICE' : 'UNCERTAIN';
+  const rawInvoice = parsed.invoice && typeof parsed.invoice === 'object' && !Array.isArray(parsed.invoice) ? parsed.invoice as Record<string, unknown> : {};
+  const { data, droppedKeys } = filterVisionInvoice(rawInvoice);
+  return {
+    documentType,
+    data: documentType === 'NOT_INVOICE' ? {} : data,
+    droppedKeys,
+    provenance: { principal: `agent:vision@${dev.model}#${VISION_PROMPT_SHA256.slice(0, 12)}`, provider: `dev-llm:${dev.host}`, model: dev.model, promptSha256: VISION_PROMPT_SHA256, latencyMs: Date.now() - started, finishReason: typeof choice?.finish_reason === 'string' ? choice.finish_reason : null },
   };
 }
 

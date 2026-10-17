@@ -4,7 +4,7 @@
 
 ## 1. Định hướng
 
-Ứng dụng kế toán đơn giản, hiện đại, ít chữ, ưu tiên quyết định và dữ kiện. Tham khảo cách phân cấp, màu và khoảng trắng của [Taste Skill](https://www.tasteskill.dev/). Áp dụng skill đã cài tại `/Users/xuannguyen/.codex/skills/design-taste-frontend/SKILL.md` theo ngữ cảnh sản phẩm nghiệp vụ; không áp đặt bố cục landing page lên biểu mẫu và bảng dữ liệu.
+Ứng dụng kế toán đơn giản, hiện đại, ít chữ, ưu tiên quyết định và dữ kiện. Tham khảo cách phân cấp, màu và khoảng trắng của [Taste Skill](https://www.tasteskill.dev/). Áp dụng skill `design-taste-frontend` đã cài trên máy thành viên theo ngữ cảnh sản phẩm nghiệp vụ; không áp đặt bố cục landing page lên biểu mẫu và bảng dữ liệu.
 
 `DESIGN_VARIANCE: 3`, `MOTION_INTENSITY: 3`, `VISUAL_DENSITY: 5`. Next.js, Tailwind 3, Radix, Sonner, Lucide hiện hành; không thêm thư viện animation. Chỉ chế độ sáng.
 

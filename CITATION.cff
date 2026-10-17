@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "Nếu dùng hoặc trích dẫn Tax Referee, vui lòng trích dẫn theo thông tin dưới đây."
+title: "Tax Referee — Trọng tài thuế GTGT đầu vào cho hóa đơn điện tử Việt Nam"
+type: software
+version: 1.0.0
+date-released: 2026-10-16
+license: MIT
+url: "https://limegreen-salamander-517622.hostingersite.com"
+repository-code: "https://github.com/khanhle1406/Tax-Referee"
+abstract: >-
+  Quy tắc tất định quyết định khấu trừ thuế GTGT đầu vào; AI chỉ đọc chứng từ;
+  chuyển người đúng lúc bằng một câu hỏi; nhật ký chống sửa SHA-256 + HMAC.
+  MLAI Hackathon 2026 · Track VNG · Đề A "The Escalation Referee".
+keywords:
+  - vat
+  - e-invoice
+  - vietnam
+  - human-in-the-loop
+  - escalation
+  - audit-log
+authors:
+  - name: "Đội Fprinciples"
+  - given-names: Khánh
+    family-names: Lê
+    alias: khanhle1406
+  - given-names: Minh
+    alias: bminhnemhoi
+  - given-names: Tiến
+    alias: Towfienes

@@ -1,0 +1,40 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+      timezone: Asia/Ho_Chi_Minh
+    # Chờ bản phát hành ổn định ít nhất 14 ngày trước khi đề xuất (giảm rủi ro chuỗi cung ứng).
+    cooldown:
+      default-days: 14
+    groups:
+      github-actions:
+        patterns: ['*']
+    commit-message:
+      prefix: 'chore(ci)'
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+      timezone: Asia/Ho_Chi_Minh
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Ghim 12.11.1: bản có prebuilt cho Node 22 Linux x64 trên Hostinger (deployment/HOSTINGER.md).
+      - dependency-name: better-sqlite3
+      # Nâng major (Next 16, Tailwind 4, TypeScript 7, ESLint 10…) cần PR riêng, kế hoạch nâng cấp và kiểm chứng đầy đủ.
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+    commit-message:
+      prefix: 'chore(deps)'

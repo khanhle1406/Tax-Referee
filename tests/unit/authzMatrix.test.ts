@@ -10,7 +10,15 @@ import { switchRole, type AppUser } from '../../lib/server/auth';
 import { CAPABILITIES, HUMAN_ROLES, can, type Principal } from '../../lib/capabilities';
 import { allowedActions, answerHandoff, applyWorkflowAction, evaluateWorkflow, readRecord, reviewPostAudit } from '../../services/workflowService';
 import { setAutomationPaused } from '../../services/automationControl';
+import { answerGroup, attachToBatch, createBatch, signOffBatch } from '../../services/batchService';
+import { addStaff, assignSender, listChannelMessages, pullChannel } from '../../services/channels/channelService';
+import type { GmailClient, InboundMail } from '../../services/channels/gmailChannel';
+
+/** Client Gmail giả: không gọi mạng. */
+const fakeGmail = (mails: InboundMail[]): GmailClient => ({ fetchUnseen: async () => mails, markSeen: async () => undefined, close: async () => undefined });
 import { createPolicyDraft, publishPolicy, rollbackPolicy } from '../../services/policyService';
+import { getDashboard } from '../../services/dashboardService';
+import { getMyHistory } from '../../services/historyService';
 
 const base = { invoiceDate: '2026-10-05', supplierTaxCode: '0312345678', supplierName: 'Công ty TNHH Minh An', taxRate: 10 };
 let seq = 0;
@@ -29,6 +37,20 @@ function setup(): Users {
 
 /** Mỗi quyền: dựng tình huống bằng người khác (để không vướng bất kiêm nhiệm), rồi để `actor` thử. Trả true nếu được phép. */
 const SCENARIOS: Record<string, (u: Users, actor: AppUser) => Promise<boolean>> = {
+  'batch.create': async (_u, actor) => attempt(() => createBatch(actor, { label: 'Lô thử quyền' })),
+  // Lô do kế toán viên tạo, có một ca thường quy đã tự duyệt: người khác người tạo, đủ vai trò mới chốt được.
+  'batch.signoff': async (u, actor) => { const lot = createBatch(u.ACCOUNTANT, { label: 'Lô chốt thử' }); const inv = routine(); await evaluateWorkflow(inv, u.ACCOUNTANT, { forceLocalOnly: true });
+    attachToBatch(u.ACCOUNTANT, lot.id, { invoiceId: inv.id }); return attempt(() => signOffBatch(lot.id, actor, 'Chốt lô sau khi xem tổng hợp')); },
+  // Hai hóa đơn tiếp khách có rượu ở hai nhà hàng khác nhau: cùng một câu hỏi, trả lời chung được.
+  'batch.answerGroup': async (u, actor) => { const lot = createBatch(u.ACCOUNTANT, { label: 'Lô nhóm thử' }); const ids: string[] = [];
+    for (const k of [1, 2]) { seq += 1; const n = String(9_500_000 + seq); const inv = { ...base, id: `AZG-${n}`, invoiceNumber: n, supplierTaxCode: `031955${String(seq).padStart(4, '0')}`, itemName: 'Tiếp khách đối tác - rượu vang', preTaxAmount: 3_000_000, taxAmount: 300_000, totalAmount: 3_300_000, paymentMethod: 'BANK_TRANSFER' as const };
+      void k; await evaluateWorkflow(inv, u.ACCOUNTANT, { forceLocalOnly: true }); attachToBatch(u.ACCOUNTANT, lot.id, { invoiceId: inv.id }); ids.push(inv.id); }
+    return attempt(async () => { const r = await answerGroup(lot.id, actor, { invoiceIds: ids, answers: { '1': 'A', '2': 'A' }, reason: 'Tiếp khách theo quy chế, có bảng kê' }); if (!r.every(x => x.ok)) throw new Error('bị chặn'); }); },
+  'channel.pull': async (_u, actor) => attempt(() => pullChannel(actor, 'GMAIL', { gmail: fakeGmail([]) })),
+  'staff.edit': async (_u, actor) => attempt(() => addStaff(actor, { fullName: 'Người thử quyền', email: `thu-quyen-${actor.role.toLowerCase()}@example.com` })),
+  // File PDF từ người lạ chờ xác nhận người gửi; người thử gắn cho một nhân viên trong danh bạ.
+  'channel.assignSender': async (u, actor) => { await pullChannel(u.ACCOUNTANT, 'GMAIL', { gmail: fakeGmail([{ uid: 1, messageId: `<authz-${actor.role}@example.net>`, from: 'la@example.net', attachments: [{ fileName: 'hd.pdf', mime: 'application/pdf', content: Buffer.from('%PDF-1.4 thu quyen') }] }]) });
+    const message = listChannelMessages().find(m => m.status === 'NEEDS_SENDER_REVIEW')!; return attempt(() => assignSender(actor, message.id, 'STAFF-KD')); },
   'invoice.submit': async (_u, actor) => attempt(() => evaluateWorkflow(routine(), actor, { forceLocalOnly: true })),
   'invoice.confirmFields': async (u, actor) => { const inv = routine(); await evaluateWorkflow(inv, u.ACCOUNTANT, { forceLocalOnly: true });
     return attempt(() => evaluateWorkflow(inv, actor, { forceLocalOnly: true, expectedRevision: readRecord(inv.id).revision, confirmations: [{ field: 'totalAmount', evidence: 'Đối chiếu hóa đơn gốc' }] })); },
@@ -55,12 +77,20 @@ const SCENARIOS: Record<string, (u: Users, actor: AppUser) => Promise<boolean>> 
     const strict = createPolicyDraft({ config: { ...getActivePolicy().config, postAuditRate: 0.3 }, version: `AZ-STRICT-${seq}` }, u.CHIEF_ACCOUNTANT.id);
     publishPolicy(strict.version, u.CHIEF_ACCOUNTANT.id, 'Siết hậu kiểm', u.CHIEF_ACCOUNTANT.role);
     return attempt(() => rollbackPolicy(baseVersion, actor.id, 'Quay lại bản trước', actor.role)); },
+  'dashboard.view': async (u, actor) => { await evaluateWorkflow(routine(), u.ACCOUNTANT, { forceLocalOnly: true }); return attempt(() => getDashboard(actor)); },
+  // Được xem nhưng chỉ bản ghi của chính mình: có bản ghi của người khác trong kết quả thì coi như sai quyền (trả false).
+  'history.viewOwn': async (u, actor) => { await evaluateWorkflow(routine(), u.ACCOUNTANT, { forceLocalOnly: true }); await evaluateWorkflow(routine(), u.CHIEF_ACCOUNTANT, { forceLocalOnly: true });
+    return attempt(() => { const h = getMyHistory(actor), db = getDatabase();
+      const foreign = h.submissions.some(s => readRecord(s.invoiceId).created_by_user_id !== actor.id)
+        || h.actions.some(a => (db.prepare('SELECT actor_id FROM audit_events WHERE id=?').get(a.eventId) as { actor_id: string | null }).actor_id !== actor.id);
+      if (foreign || (actor.role !== 'CFO' && !h.submissions.length)) throw new Error('lịch sử lẫn bản ghi người khác'); }); },
 };
 /** Quyền được thực thi ở route API: kiểm cổng vai trò có trong mã nguồn route (không dựa số dòng). */
 const ROUTE_GATES: Record<string, { file: string; gate: string }> = {
   'policy.draft': { file: 'app/api/policy/route.ts', gate: "['CHIEF_ACCOUNTANT', 'CFO'].includes(user.role)" },
   'precedent.manage': { file: 'app/api/precedents/route.ts', gate: "user.role !== 'CFO'" },
   'supplier.update': { file: 'app/api/suppliers/route.ts', gate: "user.role === 'ACCOUNTANT'" },
+  'ledger.export': { file: 'app/api/ledger/export/route.ts', gate: "['CHIEF_ACCOUNTANT', 'CFO'].includes(user.role)" },
 };
 
 test('mọi quyền của con người trong bảng đều có phép kiểm (hàm thật hoặc cổng route)', () => {

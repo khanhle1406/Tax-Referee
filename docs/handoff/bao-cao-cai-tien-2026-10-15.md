@@ -1,5 +1,7 @@
 # Báo cáo cải tiến Tax Referee — nhánh `feat/track-a-hardening` (14–15/10/2026)
 
+> 📌 **Ảnh chụp lịch sử** — báo cáo ngày 15/10, nhánh đã vào `main` qua PR #1 và PR #2; số liệu là của lúc viết (44 unit test, "chờ 16/10"). Hiện hành: 110 kiểm tra unit; buổi thử người dùng 16/10 không có phản hồi chi tiết bằng văn bản nên repo không công bố số liệu người dùng; ca bẫy U2 đã đóng ở commit `02b8a24`. Số liệu hiện hành: [README](../../README.md), trang `/verify`, `/sop` và `docs/evidence/`.
+
 **Đội:** Fprinciples · **Đề:** MLAI Hackathon 2026 · Track VNG · Đề A "The Escalation Referee"
 **Phạm vi:** từ commit `33522a0` (main, 13/10) đến đầu nhánh `feat/track-a-hardening` (15/10) · 114 file, +5.260/−789 dòng, hơn 35 commit nhỏ.
 **Người thực hiện:** Minh (bminhnemhoi), có Claude Code hỗ trợ. Mỗi thay đổi đều chạy test trước khi commit.

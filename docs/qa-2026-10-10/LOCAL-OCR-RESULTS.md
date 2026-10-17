@@ -12,7 +12,7 @@ Phương pháp thử là worker OCR giữ model **PP-OCRv5 mobile Latin** trong 
 | 10 — nhà hàng | 1,44 giây |
 | 11 — hóa đơn gaming | 1,52 giây |
 
-Trung vị là **1,44 giây**, P95 nearest-rank của mẫu 5 ảnh là **1,52 giây**, và **5/5 ảnh** dưới 2 giây. Đây là kết quả của bộ mẫu thử hiện tại, chưa phải cam kết cho mọi loại hóa đơn. Kết quả đo chi tiết nằm trong [ui-results.json](./local-ocr-evidence/ui-results.json).
+Trung vị là **1,44 giây**, P95 nearest-rank của mẫu 5 ảnh là **1,52 giây**, và **5/5 ảnh** dưới 2 giây. Đây là kết quả của bộ mẫu thử hiện tại, chưa phải cam kết cho mọi loại hóa đơn. Kết quả đo chi tiết nằm trong `local-ocr-evidence/ui-results.json` (bằng chứng thô không commit, xem `.gitignore`).
 
 Worker được khởi động và nạp model trước khi bấm tải ảnh. Thời gian nạp model là **1,922 giây** riêng, chưa tính vào con số trên UI. Trong 15 lượt gọi trực tiếp worker sau khi đã nạp model, profile giới hạn cạnh dài 960px có trung vị **832 ms**, P95 nearest-rank **1,052 ms**, tối đa **1,052 ms** ở vòng chạy cải thiện. Cold start vẫn mất khoảng **1,922 ms** và được đo riêng.
 
@@ -22,7 +22,7 @@ Worker được khởi động và nạp model trước khi bấm tải ảnh. T
 
 Kết quả 100% đạt được sau khi bổ sung các biến thể nhãn bị OCR làm sai ("ngy", "Hạ số thuế", "Tiền MT"), nối tiếp số tiền ở dòng kế bên và nhận tiền thuế chỉ khi ảnh có nhãn VAT rõ ràng. Guard ở route cũng chặn việc tự điền MST từ danh bạ nhà cung cấp và chặn suy ra tiền trước thuế từ tổng tiền + thuế suất cho local OCR. Vì vậy, 100% là độ đúng của các trường đã chọn trên đúng 5 ảnh, không phải độ chính xác tổng quát hay cam kết cho dữ liệu thực tế.
 
-Bằng chứng worker theo từng lần chạy: [max960-accuracy-final/benchmark.json](./local-ocr-evidence/max960-accuracy-final/benchmark.json). Các file JSON kèm theo giữ kết quả OCR và đối chiếu trường cho từng ảnh.
+Bằng chứng worker theo từng lần chạy: `local-ocr-evidence/max960-accuracy-final/benchmark.json` (không commit, xem `.gitignore`). Các file JSON kèm theo giữ kết quả OCR và đối chiếu trường cho từng ảnh.
 
 ## Cách diễn giải và giới hạn
 

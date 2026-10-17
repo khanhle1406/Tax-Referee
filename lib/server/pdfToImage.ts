@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
-import crypto from 'node:crypto';
 import sharp from 'sharp';
 
 /** Chỉ chuyển các biến cần để chạy Python (đường dẫn, mã hóa, thư mục tạm); mọi biến khác — gồm khóa bí mật — bị bỏ. */
@@ -19,11 +18,14 @@ export function pdfChildEnv(env: NodeJS.ProcessEnv): Record<string, string> {
  */
 
 export function extractTextFromPdfBuffer(pdfBuffer: Buffer): string | null {
-  const tmpId = crypto.randomUUID();
-  const tmpPdfPath = path.join(os.tmpdir(), `tax-referee-text-${tmpId}.pdf`);
+  // Thư mục tạm riêng (mkdtemp: quyền 700 trên POSIX) và file chỉ chủ sở hữu đọc được: user khác trên cùng host
+  // không đọc được chứng từ trong /tmp dùng chung, không đặt sẵn file hay symlink được (CodeQL js/insecure-temporary-file).
+  let tmpDir: string | undefined;
 
   try {
-    fs.writeFileSync(tmpPdfPath, pdfBuffer);
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tax-referee-text-'));
+    const tmpPdfPath = path.join(tmpDir, 'input.pdf');
+    fs.writeFileSync(tmpPdfPath, pdfBuffer, { flag: 'wx', mode: 0o600 });
 
     // Dùng Python PyMuPDF (fitz) hoặc pypdf có sẵn trên máy để đọc trực tiếp text stream
     const pyScript = `
@@ -61,12 +63,10 @@ sys.stdout.write(text.strip())
   } catch (err: any) {
     console.warn('[PDF Extractor] Lỗi đọc text stream trực tiếp từ PDF:', err?.message);
   } finally {
-    if (fs.existsSync(tmpPdfPath)) {
-      try {
-        fs.unlinkSync(tmpPdfPath);
-      } catch {
-        // ignore
-      }
+    try {
+      if (tmpDir) fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+    } catch {
+      // Không để lỗi dọn dẹp (Windows: tiến trình con còn giữ thư mục) làm hỏng lượt đọc; thư mục chỉ chủ sở hữu truy cập được.
     }
   }
 
@@ -101,69 +101,5 @@ export async function optimizeImageBuffer(
     return { buffer, mimeType: 'image/jpeg' };
   } catch {
     return { buffer: imageBuffer, mimeType };
-  }
-}
-
-/**
- * Render trang đầu của tài liệu PDF sang định dạng hình ảnh PNG (Base64)
- * Chỉ dùng khi PDF là bản scan (không có text stream).
- */
-export function convertPdfToPngBase64(pdfBuffer: Buffer): string {
-  const tmpId = crypto.randomUUID();
-  const tmpPdfPath = path.join(os.tmpdir(), `tax-referee-${tmpId}.pdf`);
-  const tmpOutDir = os.tmpdir();
-  const expectedPngPath = path.join(tmpOutDir, `tax-referee-${tmpId}.pdf.png`);
-
-  try {
-    fs.writeFileSync(tmpPdfPath, pdfBuffer);
-
-    let converted = false;
-
-    // 1. Thử dùng qlmanage của macOS
-    try {
-      execSync(`qlmanage -t -s 1500 -o "${tmpOutDir}" "${tmpPdfPath}"`, {
-        stdio: 'pipe',
-        timeout: 5000
-      });
-      if (fs.existsSync(expectedPngPath) && fs.statSync(expectedPngPath).size > 0) {
-        converted = true;
-      }
-    } catch {
-      // Fallback
-    }
-
-    // 2. Fallback sang PyMuPDF
-    if (!converted) {
-      const pythonPngPath = path.join(tmpOutDir, `tax-referee-${tmpId}.png`);
-      try {
-        execSync(
-          `python3 -c "import fitz, sys; doc=fitz.open(sys.argv[1]); doc[0].get_pixmap(dpi=150).save(sys.argv[2])" "${tmpPdfPath}" "${pythonPngPath}"`,
-          { stdio: 'pipe', timeout: 8000 }
-        );
-        if (fs.existsSync(pythonPngPath) && fs.statSync(pythonPngPath).size > 0) {
-          const pngBuf = fs.readFileSync(pythonPngPath);
-          fs.unlinkSync(pythonPngPath);
-          return pngBuf.toString('base64');
-        }
-      } catch (pyErr) {
-        console.warn('[PDF Converter] Python fitz fallback error:', pyErr);
-      }
-    }
-
-    if (fs.existsSync(expectedPngPath)) {
-      const pngBuf = fs.readFileSync(expectedPngPath);
-      fs.unlinkSync(expectedPngPath);
-      return pngBuf.toString('base64');
-    }
-
-    throw new Error('Không thể render trang PDF sang PNG để thực hiện Vision OCR');
-  } finally {
-    if (fs.existsSync(tmpPdfPath)) {
-      try {
-        fs.unlinkSync(tmpPdfPath);
-      } catch {
-        // ignore
-      }
-    }
   }
 }

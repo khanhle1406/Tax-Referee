@@ -1,5 +1,7 @@
 # PROPOSAL · Tax Referee
 
+> 📌 **Ảnh chụp lịch sử** — bản nộp 15/10/2026 (`referee-contract-2026-10-15`, 24 quy tắc; `RULE_CATALOG` 25 mục). Hiện hành: `referee-contract-2026-10-16`, 25 quy tắc (`data/policyContract.ts`), `RULE_CATALOG` 26 mục (13/10/3). Buổi thử người dùng 16/10 không có phản hồi chi tiết bằng văn bản nên repo không công bố số liệu người dùng. Số liệu hiện hành: [README](../../README.md), trang `/verify`, `/sop` và `docs/evidence/`.
+
 **Trọng tài hóa đơn điện tử đầu vào cho kế toán doanh nghiệp Việt Nam: tự xử lý ca thường quy, dừng đúng lúc, hỏi đúng người.**
 
 MLAI Hackathon 2026 · Track VNG · Đề A "The Escalation Referee" · Bản nộp ngày 15/10/2026

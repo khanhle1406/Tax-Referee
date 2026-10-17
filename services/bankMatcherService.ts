@@ -24,6 +24,8 @@ export interface SameDayRuleResult {
   invoiceCount: number;
   violatingInvoiceIds: string[];
   reason?: string;
+  /** Các hóa đơn trong cụm (đã khử trùng) — để câu hỏi chuyển tiếp nêu đúng từng tờ. */
+  invoices?: InvoiceInput[];
 }
 
 function normalizeMst(mst?: string): string {
@@ -233,6 +235,7 @@ export function checkSameDayMultipleInvoicesRule(
         dailyTotal,
         invoiceCount: sameDayInvoices.length,
         violatingInvoiceIds: violatingInvoices.map(inv => inv.id),
+        invoices: sameDayInvoices,
         reason: `Phát hiện cụm ${sameDayInvoices.length} hóa đơn cùng ngày (${currentDate}) từ nhà cung cấp [${currentInvoice.supplierName} - MST ${currentInvoice.supplierTaxCode}] có tổng thanh toán ${dailyTotal.toLocaleString('vi-VN')}₫ (vượt ngưỡng 5 triệu đồng theo Luật Thuế GTGT 48/2024/QH15). Tất cả hóa đơn trong cụm bắt buộc phải thanh toán không dùng tiền mặt (Ủy nhiệm chi ngân hàng).`
       };
     }

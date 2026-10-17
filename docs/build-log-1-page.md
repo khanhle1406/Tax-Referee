@@ -1,5 +1,7 @@
 # Build log — Tax Referee (Đề A · The Escalation Referee)
 
+> 📌 **Ảnh chụp lịch sử** — bản nộp 15/10/2026, số liệu là của lúc đó (44 unit test). Hiện hành: `npm test` 16 bộ, 110 kiểm tra unit; buổi thử người dùng 16/10 không có phản hồi chi tiết bằng văn bản nên repo không công bố số liệu người dùng. Số liệu hiện hành: [README](../README.md), trang `/verify`, `/sop` và `docs/evidence/`.
+
 **Đội:** Fprinciples · **Sprint 1:** 19–22/09 · **Sprint 2:** 28/09–15/10/2026 · **Live:** https://limegreen-salamander-517622.hostingersite.com
 
 ## 1. Công cụ AI đã dùng và cách dùng

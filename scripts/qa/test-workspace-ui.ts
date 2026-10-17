@@ -22,6 +22,10 @@ async function main():Promise<void> {
   assert.equal(invoiceReturnPath(new URLSearchParams('from=https://outside.test&search=0000123')),'/workspace/inbox?search=0000123');
   assert.equal(readInvoiceTab(new URLSearchParams('tab=invalid')),'review');
   assert.equal(viewForPath('/workspace/approvals'),'approval');
+  assert.equal(viewForPath('/workspace/dashboard'),'dashboard');
+  assert.equal(viewForPath('/workspace/batches'),'batches');
+  assert.equal(viewForPath('/workspace/channels'),'channels');
+  assert.equal(viewForPath('/workspace/history'),'history');
   console.log('PASS typed route/query round trip, invalid input and safe return navigation');
   await runIsolated(async()=>{
     const db=getDatabase();const policy=getActivePolicy();policy.config.companyTaxCode=demoCompanyTaxCode;

@@ -1,3 +1,5 @@
+> 📌 Bản sao đánh giá Sprint 1 của Ban giám khảo, giữ nguyên văn (ngoại lệ: commit `6b1143e` đổi đường dẫn `services/legalUpdateService.ts` → `services/legal/legalUpdateService.ts` khi sắp xếp lại thư mục). Đường dẫn `team_repos/Fprinciples/…` trong bài theo cấu trúc thư mục của BTC, tương ứng thư mục gốc repo này (ví dụ `team_repos/Fprinciples/lib/server/db.ts` → [`lib/server/db.ts`](../../lib/server/db.ts)); mã đã thay đổi nhiều sau Sprint 1.
+
 # ĐÁNH GIÁ KỸ THUẬT SPRINT 1 — BAN GIÁM KHẢO HACKATHON
 
 ---

@@ -68,7 +68,7 @@ export default function HomePage():ReactElement {
         </form>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-        <span className="flex flex-wrap gap-4"><Link href="/sop" className="font-medium underline underline-offset-4">Tài liệu quy định (SOP) →</Link><Link href="/trust" className="font-medium underline underline-offset-4">Trung tâm tin cậy (bảo mật) →</Link></span>
+        <span className="flex flex-wrap gap-4"><Link href="/sop" className="font-medium underline underline-offset-4">Tài liệu quy định (SOP) →</Link><Link href="/trust" className="font-medium underline underline-offset-4">Trung tâm tin cậy (bảo mật) →</Link><Link href="/privacy" className="font-medium underline underline-offset-4">Dữ liệu của bạn đi đâu →</Link></span>
         <details className="text-muted-foreground">
           <summary className="cursor-pointer select-none hover:text-foreground">Đăng nhập nội bộ</summary>
           <form className="mt-3 grid gap-2" onSubmit={(event:FormEvent<HTMLFormElement>)=>{event.preventDefault();void enter('/api/auth/login',{email,password});}}>

@@ -2,9 +2,9 @@
 > **Tài liệu Kế hoạch Kỹ thuật & Lộ trình Triển khai Chi tiết dành cho Đội ngũ Phát triển**  
 > **Dự án:** Tax Referee - The Escalation Referee (Đề bài A - Cuộc thi Trí tuệ Nhân tạo trong Tổ chức 2026)  
 > **Không gian phát triển:** `competitions/tax-referee` | **Công nghệ:** Next.js 15 (App Router), TypeScript, Tailwind CSS, Zod  
-> **Căn cứ nghiệp vụ:** [quy-trinh-nghiep-vu-ke-toan.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/quy-trinh-nghiep-vu-ke-toan.md)  
-> **Căn cứ workflow:** [workflow-v2.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/workflow-v2.md)  
-> **Căn cứ đề bài:** [Challenge_Brief_OrganizationAI_VN.docx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/Challenge_Brief_OrganizationAI_VN.docx)
+> **Căn cứ nghiệp vụ:** [quy-trinh-nghiep-vu-ke-toan.md](quy-trinh-nghiep-vu-ke-toan.md)  
+> **Căn cứ workflow:** [workflow-v2.md](workflow-v2.md)  
+> **Căn cứ đề bài:** Challenge_Brief_OrganizationAI_VN.docx (đề bài gốc của BTC, đã gỡ khỏi bản hiện tại của repo)
 
 ---
 
@@ -121,7 +121,7 @@ Kế hoạch này nhằm nâng cấp toàn diện dự án Tax Referee từ phi�
 
 ### 4.1 Tầng Schema & Cấu Hình
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/lib/schemas.ts]
+#### [lib/schemas.ts]
 - **Bổ sung Dynamic Configuration Schema:**
   ```typescript
   export const SystemPolicyConfigSchema = z.object({
@@ -141,7 +141,7 @@ Kế hoạch này nhằm nâng cấp toàn diện dự án Tax Referee từ phi�
   ```
 - **Chuẩn hóa Referee Decision Type:** Bổ sung trường `appliedLawBasis`, `temporalVersion` và tùy biến action của CFO (không dùng `REJECT_TAX_DEDUCTION` cho K-Factor mà dùng `ACCEPT_WITH_DEFENSE_DOSSIER`).
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/lib/constants.ts]
+#### [lib/constants.ts]
 - Cập nhật các hằng số mặc định chuẩn xác:
   ```typescript
   export const LEGAL_CONSTANTS_2026 = {
@@ -161,7 +161,7 @@ Kế hoạch này nhằm nâng cấp toàn diện dự án Tax Referee từ phi�
 
 ### 4.2 Tầng Dữ Liệu Pháp Lý & Dữ Liệu Mẫu
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/data/regulatoryRegistry.ts]
+#### [data/regulatoryRegistry.ts]
 - Thay thế toàn bộ hệ thống văn bản cũ bằng danh mục quy phạm pháp luật 2025 - 2026:
   + `LUAT-108-2025`: Luật Quản lý thuế số 108/2025/QH15.
   + `LUAT-48-2024`: Luật Thuế Giá trị gia tăng số 48/2024/QH15 (Ngưỡng 5M không tiền mặt).
@@ -173,17 +173,17 @@ Kế hoạch này nhằm nâng cấp toàn diện dự án Tax Referee từ phi�
   + `TT-94-2026`: Thông tư số 94/2026/TT-BTC & CV 2392/TCT-QLRR (Quản lý tuân thủ, rủi ro và Tham số K).
 - Xây dựng hàm `resolveTemporalPolicy(invoiceDate: string): ResolvedPolicy` để tự động chọn đúng ngưỡng luật theo ngày xuất hóa đơn.
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/data/sopText.ts]
-- Cập nhật toàn văn Quy chế Quản trị Thuế Doanh nghiệp `TAX-SOP-2026` đồng bộ với 10 chương của [quy-trinh-nghiep-vu-ke-toan.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/quy-trinh-nghiep-vu-ke-toan.md).
+#### [data/sopText.ts]
+- Cập nhật toàn văn Quy chế Quản trị Thuế Doanh nghiệp `TAX-SOP-2026` đồng bộ với 10 chương của [quy-trinh-nghiep-vu-ke-toan.md](quy-trinh-nghiep-vu-ke-toan.md).
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/data/mockInvoices.ts]
+#### [data/mockInvoices.ts]
 - Hiệu chỉnh bộ 15 ca kiểm thử chuẩn xác 100% niên độ 2025 - 2026 (chi tiết tại Mục 5).
 
 ---
 
 ### 4.3 Tầng Logic Điều Phối & AI Lõi
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/services/policyEngine.ts]
+#### [services/policyEngine.ts]
 - **Nâng cấp hàm kiểm tra điều kiện không tiền mặt:**
   ```typescript
   const threshold = policyConfig.nonCashThreshold; // Mặc định 5_000_000
@@ -203,23 +203,23 @@ Kế hoạch này nhằm nâng cấp toàn diện dự án Tax Referee từ phi�
   + Khi K rơi vào Vùng Đỏ, đổi phương án B từ "Hoãn kê khai" thành "Phê duyệt kê khai kèm chỉ đạo lập Hồ sơ Phòng vệ Nguồn hàng (Tax Defense Dossier)".
 - **Tích hợp Dynamic Policy Ingestion:** Hàm `evaluateInvoiceLocally` nhận thêm tham số tùy chọn `customConfig?: SystemPolicyConfig` để Giám khảo có thể test với cấu hình tùy biến ngay lập tức.
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/services/jevService.ts] & [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/services/geminiService.ts]
+#### [services/jevService.ts] & [services/geminiService.ts]
 - Đồng bộ các prompt và context pháp lý mới nhất (2025 - 2026) vào hệ thống TypeSafe AI Jev và Gemini 2.5 Flash, đảm bảo AI sinh câu hỏi đóng A/B dẫn chiếu đúng điều khoản luật mới.
 
 ---
 
 ### 4.4 Tầng API Endpoints
 
-- **[file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/api/verify/route.ts]:**
+- **[app/api/verify/route.ts]:**
   + Tích hợp bộ quy chuẩn mới; đo thời gian thực thi chính xác của từng ca; xuất bảng tóm tắt kết quả theo đúng chuẩn format chấm điểm của Ban Giám khảo.
-- **[file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/api/policy/route.ts] (API Mới):**
+- **[app/api/policy/route.ts] (API Mới):**
   + Hỗ trợ GET (lấy cấu hình quy định hiện hành) và POST (cập nhật cấu hình quy định động từ giao diện quản trị).
 
 ---
 
 ### 4.5 Tầng Giao Diện Người Dùng & Component Mới
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/PolicyViewerModal.tsx] & Bổ Sung Tab "Dynamic Policy Studio"
+#### [components/PolicyViewerModal.tsx] & Bổ Sung Tab "Dynamic Policy Studio"
 - Bổ sung thanh công cụ cho phép chuyển đổi giữa:
   + **Tab 1: Tra Cứu Văn Bản Luật 2025 - 2026 (Căn Cứ Chân Lý)**: Đọc toàn văn các luật, nghị định, thông tư mới.
   + **Tab 2: Trình Quản Trị Quy Định Động (Dynamic Policy Studio)**: Form trực quan cho phép Giám khảo/KTT:
@@ -229,15 +229,15 @@ Kế hoạch này nhằm nâng cấp toàn diện dự án Tax Referee từ phi�
     * Nút "Lưu Cấu Hình & Chạy Thử Ngay" (Test Live).
     * Nút "Khôi Phục Chuẩn Luật 2026".
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/VerifyHarness.tsx]
+#### [components/VerifyHarness.tsx]
 - Bổ sung nhãn trực quan: Hiển thị rõ mốc thời gian pháp lý áp dụng cho từng ca (Ví dụ: `[Luật GTGT 48/2024]`, `[NQ 204/2025]`, `[NĐ 254/2026]`).
 - Bổ sung nút chạy lại Verify khi cấu hình luật bị thay đổi để chứng minh tính thích ứng động.
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/EscalationCard.tsx]
+#### [components/EscalationCard.tsx]
 - Hiển thị rõ ràng: Căn cứ pháp lý (Legal Basis) + Dữ liệu thực tế từ bill + Đúng 2 nút bấm A/B to, rõ, dễ bấm.
 - Nút "Xem Bộ Hồ Sơ Phòng Vệ" (View Tax Defense Dossier) liên kết trực tiếp.
 
-#### [file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/MacroHealthWidget.tsx]
+#### [components/MacroHealthWidget.tsx]
 - Cập nhật giải thích chuẩn mực: K là Tham số rủi ro nguồn hàng tham chiếu (CV 2392/TCT-QLRR & TT 94/2026/TT-BTC), không gọi là tỷ số bắt buộc của luật.
 - Hiển thị hướng dẫn hành động khi chạm Vùng Đỏ: *"Chủ động chuẩn bị Hồ sơ Phòng vệ Nguồn hàng để sẵn sàng giải trình với Cục Thuế."*
 

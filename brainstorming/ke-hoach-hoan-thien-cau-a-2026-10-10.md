@@ -417,7 +417,7 @@ Các đường dẫn dưới đây tương đối với thư mục `brainstormin
 
 | Nguồn | Nội dung đã dùng |
 |---|---|
-| [Đề bài gốc](Challenge_Brief_OrganizationAI_VN.docx) | Câu A; sản phẩm nộp; bảng chấm điểm; quy định bằng chứng; hạn 15/10 và Demo Day 17/10 |
+| Đề bài gốc (`Challenge_Brief_OrganizationAI_VN.docx` của BTC, đã gỡ khỏi bản hiện tại của repo; vẫn còn trong lịch sử git) | Câu A; sản phẩm nộp; bảng chấm điểm; quy định bằng chứng; hạn 15/10 và Demo Day 17/10 |
 | [Workflow](../services/workflowService.ts) | `evaluateWorkflow`, `approvalBlock`, `applyWorkflowAction`, `recordAction`, `recordBankEvidence` |
 | [Policy engine](../services/policyEngine.ts) | Ba nhóm, nhiều findings, ngưỡng quyền, template và câu hỏi |
 | [SOP](../data/sopText.ts) và [Policy service](../services/policyService.ts) | Nội dung quy chế, publish/rollback và gate hiện tại |
@@ -435,7 +435,7 @@ Các đường dẫn dưới đây tương đối với thư mục `brainstormin
 | [QA fix report](../docs/qa-2026-10-10/FIX-REPORT.md), [implementation status](../docs/implementation-status.md) | Phân biệt lỗi cũ đã sửa và phần chưa nghiệm thu |
 | [Performance](../docs/qa-2026-10-10/PERFORMANCE.md) | Phép đo OCR cũ có nhiều profile; không gộp thành SLA live |
 | [Runbook hiện hành](../docs/runbook-final.md), [runbook cũ](../RUNBOOK.md), [cheat sheet cũ](../docs/judge-cheat-sheet-8-mins.md) | Chỗ cần đồng bộ hướng dẫn và claim |
-| [Nội dung slide](../docs/presentation-5-slides.md), [PPTX](../docs/submission/Tax-Referee-5-slides-final.pptx) | Đã có artifact slide, cần kiểm tra/cập nhật bản cuối theo bằng chứng |
+| [Nội dung slide](../docs/presentation-5-slides.md), PPTX cũ `Tax-Referee-5-slides-final.pptx` (đã gỡ ở commit `9c0632c`; bản nộp 15/10: [Tax-Referee-5-slides.pptx](../docs/submission/Tax-Referee-5-slides.pptx)) | Đã có artifact slide, cần kiểm tra/cập nhật bản cuối theo bằng chứng |
 
 
 ## Cập nhật thực hiện ngày 10/10/2026

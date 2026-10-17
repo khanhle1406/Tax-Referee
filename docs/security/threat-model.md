@@ -1,7 +1,7 @@
 # Mô hình mối đe dọa và bảo mật hệ có agent AI
 
 > **Tax Referee** · trả lời câu hỏi Q1 của BTC Track VNG: định danh, đặc quyền tối thiểu, ranh giới thực thi tất định, cách ly.
-> Phạm vi: mã trên nhánh `docs/demo-day-q1-q2` (gồm PR #6), cập nhật 16/10/2026. Mỗi khẳng định về hệ thống trỏ tới file và hàm.
+> Phạm vi: mã trên `main` từ merge PR #7 (`d882768`, gồm nội dung PR #6); PR #8 (`e496ab4`) bổ sung tự sinh khóa audit và ghi commit vào bản build. Cập nhật 17/10/2026 (bảng mục 6 thêm XML-01/02/03, TMP-01 của `v1.1.0`, chưa deploy lên live). Những chỗ trong bài ghi live 16/10 còn `hmac:false` và commit `unknown` là trạng thái trước deploy; sau deploy PR #8, live báo commit `e496ab4`, HMAC bật (`keySource: file`) ([`live-2026-10-16-post-deploy.json`](../evidence/live-2026-10-16-post-deploy.json)). Mỗi khẳng định về hệ thống trỏ tới file và hàm.
 > OWASP, NIST và các bài báo được dẫn là **chuẩn tham chiếu tự nguyện**, không phải tuyên bố tuân thủ. Mã LLMxx theo bản OWASP LLM Top 10 2025; theo nguồn thứ cấp, bản 2026 đã xếp lại thứ tự.
 
 ## 1. Tóm tắt
@@ -178,6 +178,10 @@ Trần theo giờ (`lib/server/aiBudget.ts`): Vision 60 lần/người dùng và
 | LLM10 | Gọi Vision/grounding không ngân sách; `forceRefresh` vượt cache | `lib/server/aiBudget.ts`, fail-closed; bỏ `forceRefresh`; trả 413 sớm | `e88eace` | `aiBudget.test.ts` |
 | SBX-06 | Xóa hết HMAC rồi tính lại chuỗi vẫn "hợp lệ kèm cảnh báo" | Mốc `TAX_REFEREE_AUDIT_SIGNED_SINCE` đặt ngoài DB | `482f831` | `auditIntegrity.test.ts` |
 | F7 | Cấu hình fail-open âm thầm: thiếu khóa audit, commit `unknown` | `warnings` trên `/api/health`; đọc commit từ `.git` | `482f831`, `8bcfbb0` | Chưa có test đơn vị; kiểm `/api/health` theo checklist A5c |
+| XML-01 | Bộ trích XML bằng regex bỏ nội dung CDATA, không giải mã `&#NN;`, bị PI và `>` trong thuộc tính đánh lừa: app đọc 2.880.000₫ trong khi bộ đọc chuẩn đọc 22.880.000₫ (CodeQL + phản biện, 17/10) | `canonicalXmlForRegex` (bỏ chú thích, PI, thuộc tính; mở CDATA) + `decodeXmlText` chặt cho cả regex lẫn cây dự phòng; từ chối tham chiếu tới ký tự cấm | `221c614`, `7206a2f`, `d1ef3d0` | `xmlIntegrity.test.ts` |
+| XML-03 | Regex lấy phần tử trùng tên đầu tiên: khối mở rộng đặt trước phần tổng thật làm hóa đơn 220 triệu thành 2,2 triệu, tự duyệt | `assertUnambiguousXml`: trùng tên ở phần đầu, trùng khối bên bán/mua, dòng hàng lồng → từ chối (fail-closed). Còn lại: thẻ đồng nghĩa ưu tiên cao hơn — cần trích theo đường dẫn schema | `7206a2f` | `xmlIntegrity.test.ts` |
+| XML-02 | XML sổ cái (beta) chèn giá trị thô: số hóa đơn tạo được phần tử giả; CSV không nhân đôi nháy kép tạo được dòng tiền giả | `xmlEscape` (kèm loại ký tự cấm), `csvCell` (nháy kép, vô hiệu công thức) | `781aa0e`, `64919f5` | `xmlIntegrity.test.ts` |
+| TMP-01 | PDF tải lên ghi vào `/tmp` dùng chung với quyền mặc định | `mkdtemp` riêng, file 600, luôn dọn; xóa `convertPdfToPngBase64` không dùng | `2c5cf09`, `240f59f` | `xmlIntegrity.test.ts` |
 
 ## 7. Rủi ro còn lại và lộ trình
 

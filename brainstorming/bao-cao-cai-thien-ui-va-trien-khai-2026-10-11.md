@@ -21,7 +21,7 @@ Ngày: 11/10/2026. Đã thực hiện năm chặng của [kế hoạch UI](ke-ho
 | Chính sách | Nhúng vào workspace, ba tab Quy chế/Tiền lệ/Phiên bản. Kế toán viên chỉ đọc. Draft chưa publish không được hiển thị như bản đang có hiệu lực; giữ các gate phía server. |
 | Verify/SOP | Ưu tiên bộ ca, nút chạy, kết quả và JSON export; chi tiết câu hỏi/options/effects mở theo ca. Metrics/hash và form custom thu gọn. Ghi rõ hồi quy tổng hợp nội bộ. SOP dùng cùng typography. |
 
-Design system: [MASTER.md](../design-system/tax-referee/MASTER.md). Hướng dẫn tham khảo: [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill), [Taste redesign](https://github.com/Leonxlnx/taste-skill/blob/main/skills/redesign-skill/SKILL.md). Thiết kế được điều chỉnh cho công cụ nghiệp vụ; không lấy nguyên một template trang quảng bá.
+Design system: [MASTER.md](../docs/archive/design-system-MASTER.md) (đã lưu trữ). Hướng dẫn tham khảo: [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill), [Taste redesign](https://github.com/Leonxlnx/taste-skill/blob/main/skills/redesign-skill/SKILL.md). Thiết kế được điều chỉnh cho công cụ nghiệp vụ; không lấy nguyên một template trang quảng bá.
 
 ## Ràng buộc nghiệp vụ được giữ
 

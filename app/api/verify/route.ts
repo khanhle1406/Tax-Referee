@@ -1,6 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {runVerification,VERIFY_MODES} from '@/services/verificationService';
-import {evaluateWorkflow} from '@/services/workflowService';
+import {coerceFieldValue,evaluateWorkflow} from '@/services/workflowService';
 import {runIsolated,getDatabase,getActivePolicy,withRequestDatabase} from '@/lib/server/db';
 import {getRequestUser} from '@/lib/server/auth';
 import {challengeCases,demoCompanyTaxCode} from '@/data/verification/challengeCases';
@@ -13,7 +13,10 @@ export async function GET(req:NextRequest){const mode=req.nextUrl.searchParams.g
 export async function POST(req:NextRequest){
  try{
   const body=await req.json();const invoice=body.sampleType==='CUSTOM'?body.customInvoice:body.sampleType==='ROUTINE'?challengeCases[0].invoice:challengeCases[3].invoice;
-  const context=RefereeContextSchema.optional().parse(body.context);const started=performance.now();
+  // Hóa đơn lịch sử gõ tay được hiểu như hóa đơn chính: ô trống là chưa biết, "Tiền mặt"/"Chuyển khoản" được nhận.
+  const rawHistory=body.context?.history;
+  const history=Array.isArray(rawHistory)?rawHistory.map((h:unknown)=>h&&typeof h==='object'?Object.fromEntries(Object.entries(h as Record<string,unknown>).map(([k,v])=>[k,coerceFieldValue(k,v)]).filter(([,v])=>v!==undefined)):h):rawHistory;
+  const context=RefereeContextSchema.optional().parse(body.context?{...body.context,history}:body.context);const started=performance.now();
   const policy=await runIsolated(async()=>{const p=getActivePolicy();p.config.companyTaxCode=demoCompanyTaxCode;return p;});
   const report=await evaluateRefereeCases([{id:'SANDBOX',name:'Dữ liệu mới',invoice,context,expectedStatus:'ROUTINE',expectedRequiresCFO:false,rationale:'Sandbox không có nhãn kỳ vọng.',provenance:'USER_INPUT_SANDBOX'}],policy);
   const r=report.results[0];if(r.actual==='ERROR')return NextResponse.json({success:false,error:r.error},{status:400});

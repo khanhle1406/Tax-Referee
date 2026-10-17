@@ -4,20 +4,37 @@ on:
   push:
     branches: [main, 'feat/**']
   pull_request:
+  workflow_dispatch:
+
+# Quyền tối thiểu cho GITHUB_TOKEN (OpenSSF Scorecard: Token-Permissions).
+permissions:
+  contents: read
+
+# PR: hủy lần chạy cũ khi có commit mới. main: giữ mọi lần chạy để commit nào cũng có trạng thái.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
-    name: test (${{ matrix.os }})
+    name: test (${{ matrix.os }}, Node ${{ matrix.node }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        include:
+          - { os: ubuntu-24.04, node: 22 }
+          - { os: windows-latest, node: 22 }
+          - { os: ubuntu-24.04, node: 24 }
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # Action ghim theo SHA đầy đủ (OpenSSF Scorecard: Pinned-Dependencies); Dependabot cập nhật hằng tuần.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 22
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
       - run: npm run typecheck
@@ -26,13 +43,18 @@ jobs:
       - run: npm test
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: test
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1

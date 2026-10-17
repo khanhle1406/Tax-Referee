@@ -137,6 +137,8 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
   const [fieldEvidence, setFieldEvidence] = useState<Record<string, FieldEvidence>>({});
   const [supplierIdentity, setSupplierIdentity] = useState<SupplierIdentity | undefined>(undefined);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  /** Dữ kiện SOP cần để quyết định mà người nhập để trống: nhắc đúng một lần cho mỗi bộ giá trị, bấm lần nữa thì vẫn gửi (KTT sẽ được hỏi). */
+  const factPromptRef = useRef('');
   const [ocrHighlights, setOcrHighlights] = useState<OcrHighlight[]>([]);
   const [showOcrHighlights, setShowOcrHighlights] = useState<boolean>(true);
   const [activeHighlightField, setActiveHighlightField] = useState<string | null>(null);
@@ -867,6 +869,17 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
       return;
     }
 
+    const factPrompts: Record<string, string> = {};
+    if (requiredFields.has('hasBankSlip') && formData.hasBankSlip === undefined) factPrompts.hasBankSlip = 'Chứng từ thanh toán: chọn Có/Không';
+    if (requiredFields.has('hasItemManifest') && formData.hasItemManifest === undefined) factPrompts.hasItemManifest = 'Bảng kê hàng hóa: chọn Có/Không';
+    if (requiredFields.has('sellerStatus') && (!formData.sellerStatus || formData.sellerStatus === 'UNKNOWN')) factPrompts.sellerStatus = 'Trạng thái bên bán: chọn sau khi tra cứu MST';
+    const promptKey = JSON.stringify([formData.totalAmount, formData.paymentMethod, Object.keys(factPrompts)]);
+    if (Object.keys(factPrompts).length > 0 && factPromptRef.current !== promptKey) {
+      factPromptRef.current = promptKey;
+      setFormErrors(factPrompts);
+      toast.warning('Quy định cần thêm dữ kiện cho hóa đơn này', { description: `${Object.values(factPrompts).join(' · ')}. Chưa biết thì bấm Thẩm định lần nữa: hồ sơ chuyển Kế toán trưởng xác minh (nhóm chưa xác định thông tin).` });
+      return;
+    }
     setFormErrors({});
     setIsEvaluating(true);
     try {

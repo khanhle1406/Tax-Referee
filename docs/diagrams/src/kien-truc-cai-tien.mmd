@@ -1,0 +1,41 @@
+---
+config:
+  flowchart:
+    wrappingWidth: 460
+    nodeSpacing: 30
+    rankSpacing: 44
+    subGraphTitleMargin:
+      top: 6
+      bottom: 16
+---
+flowchart TB
+  subgraph R1["① Nhận và đọc hóa đơn"]
+    direction LR
+    K["<b>Kênh vào</b><br/>Gmail · Zalo · Tải lên"] --> N["<b>Nhận diện người gửi</b><br/>Gmail: danh bạ + SPF/DKIM<br/>Zalo: user id"]
+    N --> D["<b>Đọc chứng từ</b><br/>XML: máy đọc tất định<br/>Ảnh: AI chỉ đọc 14 trường"]
+    D --> L["<b>Lô hóa đơn</b><br/>xếp MST → ngày → số<br/>nhận ra hóa đơn trùng"]
+  end
+  subgraph R2["② Quyết định và chốt"]
+    direction LR
+    Q["<b>Bộ quy tắc tất định</b><br/>3 kiểu dừng<br/>căn cứ theo ngày lập"] --> M["<b>Máy đề xuất duyệt</b><br/>kèm phiếu giải trình"]
+    Q --> H["<b>Câu hỏi đúng người 1A/2B</b><br/>gửi KTT/CFO · duyệt nhóm"]
+    M --> C["<b>Chốt lô</b><br/>người ký rồi mới ghi sổ"]
+    H --> C
+    C --> O["<b>Tổng quan cho sếp</b><br/>Lịch sử của tôi<br/>Báo tin Gmail/Zalo"]
+  end
+  subgraph R3["Nền an toàn dưới mọi bước"]
+    direction LR
+    AU["<b>Nhật ký chỉ ghi thêm</b><br/>chuỗi băm + HMAC"]
+    PQ["<b>Phân quyền + cách ly</b><br/>mỗi phiên một CSDL riêng"]
+    AU ~~~ PQ
+  end
+  R1 --> R2
+  R2 -.- R3
+  classDef ai fill:#e6ecff,stroke:#2f4fb3,color:#0d1a4a
+  classDef core fill:#0f172a,stroke:#0f172a,color:#ffffff
+  classDef human fill:#ecfccb,stroke:#4d7c0f,color:#1a2e05
+  classDef base fill:#f1f5f9,stroke:#64748b,color:#0f172a
+  class D ai
+  class Q core
+  class H,C human
+  class AU,PQ base

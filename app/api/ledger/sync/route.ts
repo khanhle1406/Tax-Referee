@@ -2,6 +2,7 @@ import { RequestError, requestErrorResponse } from '@/lib/server/http';
 import { withRequestDatabase } from '@/lib/server/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRequestUser } from '@/lib/server/auth';
+import { LEDGER_READY_SQL } from '@/services/batchService';
 import { getDatabase } from '@/lib/server/db';
 import { InvoiceInput, RefereeDecision } from '@/lib/schemas';
 import { generateCanonicalVoucher } from '@/lib/accounting/ledgerMapper';
@@ -40,6 +41,7 @@ async function handleGET(request: NextRequest) {
         ORDER BY datetime(e2.created_at) DESC LIMIT 1
       )
       WHERE i.status = 'APPROVED'
+        AND ${LEDGER_READY_SQL}
       ORDER BY datetime(i.updated_at) DESC
       LIMIT 100
     `).all() as Array<Record<string, unknown>>;
@@ -82,6 +84,8 @@ async function handleGET(request: NextRequest) {
 async function handlePOST(request: NextRequest) {
   try {
     const user = requireRequestUser(request);
+    // Xuất chứng từ sang phần mềm kế toán là bước ghi sổ: chỉ Kế toán trưởng/CFO, không phải người nhập.
+    if (!['CHIEF_ACCOUNTANT', 'CFO'].includes(user.role)) throw new RequestError('Chỉ Kế toán trưởng hoặc CFO được xuất chứng từ sang phần mềm kế toán.', 403);
     const body = (await request.json()) as LedgerSyncRequest;
     const { targetSystem = 'MISA_AMIS', voucherIds, regime = 'CIRCULAR_99_200' } = body;
 
@@ -101,6 +105,7 @@ async function handlePOST(request: NextRequest) {
         ORDER BY datetime(e2.created_at) DESC LIMIT 1
       )
       WHERE i.status = 'APPROVED'
+        AND ${LEDGER_READY_SQL}
       ORDER BY datetime(i.updated_at) DESC
     `).all() as Array<Record<string, unknown>>;
 

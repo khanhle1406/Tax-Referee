@@ -1,8 +1,8 @@
 # THIẾT KẾ WORKFLOW TOÀN DIỆN HỆ THỐNG TAX REFEREE (PHIÊN BẢN 2.0)
 > **Kiến Trúc Tác Tử Điều Phối Chuyển Tiếp (The Escalation Referee) Tự Động Hóa Nghiệp Vụ Kế Toán Thuế, Kiểm Soát Rủi Ro Hóa Đơn & Quản Trị Tuân Thủ Niên Độ 2025 - 2026**  
 > **Đáp ứng chuẩn mực Đề bài A - Cuộc thi Trí tuệ Nhân tạo trong Tổ chức (Organization AI Challenge 2026)**  
-> **Căn cứ nghiệp vụ:** [quy-trinh-nghiep-vu-ke-toan.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/quy-trinh-nghiep-vu-ke-toan.md)  
-> **Căn cứ đề bài:** [Challenge_Brief_OrganizationAI_VN.docx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/Challenge_Brief_OrganizationAI_VN.docx)
+> **Căn cứ nghiệp vụ:** [quy-trinh-nghiep-vu-ke-toan.md](quy-trinh-nghiep-vu-ke-toan.md)  
+> **Căn cứ đề bài:** Challenge_Brief_OrganizationAI_VN.docx (đề bài gốc của BTC, đã gỡ khỏi bản hiện tại của repo)
 
 ---
 
@@ -357,7 +357,7 @@ Khi kích hoạt chuyển tiếp, module **Actionable Question Generator** khôn
 
 | Tiêu Chí Đề Bài A (Challenge Brief) | Yêu Cầu Cụ Thể Của Ban Giám Khảo | Giải Pháp Kỹ Thuật Đã Triển Khai Trong Tax Referee | Mức Độ Đáp Ứng |
 | :--- | :--- | :--- | :---: |
-| **Quy trình thường quy cụ thể** | Chọn 1 quy trình cụ thể và xây dựng tài liệu quy định rõ ràng. | Quy trình Kế toán Thuế Doanh nghiệp; tài liệu [quy-trinh-nghiep-vu-ke-toan.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/quy-trinh-nghiep-vu-ke-toan.md) (10 chương chuyên sâu 2025-2026). | **100% ĐẠT** |
+| **Quy trình thường quy cụ thể** | Chọn 1 quy trình cụ thể và xây dựng tài liệu quy định rõ ràng. | Quy trình Kế toán Thuế Doanh nghiệp; tài liệu [quy-trinh-nghiep-vu-ke-toan.md](quy-trinh-nghiep-vu-ke-toan.md) (10 chương chuyên sâu 2025-2026). | **100% ĐẠT** |
 | **Bộ dữ liệu kiểm thử** | Tối thiểu 15 trường hợp, có ca không rõ ràng, ngoài quy định, vượt thẩm quyền. | Bộ 15 ca kiểm thử chuẩn hóa đa chiều (3 Routine, 4 Nhóm 1, 4 Nhóm 2, 4 Nhóm 3) tại `mockInvoices.ts`. | **100% ĐẠT** |
 | **Phân loại mức độ không chắc chắn** | Chia thành đúng 3 nhóm: Chưa rõ thông tin, Ngoài quy định, Vượt thẩm quyền. | Phân luồng chuẩn xác: `UNCERTAIN_INFO` (Nhóm 1), `OUT_OF_POLICY` (Nhóm 2), `EXCEED_AUTHORITY` (Nhóm 3). | **100% ĐẠT** |
 | **Chất lượng câu hỏi chuyển tiếp** | Câu hỏi cụ thể, trả lời trực tiếp trong 1 thao tác, không dùng câu hỏi chung chung. | 100% câu hỏi dạng Đóng A/B (nêu rõ số tiền, căn cứ luật, 2 nút bấm phương án đối ứng rõ ràng). | **100% ĐẠT** |

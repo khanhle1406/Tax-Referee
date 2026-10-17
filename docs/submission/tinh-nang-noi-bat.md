@@ -40,4 +40,4 @@ Parser hóa đơn điện tử XML theo định dạng Viettel, MISA, VNPT, FPT 
 ## Giá trị cho doanh nghiệp
 Định giá theo **thuế đầu vào được bảo vệ và tiền phạt tránh được**, không theo giờ công: mỗi câu hỏi hiện "VAT chờ quyết định", người duyệt chỉ xem những ca thật sự cần mình.
 
-> Giới hạn (nói thật): dữ liệu kiểm thử là tổng hợp, chưa phải đánh giá độc lập; "ngoài phạm vi" nhận diện bằng từ khóa nên chi cá nhân đặt tên khác có thể lọt; đọc ảnh/PDF cần người kiểm tra; kết quả 3 người dùng do BTC điều phối có ngày 16/10. Chi tiết: [README](../../README.md) mục "Bằng chứng và giới hạn".
+> Giới hạn (nói thật): dữ liệu kiểm thử là tổng hợp, chưa phải đánh giá độc lập; "ngoài phạm vi" nhận diện bằng từ khóa nên chi cá nhân đặt tên khác có thể lọt; đọc ảnh/PDF cần người kiểm tra. Buổi thử với người dùng do BTC điều phối diễn ra 16/10; BTC xác nhận buổi thử ổn, không có phản hồi chi tiết bằng văn bản, nên repo không công bố số liệu người dùng. Chi tiết: [README](../../README.md) mục "Bằng chứng và giới hạn".

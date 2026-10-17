@@ -4,6 +4,7 @@ import { demoCount, demoExists, isSandbox, withDemoDatabase, withRequestDatabase
 import { AppRole, getRequestUser, switchRole } from '@/lib/server/auth';
 import { allowRate, clientIp } from '@/lib/server/rateLimit';
 import { seedDemoCases } from '@/services/demoSeed';
+import { demoBatchPresetEnabled, seedDemoBatches } from '@/services/demo/demoBatchPreset';
 
 const DEMO_ROLES: AppRole[] = ['ACCOUNTANT', 'CHIEF_ACCOUNTANT', 'CFO'];
 
@@ -34,6 +35,8 @@ export async function POST(req: NextRequest) {
       if (!session) throw new Error('Không thể mở demo.');
       // Phiên mới: nạp sẵn 4 ca mẫu (1 tự xử lý + 3 kiểu dừng) để hộp chuyển tiếp không trống.
       if (!reuse) await seedDemoCases();
+      // Máy local của đội (TAX_REFEREE_DEMO_PRESET_BATCHES=1): phiên mới có sẵn lô mẫu để trình bày ngay.
+      if (!reuse && demoBatchPresetEnabled()) await seedDemoBatches();
       const res = NextResponse.json({ user: session.user, demo: true });
       const opts = { httpOnly: true, sameSite: 'lax' as const, secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 8 * 60 * 60 };
       res.cookies.set('tax_referee_demo', id, opts);

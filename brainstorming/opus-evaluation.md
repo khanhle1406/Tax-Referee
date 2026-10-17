@@ -6,7 +6,7 @@
 
 - **Ngày cập nhật:** 04/10/2026
 - **Phiên bản:** Chuẩn hóa phục vụ Vòng Chung kết cuộc thi OrganizationAI (Demo Day: 17/10/2026)
-- **Tài liệu căn cứ:** [Challenge_Brief_OrganizationAI_VN.docx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/Challenge_Brief_OrganizationAI_VN.docx) (Mục 2 - Đề bài A và Mục 4 - Thang điểm 100), mã nguồn hệ thống Tax Referee, cùng kết quả kiểm thử an toàn Giai đoạn 0.
+- **Tài liệu căn cứ:** `Challenge_Brief_OrganizationAI_VN.docx` (Mục 2 - Đề bài A và Mục 4 - Thang điểm 100; đề bài gốc của BTC, đã gỡ khỏi bản hiện tại của repo), mã nguồn hệ thống Tax Referee, cùng kết quả kiểm thử an toàn Giai đoạn 0.
 
 ---
 
@@ -30,7 +30,7 @@ Trong doanh nghiệp, một quy trình thường quy lý tưởng cho **Đề b�
 
 ## 2. NHỮNG NỀN TẢNG VỮNG CHẮC ĐÃ ĐẠT ĐƯỢC (GIỮ NGUYÊN)
 
-1. **Bộ máy quy tắc tất định là nguồn quyết định duy nhất:** [jevService.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/services/jevService.ts) và [policyEngine.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/services/policyEngine.ts) bảo đảm logic phân loại rủi ro và thẩm quyền được xác định bằng mã lệnh có thể kiểm chứng. AI (DeepSeek) chỉ đóng vai trò trợ lý ngôn ngữ diễn giải câu từ thân thiện cho người dùng, không có quyền quyết định phân loại rủi ro.
+1. **Bộ máy quy tắc tất định là nguồn quyết định duy nhất:** [jevService.ts](../services/jevService.ts) và [policyEngine.ts](../services/policyEngine.ts) bảo đảm logic phân loại rủi ro và thẩm quyền được xác định bằng mã lệnh có thể kiểm chứng. AI (DeepSeek) chỉ đóng vai trò trợ lý ngôn ngữ diễn giải câu từ thân thiện cho người dùng, không có quyền quyết định phân loại rủi ro.
 2. **Xử lý XML hóa đơn điện tử chuẩn quốc gia:** Đọc trực tiếp cấu trúc XML của Tổng cục Thuế và các nhà cung cấp lớn, kiểm tra tính toàn vẹn, đa thuế suất, tính toán số học từng dòng hàng.
 3. **Khóa chống trùng lắp:** Khóa đa tầng theo (Mã số thuế người bán + Ký hiệu + Số hóa đơn) kết hợp mã băm SHA-256 nội dung tệp.
 4. **Nhật ký kiểm toán chuỗi băm bất biến (Immutable Merkle Audit Trail):** Mọi sự kiện tiếp nhận, phân loại rủi ro, chuyển tiếp, quyết định phê duyệt và ghi đè của con người đều được băm nối chuỗi (SHA-256), sẵn sàng giải trình trước kiểm toán và cơ quan thuế.

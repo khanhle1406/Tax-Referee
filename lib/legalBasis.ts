@@ -27,7 +27,10 @@ export function vatReductionAt(invoiceDate: string): VatReductionPeriod | null {
 // "quảng cáo trên Internet", "điện thoại 5G" không phải dịch vụ viễn thông.
 export const VAT8_EXCLUDED_ALWAYS = ['CƯỚC INTERNET', 'DỊCH VỤ INTERNET', 'THUÊ BAO INTERNET', 'GÓI INTERNET', 'INTERNET CÁP QUANG', 'CÁP QUANG', 'CƯỚC DI ĐỘNG', 'THUÊ BAO DI ĐỘNG', 'CƯỚC ĐIỆN THOẠI',
   'CƯỚC 4G', 'CƯỚC 5G', 'GÓI 4G', 'GÓI 5G', 'DATA 4G', 'DATA 5G', 'SIM 4G', 'SIM 5G', 'GÓI CƯỚC', 'CƯỚC VIỄN THÔNG',
-  'THÉP', 'SẮT THÉP', 'ỐNG ĐỒNG', 'DÂY ĐỒNG', 'ĐỒNG THAU', 'NHÔM', 'INOX', 'BIA', 'RƯỢU', 'THUỐC LÁ', 'Ô TÔ', 'QUẶNG'];
+  'THÉP', 'SẮT THÉP', 'ỐNG ĐỒNG', 'DÂY ĐỒNG', 'ĐỒNG THAU', 'NHÔM', 'INOX', 'BIA', 'RƯỢU', 'THUỐC LÁ', 'Ô TÔ', 'QUẶNG',
+  // Kinh doanh bất động sản bị loại ở mọi kỳ giảm thuế; tên hàng thực tế ghi "thuê văn phòng" chứ hiếm khi ghi "bất động sản".
+  // Không thêm "THUÊ NHÀ" vì khớp cả "thuê nhà hàng".
+  'THUÊ VĂN PHÒNG', 'THUÊ MẶT BẰNG', 'THUÊ NHÀ XƯỞNG', 'TIỀN THUÊ NHÀ', 'THUÊ NHÀ LÀM', 'CHO THUÊ NHÀ', 'THUÊ ĐẤT'];
 
 /**
  * Bị loại trước 01/7/2025 (NQ 43/2022 … NQ 174/2024: CNTT, than cốc, dầu mỏ tinh chế, hóa chất, mọi hàng chịu TTĐB) nhưng

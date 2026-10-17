@@ -38,6 +38,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 
 import { toast } from 'sonner';
+import { DashboardView } from '@/components/workspace/DashboardView';
+import { BatchesView } from '@/components/workspace/BatchesView';
+import { ChannelsView } from '@/components/workspace/ChannelsView';
+import { HistoryView } from '@/components/workspace/HistoryView';
 
 type AppUser = { id: string; email: string; displayName: string; role: 'ACCOUNTANT' | 'CHIEF_ACCOUNTANT' | 'CFO' };
 type View = WorkspaceView;
@@ -715,6 +719,10 @@ export function ProductionWorkspace({
             </div>}
             {/* Reports use server values and an explicit draft period. */}
             {!loading&&!error&&view==='reports'&&<ReportsView macro={macro} items={items} policyVersion={policyVersion}/>}
+            {!loading&&!error&&view==='dashboard'&&<DashboardView user={user}/>}
+            {!loading&&!error&&view==='batches'&&<BatchesView user={user}/>}
+            {!loading&&!error&&view==='channels'&&<ChannelsView user={user}/>}
+            {!loading&&!error&&view==='history'&&<HistoryView user={user}/>}
 
             {/* TCT Reconciliation View */}
             {!loading && !error && view === 'reconciliation' && (

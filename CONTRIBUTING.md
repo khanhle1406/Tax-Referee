@@ -6,7 +6,7 @@ Khi tham gia, bạn đồng ý tuân theo [Quy tắc ứng xử](CODE_OF_CONDUCT
 
 ## 1. Chuẩn bị môi trường
 
-**Yêu cầu:** Node.js ≥ 20.19 (khuyến nghị 22, giống CI) kèm npm. Python 3 với PyMuPDF là tùy chọn (đọc lớp chữ PDF).
+**Yêu cầu:** Node.js 22 (giống CI và production; có sẵn `.nvmrc`) hoặc 24, kèm npm. Python 3 với PyMuPDF là tùy chọn (đọc lớp chữ PDF).
 
 ```bash
 git clone https://github.com/khanhle1406/Tax-Referee.git
@@ -20,7 +20,7 @@ Verify và toàn bộ test chạy tất định, **không cần khóa API**. Kh�
 
 ## 2. Kiểm chứng trước khi mở PR
 
-Chạy **tuần tự** (CI chạy typecheck, lint, test trên Ubuntu và Windows; build chạy trên Ubuntu sau khi test đạt):
+Chạy **tuần tự** (CI chạy typecheck, lint, test trên Ubuntu với Node 22 và 24, Windows với Node 22; build chạy trên Ubuntu sau khi test đạt; CodeQL quét bảo mật):
 
 ```bash
 npm run typecheck
@@ -48,7 +48,7 @@ TAX_REFEREE_DATA_DIR=$(mktemp -d) NODE_ENV=test node --import tsx --test tests/u
 2. **Commit nhỏ, một ý một commit**, message tiếng Việt theo dạng Conventional Commits:
    - `feat(referee): ...`, `fix(auth): ...`, `docs: ...`, `test: ...`, `refactor: ...`, `chore: ...`
    - Commit có trợ lý AI tham gia thì thêm trailer `Co-Authored-By:` tương ứng.
-3. **Mở PR vào `main`** theo mẫu có sẵn: mục đích, thay đổi, cách kiểm chứng, rủi ro. Reviewer: `@khanhle1406`.
+3. **Mở PR vào `main`** theo mẫu có sẵn: mục đích, thay đổi, cách kiểm chứng, rủi ro. Reviewer: `@khanhle1406` (mặc định theo [`.github/CODEOWNERS`](.github/CODEOWNERS)).
 4. **CI phải xanh** trước khi merge.
 5. **Merge bằng *Create a merge commit*.** Không squash, không rebase, không force-push, không `--no-verify` — lịch sử git là bằng chứng quá trình làm.
 6. **Merge vào `main` = deploy production** (hPanel tự deploy sau khoảng 1,5 phút; chờ 2–5 phút rồi kiểm). Sau merge, kiểm `/api/health` (commit mới), `/verify` (9/9), `/trust` (12/12).

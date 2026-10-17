@@ -20,7 +20,7 @@ type Suite = {name: string; files: string[]; minChecks: number; env?: Record<str
 const MOCK_AI = {OPENROUTER_API_KEY: 'qa-mocked-only', QWEN_API_KEY: 'qa-mocked-only'};
 
 export const suites: Suite[] = [
-  {name: 'unit', files: [], minChecks: 114},
+  {name: 'unit', files: [], minChecks: 169},
   {name: 'manifest', files: ['scripts/qa/test-regression-manifest.ts'], minChecks: 4},
   {name: 'referee-core', files: ['scripts/qa/test-referee-core.ts'], minChecks: 14},
   {name: 'redteam', files: ['scripts/qa/test-redteam.ts'], minChecks: 1},

@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
   output:'standalone',
   async headers() {
     const security = [{ key: 'X-Content-Type-Options', value: 'nosniff' }, { key: 'X-Frame-Options', value: 'SAMEORIGIN' }, { key: 'Referrer-Policy', value: 'same-origin' }];
-    return [{ source: '/:path*', headers: security }, ...['/', '/verify', '/sop', '/trust'].map(source => ({ source, headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }] }))];
+    return [{ source: '/:path*', headers: security }, ...['/', '/verify', '/sop', '/trust', '/privacy'].map(source => ({ source, headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }] }))];
   },
   outputFileTracingRoot: process.cwd(),
   outputFileTracingExcludes:{'/*':['./data/runtime/**','./data/uploads/**','./.env*','./.codex-finalizer/**']},

@@ -1,10 +1,12 @@
+import { seedStaffDirectory } from './staffDirectory';
 import { getDatabase } from '@/lib/server/db';
 import type { AppUser, AppRole } from '@/lib/server/auth';
 import type { RefereeDecision } from '@/lib/schemas';
 import { evaluateWorkflow, readRecord } from './workflowService';
 import { samplePostAudit } from './postAuditService';
 
-const SAMPLE_SUPPLIER = { supplierTaxCode: '0312345678', supplierName: 'Công ty TNHH Dịch vụ Minh An (dữ liệu mẫu)' };
+// MST riêng cho dữ liệu nạp sẵn (số kiểm tra hợp lệ): ca giám khảo chép từ /verify (MST 0312345678) không bị gộp nhầm vào cụm cùng ngày với dữ liệu mẫu.
+const SAMPLE_SUPPLIER = { supplierTaxCode: '0319876546', supplierName: 'Công ty TNHH Dịch vụ Minh An (dữ liệu mẫu)' };
 const sample = (invoiceNumber: string, fields: Record<string, unknown>) => ({
   id: `MAU-${invoiceNumber}`, invoiceNumber, invoiceDate: '2026-10-05', ...SAMPLE_SUPPLIER, ...fields
 });
@@ -23,6 +25,7 @@ export const DEMO_SAMPLE_CASES = [
  */
 export async function seedDemoCases(): Promise<RefereeDecision[]> {
   const db = getDatabase();
+  seedStaffDirectory();
   if ((db.prepare('SELECT COUNT(*) n FROM invoices').get() as { n: number }).n > 0) return [];
   const row = db.prepare("SELECT id, email, display_name, role FROM users WHERE role = 'ACCOUNTANT' LIMIT 1").get() as { id: string; email: string; display_name: string; role: AppRole } | undefined;
   if (!row) return [];

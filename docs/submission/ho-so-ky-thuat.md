@@ -1,6 +1,6 @@
 # HỒ SƠ KỸ THUẬT & NGHIÊN CỨU · Tax Referee
 
-**Đội Fprinciples · MLAI Hackathon 2026 · Track VNG · Đề A "The Escalation Referee" · Cập nhật 15/10/2026**
+**Đội Fprinciples · MLAI Hackathon 2026 · Track VNG · Đề A "The Escalation Referee" · Cập nhật 17/10/2026**
 
 Mã nguồn: https://github.com/khanhle1406/Tax-Referee · Live: https://limegreen-salamander-517622.hostingersite.com · Phiên bản đang chạy: `/api/health`
 
@@ -148,8 +148,8 @@ Các chuyển dịch phụ:
 
 ## 9. Kiểm thử và CI
 
-- **`npm test`:** 16 bộ gồm 111 kiểm tra unit (21 file trong `tests/unit/`: kiểm thử thuộc tính bằng fast-check trên ~1.500 hóa đơn sinh ngẫu nhiên với seed cố định; ma trận quyền gọi hàm thật với từng vai trò; 12 phép thử tấn công của trang /trust; ranh giới thực thi) và 15 bộ hồi quy, trong đó có 72 ca red team. Mỗi bộ chạy trong tiến trình riêng với thư mục dữ liệu tạm; các bộ có đường gọi AI dùng khóa giả, và CI không có khóa AI thật. Bộ nào in ít dòng PASS hơn ngưỡng `minChecks` bị tính là FAIL.
-- **CI** (`.github/workflows/ci.yml`): ma trận ubuntu-latest và windows-latest chạy typecheck, typecheck:referee, lint, test; job build chạy sau khi test đạt.
+- **`npm test`:** 16 bộ gồm 118 kiểm tra unit (ngưỡng `minChecks` trong `scripts/qa/run-all.ts`; 22 file trong `tests/unit/`: kiểm thử thuộc tính bằng fast-check trên ~1.500 hóa đơn sinh ngẫu nhiên với seed cố định; ma trận quyền gọi hàm thật với từng vai trò; 12 phép thử tấn công của trang /trust; ranh giới thực thi) và 15 bộ hồi quy, trong đó có 72 ca red team. Mỗi bộ chạy trong tiến trình riêng với thư mục dữ liệu tạm; các bộ có đường gọi AI dùng khóa giả, và CI không có khóa AI thật. Bộ nào in ít dòng PASS hơn ngưỡng `minChecks` bị tính là FAIL.
+- **CI** (`.github/workflows/ci.yml`): ma trận Ubuntu và Windows với Node 22, thêm Node 24 trên Ubuntu, chạy typecheck, typecheck:referee, lint, test; job build chạy sau khi test đạt.
 - **Smoke HTTP** (`scripts/qa/test-api-smoke.ts`, `TEST_BASE_URL`): cô lập giữa hai phiên demo, lỗi 409 khi gửi revision cũ, hoàn tác, đọc chứng từ.
 - **Phục hồi:** `npm run test:recovery` kiểm tra dữ liệu còn nguyên sau khởi động lại.
 - **Playwright** (ngoài repo): 18/19 mục trên bản build, máy tính và điện thoại 390px; mục còn lại là phản hồi 401 đúng thiết kế.
@@ -191,7 +191,7 @@ Văn bản mới từ nguồn cập nhật chỉ thành ứng viên `NEEDS_REVIE
 | Red team 72 ca | 6 trợ lý AI viết từ tài liệu quy định, không đọc mã engine; 21 thường quy, 51 chuyển tiếp (19/25/7) | 66/72 → 72/72, nay là bộ hồi quy | Nhãn do AI gán, chưa được người nghiệp vụ duyệt |
 | Verify live | 4 ca chung + 5 ca Đề A, từng ca trên `:memory:` | 9/9, 268 ms, 15/10/2026 | Ca công khai |
 | Tự điều chỉnh ngưỡng | ≥ 10 nhãn hậu kiểm; holdout 30% mới nhất theo thời gian; Wilson 95%; 4 ca đối kháng trong savepoint; phiên bản, audit, CFO khôi phục | Cơ chế đã có kiểm thử (`tests/unit/thresholdHoldout.test.ts`) | Chưa có nhãn thật |
-| Người dùng (16/10) | 3 người ghi quyết định cho 5 ca trước khi xem kết quả; 20 câu hỏi; `scripts/qa/evaluate-user-study.ts` tính đồng thuận, bỏ sót, chuyển tiếp thừa kèm Wilson | Có ngày 16/10 | 5 ca: khoảng tin cậy rộng |
+| Người dùng (16/10) | 3 người ghi quyết định cho 5 ca trước khi xem kết quả; 20 câu hỏi; `scripts/qa/evaluate-user-study.ts` tính đồng thuận, bỏ sót, chuyển tiếp thừa kèm Wilson | Buổi thử do BTC điều phối diễn ra 16/10; BTC xác nhận ổn, không có phản hồi chi tiết bằng văn bản, nên không công bố số liệu | 5 ca: khoảng tin cậy rộng |
 | Đánh giá độc lập | Khóa nhãn SHA-256 (`npm run labels:lock`), chấm `npm run evaluate:independent`; mục tiêu 40 ca, tối thiểu 20 | Chưa công bố | Cần hóa đơn thật có cho phép |
 
 ## 13. Truy vết mã nguồn

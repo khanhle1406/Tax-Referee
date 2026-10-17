@@ -15,6 +15,10 @@ export const workflowStatusLabels: Record<string, string> = {
   REJECTED: 'Đã từ chối', NEEDS_CONFIRMATION: 'Cần xác minh', ROUTINE_PROPOSED: 'Đề xuất thường quy'
 };
 export const eventLabels: Record<string, string> = {
+  BATCH_CREATED: 'Tạo lô hóa đơn', BATCH_SIGNED_OFF: 'Chốt lô (ký trước khi ghi sổ)', INVOICE_POSTED_BY_BATCH: 'Ghi sổ theo lô đã chốt',
+  BATCH_GROUP_ANSWERED: 'Trả lời chung một nhóm hóa đơn', CHANNEL_PULLED: 'Lấy hóa đơn từ Gmail/Zalo', CHANNEL_SENDER_ASSIGNED: 'Xác nhận người gửi',
+  BATCH_ITEM_ATTACHED: 'Gắn hóa đơn vào lô', BATCH_SUPPLEMENT_SIGNED_OFF: 'Chốt bổ sung lô (ghi sổ hóa đơn duyệt sau)', CHANNEL_FILE_INGESTED: 'Nhận file qua Gmail/Zalo',
+  STAFF_ADDED: 'Thêm người vào danh bạ người gửi',
   EVALUATION_STARTED: 'Bắt đầu đánh giá', INVOICE_EVALUATED: 'Chuyển tiếp để con người xử lý',
   ROUTINE_AUTO_APPROVED: 'Tự xử lý thường quy', EVALUATION_FAILED: 'Đánh giá chưa hoàn tất',
   EVALUATION_RECOVERED: 'Phục hồi tác vụ bị gián đoạn', HUMAN_RESOLUTION_RECORDED: 'Ghi nhận quyết định con người',

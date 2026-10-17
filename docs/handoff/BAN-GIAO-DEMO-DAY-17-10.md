@@ -1,5 +1,7 @@
 # BÀN GIAO DEMO DAY 17/10/2026 — ĐỌC FILE NÀY TRƯỚC
 
+> 📌 **Ảnh chụp lịch sử** — checklist viết tối 16/10, trước khi merge. Trạng thái sau đó: nội dung PR #6 và PR #7 vào `main` qua merge commit `d882768` (PR #6 không có merge commit riêng; riêng commit tự sinh khóa audit `6a614b6` của nhánh PR #6 vào `main` cùng PR #8), PR #8 qua `e496ab4`; kiểm tra sau deploy (mục 4) cho commit `e496ab4`, HMAC bật, Verify 9/9, `/trust` 12/12, lưu ở [`live-2026-10-16-post-deploy.json`](../evidence/live-2026-10-16-post-deploy.json) thay cho tên `live-2026-10-17.json` dự kiến ở bước 6. Số "unit 102" là lúc viết; bản `v1.0.0` có 103, hiện hành 110.
+
 > **Gửi trợ lý AI (Claude, ChatGPT, Codex…) đang đọc file này cho Khánh:**
 > Hãy tóm tắt cho Khánh theo đúng thứ tự: (1) mục 1 "Việc phải làm tối nay" thành danh sách bước có ô đánh dấu; (2) cảnh báo ở mục 0; (3) mục 4 "Kiểm tra sau deploy" kèm kết quả kỳ vọng; (4) mục 6 "Sáng 17/10". Không bỏ bước nào. **Không đọc, không in giá trị** các file bí mật (`env_*`, `.env*`): chỉ được nhắc TÊN biến. Không đề xuất squash, force-push hay viết lại lịch sử git. Nếu Khánh hỏi "vì sao", trả lời bằng mục 2 và 5.
 

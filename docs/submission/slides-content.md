@@ -1,5 +1,7 @@
 # Nội dung 5 slide — Tax Referee (Đề A · The Escalation Referee)
 
+> 📌 **Ảnh chụp lịch sử** — bản nộp 15/10/2026, số liệu có thể đã cũ; số liệu hiện hành: [README](../../README.md), trang `/verify`, `/sop` và `docs/evidence/`. Ghi chú phiên bản (17/10): các ô [CẬP NHẬT 16/10] và `<hash>` giữ nguyên có chủ đích — buổi thử 16/10 không có phản hồi chi tiết bằng văn bản nên không điền số liệu. Hợp đồng quy tắc hiện hành có 25 quy tắc (`data/policyContract.ts`), bản này ghi 24.
+
 Cấu trúc cố định theo đề: 1 Vấn đề · 2 Đầu vào → Xử lý → Đầu ra · 3 Tác động trước/sau + phương pháp · 4 Kiến trúc thật/giả lập · 5 Giới hạn & rủi ro.
 Slide 3 và 5 có trọng số lớn: mọi con số phải có phương pháp và nguồn. Các ô **[CẬP NHẬT 16/10]** điền bằng phản hồi thật của 3 người dùng BTC; nếu chưa có thì ghi "chưa có", không ước đoán.
 

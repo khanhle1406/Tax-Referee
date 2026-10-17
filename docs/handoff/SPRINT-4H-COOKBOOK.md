@@ -225,7 +225,7 @@ TAX_REFEREE_DATA_DIR=$(mktemp -d) NODE_ENV=test node --import tsx --test tests/u
 **Panel trong hồ sơ:** `EscalationCard`, `HandoffAnswerPanel`, `InvoiceDataSummary`.
 
 **Lưu ý:**
-- Bề rộng 360px; xem `design-system/tax-referee/MASTER.md`.
+- Bề rộng 360px; xem `docs/archive/design-system-MASTER.md` (đã lưu trữ).
 - Chỉ kiểm UI trên bản build standalone (skill `verify-all`), rồi **tắt server `.next/standalone/server.js`**.
 
 **Kiểm nhanh:**

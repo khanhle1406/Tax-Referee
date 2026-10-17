@@ -6,7 +6,8 @@ type XmlTree = Record<string, unknown>;
 
 function xmlScalar(value: unknown): string | undefined {
   if (value === undefined || value === null) return undefined;
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value).trim() || undefined;
+  // Cây được dựng từ XML đã chuẩn hóa với processEntities: false, nên giải mã thực thể đúng một lần tại đây (cùng quy tắc với regex).
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return decodeXmlText(String(value)).trim() || undefined;
   if (typeof value === 'object' && '#text' in (value as Record<string, unknown>)) {
     return xmlScalar((value as Record<string, unknown>)['#text']);
   }
@@ -61,6 +62,7 @@ function structuredXmlFallback(xml: string): Record<string, unknown> {
     removeNSPrefix: true,
     trimValues: true,
     parseTagValue: false,
+    processEntities: false,
     isArray: (name) => ['Item', 'HHDVu', 'Detail', 'Product', 'Line'].includes(name)
   });
   const root = parser.parse(xml) as XmlTree;
@@ -110,19 +112,88 @@ function structuredXmlFallback(xml: string): Record<string, unknown> {
   };
   return Object.fromEntries(Object.entries(raw).filter(([, value]) => value !== undefined));
 }
+/**
+ * Đưa XML về dạng tương đương trước khi trích: bỏ chú thích, processing instruction và thuộc tính; thay mỗi đoạn CDATA
+ * bằng chính văn bản của nó (đã escape). Nhờ vậy giá trị app đọc trùng với bộ đọc XML chuẩn của phần mềm kế toán và cơ quan
+ * thuế — không thể chèn CDATA, chú thích, `<?pi ?>`, `>` trong thuộc tính hay tham chiếu ký tự để app thấy 2.880.000₫ trong
+ * khi chứng từ pháp lý ghi 22.880.000₫ (parser differential). Ba loại token đầu được quét cùng lúc nên token này không che token kia.
+ * Giới hạn còn lại: trích bằng tên thẻ lấy phần tử trùng tên đầu tiên, chưa theo đường dẫn schema.
+ */
+export function canonicalXmlForRegex(xml: string): string {
+  // Lặp tới điểm dừng: bỏ một token có thể ghép phần còn lại thành token mới (ví dụ `<!-<!-- x -->-`).
+  let text = xml;
+  for (let previous = ''; previous !== text;) {
+    previous = text;
+    text = text.replace(/<!\[CDATA\[([\s\S]*?)\]\]>|<!--[\s\S]*?-->|<\?[\s\S]*?\?>/g, (_whole, cdata: string | undefined) =>
+      cdata === undefined ? '' : cdata.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+  }
+  // Thuộc tính không dùng để trích; giá trị thuộc tính hợp lệ có thể chứa '>' làm regex cắt thẻ sai chỗ.
+  return text.replace(/<([A-Za-z_][\w:.-]*)(?:\s(?:[^>"'/]|"[^"]*"|'[^']*')*)?(\/?)>/g, '<$1$2>');
+}
+
+const XML_NAMED_ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+const isXmlChar = (cp: number) =>
+  cp === 0x9 || cp === 0xa || cp === 0xd || (cp >= 0x20 && cp <= 0xd7ff) || (cp >= 0xe000 && cp <= 0xfffd) || (cp >= 0x10000 && cp <= 0x10ffff);
+/** Giải mã tham chiếu thực thể và ký tự XML (`&amp;amp;`, `&#52;`, `&#x34;`) như bộ đọc XML chuẩn; tham chiếu tới ký tự cấm thì từ chối. */
+export function decodeXmlText(text: string): string {
+  return text.replace(/&(?:#x([0-9a-fA-F]+)|#([0-9]+)|(amp|lt|gt|quot|apos));/g, (_whole, hex?: string, dec?: string, named?: string) => {
+    if (named) return XML_NAMED_ENTITIES[named];
+    const codePoint = hex ? parseInt(hex, 16) : parseInt(dec as string, 10);
+    if (!isXmlChar(codePoint)) throw new Error('Tệp XML rỗng hoặc sai cấu trúc.');
+    return String.fromCodePoint(codePoint);
+  });
+}
+
 function tag(xml: string, name: string): string | undefined {
   const pattern = `<(?:[a-zA-Z0-9_]+:)?${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/(?:[a-zA-Z0-9_]+:)?${name}>`;
   const match = xml.match(new RegExp(pattern, 'i'));
-  return match?.[1]?.replace(/<[^>]+>/g, '').trim() || undefined;
+  if (!match) return undefined;
+  // Bỏ thẻ con, lặp tới điểm dừng để phần còn lại không ghép thành thẻ mới.
+  let text = match[1];
+  for (let previous = ''; previous !== text;) {
+    previous = text;
+    text = text.replace(/<[^>]+>/g, '');
+  }
+  return decodeXmlText(text).trim() || undefined;
+}
+
+/** Trường phần đầu hóa đơn chỉ được có một giá trị; trùng tên thì regex lấy phần tử đầu tiên, khác với bộ đọc theo schema. */
+const SINGLE_VALUED_HEADER_TAGS = [
+  'TgTCThue', 'TgTThue', 'TgTTThue', 'TgTTTBSo', 'TongTienHang', 'TongTienThue', 'TongThanhToan', 'TongTien', 'SubTotal', 'SubtotalAmount',
+  'TotalSaleAmount', 'TotalAmountWithoutVAT', 'GrandTotal', 'TotalPayment', 'TotalVAT', 'TotalVATAmount', 'TotalAmountWithVAT', 'InvoiceTotal',
+  'TotalAmount', 'TaxAmount', 'VATAmount', 'SHDon', 'NLap', 'KHHDon', 'KHMSHDon', 'MCCQT', 'HTTT', 'HTTToan', 'PaymentMethod',
+];
+const PARTY_BLOCK_TAGS = ['NBan', 'NMua', 'SellerInfo', 'BuyerInfo', 'Seller', 'Buyer'];
+const AMBIGUOUS_XML = (detail: string) => new Error(`Tệp XML có ${detail} — không đọc tất định được. Hãy tải bản XML gốc hoặc nhập tay.`);
+
+/**
+ * Fail-closed khi cấu trúc khiến trích theo tên thẻ có thể khác bộ đọc theo schema: phần tử tổng tiền/số hóa đơn/khối bên bán
+ * xuất hiện hai lần (ví dụ khối mở rộng đặt trước TToan thật), hoặc dòng hàng lồng nhau che dòng thật.
+ */
+function assertUnambiguousXml(canonicalXml: string, headerXml: string) {
+  const count = (source: string, name: string) => (source.match(new RegExp(`<(?:[A-Za-z0-9_]+:)?${name}>`, 'gi')) || []).length;
+  for (const name of SINGLE_VALUED_HEADER_TAGS) if (count(headerXml, name) > 1) throw AMBIGUOUS_XML(`nhiều phần tử <${name}> ngoài dòng hàng`);
+  for (const name of PARTY_BLOCK_TAGS) if (count(canonicalXml, name) > 1) throw AMBIGUOUS_XML(`nhiều khối <${name}>`);
+  let depth = 0;
+  for (const match of canonicalXml.matchAll(/<(\/?)(?:[A-Za-z0-9_]+:)?(Item|HHDVu|Detail|Product)>/gi)) {
+    depth += match[1] ? -1 : 1;
+    if (depth > 1 || depth < 0) throw AMBIGUOUS_XML('dòng hàng lồng nhau');
+  }
 }
 
 export function assertValidXml(xml: string) {
   if (!xml.trim() || /<!DOCTYPE|<!ENTITY/i.test(xml) || XMLValidator.validate(xml) !== true)
     throw new Error('Tệp XML rỗng hoặc sai cấu trúc.');
+  // Chặt như bộ đọc chuẩn (expat): '&' phải mở một tham chiếu hợp lệ, tham chiếu không trỏ tới ký tự cấm.
+  const canonical = canonicalXmlForRegex(xml);
+  if (/&(?!(?:#x[0-9a-fA-F]+|#[0-9]+|amp|lt|gt|quot|apos);)/.test(canonical)) throw new Error('Tệp XML rỗng hoặc sai cấu trúc.');
+  decodeXmlText(canonical);
 }
 
-export function parseXml(xml: string) {
-  assertValidXml(xml);
+export function parseXml(rawXml: string) {
+  assertValidXml(rawXml);
+  // Mọi trích xuất bên dưới — regex lẫn cây dự phòng — chạy trên bản đã chuẩn hóa (không CDATA, chú thích, PI, thuộc tính).
+  const xml = canonicalXmlForRegex(rawXml);
   const structured = structuredXmlFallback(xml);
   // 1. Trích xuất khối Người bán <NBan> hoặc <SellerInfo> hoặc <Seller>
   const nbanMatch =
@@ -222,6 +293,7 @@ export function parseXml(xml: string) {
     tag(xml, 'ItemName');
 
   const xmlHeader = xml.replace(/<(?:Items|InvoiceDetail|Details|HHDVu)[\s\S]*?<\/(?:Items|InvoiceDetail|Details|HHDVu)>/gi, '');
+  assertUnambiguousXml(xml, xmlHeader);
 
   // 5. Trích xuất tiền và thuế
   const preTaxAmount = numberValue(
@@ -278,13 +350,13 @@ export function parseXml(xml: string) {
     tag(xml, 'ThueSuat');
   const taxRate = parseTaxRateString(taxRateRaw);
 
-  const paymentMethodRaw = (tag(xml, 'HTTT') || tag(xml, 'PaymentMethod') || '')
+  // Chỉ đọc ngoài dòng hàng, như phép kiểm trùng tên: thẻ giả đặt trong <HHDVu> phía trước TTChung không được chọn.
+  const paymentMethodRaw = (tag(xmlHeader, 'HTTToan') || tag(xmlHeader, 'HTTT') || tag(xmlHeader, 'PaymentMethod') || '')
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toUpperCase();
-  const paymentMethod = paymentMethodRaw.includes('TM') && !paymentMethodRaw.includes('CK')
-    ? 'CASH'
-    : paymentMethodRaw.includes('CK') || paymentMethodRaw.includes('CHUYEN KHOAN')
-    ? 'BANK_TRANSFER'
-    : undefined;
+  const saysCash = /\bTM\b|TIEN MAT|\bCASH\b/.test(paymentMethodRaw);
+  const saysBank = /\bCK\b|CHUYEN KHOAN|TRANSFER|NGAN HANG/.test(paymentMethodRaw);
+  // "TM/CK" (một trong hai) là chưa rõ: không đoán; hệ thống chỉ hỏi khi số tiền tới ngưỡng thanh toán.
+  const paymentMethod = saysCash && !saysBank ? 'CASH' : saysBank && !saysCash ? 'BANK_TRANSFER' : undefined;
 
   // 6. Trích xuất chi tiết dòng hàng <Item> hoặc <HHDVu> (IMP-08)
   const items: Array<{

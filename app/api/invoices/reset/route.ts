@@ -23,6 +23,10 @@ async function handlePOST(request: NextRequest) {
     const resetTx = db.transaction(() => {
       db.exec(`
         DELETE FROM internal_vouchers;
+        DELETE FROM batch_items;
+        DELETE FROM batches;
+        DELETE FROM channel_messages;
+        DELETE FROM outbound_notifications;
         DELETE FROM invoice_revisions;
         DELETE FROM dossier_snapshots;
         DELETE FROM human_resolutions;

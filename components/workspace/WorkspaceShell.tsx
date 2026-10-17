@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import Link from 'next/link';
-import { Inbox, FileText, ClipboardCheck, History, Building2, Landmark, Scale, Bell, BookOpen, ArrowUpRight, Menu, LogOut, PanelLeftClose, PanelLeftOpen, MoreHorizontal, ShieldCheck } from 'lucide-react';
+import { Inbox, FileText, ClipboardCheck, History, Building2, Landmark, Scale, Bell, BookOpen, ArrowUpRight, Menu, LogOut, PanelLeftClose, PanelLeftOpen, MoreHorizontal, ShieldCheck, LayoutDashboard, Layers, Mail, UserCheck } from 'lucide-react';
 import { BrandMark } from '@/components/BrandMark';
 import { Dialog,DialogContent,DialogTitle,DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -16,10 +16,12 @@ interface WorkspaceShellProps {
   onReset: () => Promise<void>; resetting: boolean; detail: boolean;
   dirty?:boolean;
 }
-const primary: WorkspaceView[] = ['inbox','receive','approval','dossier'];
+const primary: WorkspaceView[] = ['dashboard','inbox','receive','batches','channels','approval','history','dossier'];
+/** Tổng quan (dashboard) dành cho Kế toán trưởng và CFO. */
+const visibleFor = (key: WorkspaceView, role: AppRole): boolean => key !== 'dashboard' || role !== 'ACCOUNTANT';
 // Ngoài luồng Đề A: tiện ích mở rộng, một phần dữ liệu/tích hợp là giả lập — tách khỏi đường đi chính của giám khảo.
 const tools: WorkspaceView[] = ['suppliers','banking','reconciliation','reports','ledger','notifications'];
-const icons: Partial<Record<WorkspaceView, ReactNode>> = { inbox:<Inbox />, receive:<FileText />, approval:<ClipboardCheck />, dossier:<History />, suppliers:<Building2 />, banking:<Landmark />, reconciliation:<Scale />, notifications:<Bell />, policy:<BookOpen /> };
+const icons: Partial<Record<WorkspaceView, ReactNode>> = { dashboard:<LayoutDashboard />, batches:<Layers />, channels:<Mail />, history:<UserCheck />, inbox:<Inbox />, receive:<FileText />, approval:<ClipboardCheck />, dossier:<History />, suppliers:<Building2 />, banking:<Landmark />, reconciliation:<Scale />, notifications:<Bell />, policy:<BookOpen /> };
 const roleNames: Record<AppRole,string> = { ACCOUNTANT:'Kế toán viên', CHIEF_ACCOUNTANT:'Kế toán trưởng', CFO:'CFO' };
 
 export function WorkspaceShell({children,view,user,demo,counts,onRoleChange,onLogout,onReset,resetting,detail,dirty=false}:WorkspaceShellProps):ReactElement {
@@ -40,7 +42,7 @@ export function WorkspaceShell({children,view,user,demo,counts,onRoleChange,onLo
 
       </div>
       <nav aria-label="Điều hướng chính" className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-4">
-        {primary.map(link)}
+        {primary.filter(key=>visibleFor(key,user.role)).map(link)}
         <details className="workspace-tools mt-5" open={tools.includes(view)||undefined}><summary title="Mở rộng · beta, một phần giả lập, ngoài phạm vi Đề A">{collapsed?<MoreHorizontal className="h-4 w-4"/>:'Mở rộng · beta (một phần giả lập)'}</summary><div className="mt-2 space-y-1">{tools.map(link)}</div></details>
         <div className="mt-auto space-y-1 pt-6">{link('policy')}<Link href="/verify" onClick={event=>{if(dirty&&!window.confirm('Bản nháp tiếp nhận chưa lưu. Rời workspace?'))event.preventDefault();}} className="workspace-nav-link"><span className="nav-icon"><ClipboardCheck/></span><span className={collapsed?'md:sr-only':''}>Verify</span></Link><Link href="/trust" onClick={event=>{if(dirty&&!window.confirm('Bản nháp tiếp nhận chưa lưu. Rời workspace?'))event.preventDefault();}} className="workspace-nav-link"><span className="nav-icon"><ShieldCheck/></span><span className={collapsed?'md:sr-only':''}>Bảo mật</span></Link></div>
       </nav>

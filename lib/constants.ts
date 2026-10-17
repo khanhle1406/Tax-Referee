@@ -21,6 +21,22 @@ export const SHOPAIKEY_GEMINI_API_CONFIG = {
   MODEL: process.env.SHOPAIKEY_MODEL || 'gemini-2.5-flash'
 };
 
+/**
+ * LLM dành cho DEMO (chuẩn OpenAI chat/completions), CHỈ dùng khi DEV_LLM_ENABLED=1 và đủ 3 biến DEV_LLM_*.
+ * Mặc định tắt. Giá trị đặt ở máy chạy — trong repo chỉ có tên biến.
+ * Riêng tư: ảnh hóa đơn đi tới máy chủ này; nội dung XML không gửi cho AI (riêng tên, MST người bán có thể được tra cứu qua công cụ tìm kiếm của nhà cung cấp AI).
+ */
+export function devLlmConfig(): { baseUrl: string; apiKey: string; model: string; host: string } | null {
+  if (process.env.DEV_LLM_ENABLED !== '1') return null;
+  const baseUrl = (process.env.DEV_LLM_BASE_URL || '').trim().replace(/\/+$/, '');
+  const apiKey = (process.env.DEV_LLM_API_KEY || '').trim();
+  const model = (process.env.DEV_LLM_MODEL || '').trim();
+  if (!/^https:\/\//.test(baseUrl) || !apiKey || !model) return null;
+  let host = '';
+  try { host = new URL(baseUrl).host; } catch { return null; }
+  return { baseUrl, apiKey, model, host };
+}
+
 export const OPENROUTER_API_CONFIG = {
   ENDPOINT: (process.env.OPENROUTER_BASE_URL || GEMINI_API_CONFIG.BASE_URL) + '/chat/completions',
   BASE_URL: process.env.OPENROUTER_BASE_URL || GEMINI_API_CONFIG.BASE_URL,

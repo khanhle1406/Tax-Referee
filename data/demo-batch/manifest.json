@@ -1,0 +1,180 @@
+{
+  "note": "DỮ LIỆU TỔNG HỢP do đội tự tạo cho demo; không phải hóa đơn thật.",
+  "buyerTaxCode": "0102030405",
+  "cases": [
+    {
+      "file": "01-van-phong-pham.xml",
+      "invoiceNumber": "0000101",
+      "scenario": "Văn phòng phẩm dưới 5 triệu",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "02-nuoc-uong.xml",
+      "invoiceNumber": "0000102",
+      "scenario": "Tiền mặt nhưng dưới 5 triệu",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "quocbao.hc@example.com"
+    },
+    {
+      "file": "03-chuyen-phat.xml",
+      "invoiceNumber": "0000103",
+      "scenario": "Dịch vụ dưới 5 triệu",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "04-internet.xml",
+      "invoiceNumber": "0000104",
+      "scenario": "Viễn thông đúng 10%",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "05-sua-may-lanh.xml",
+      "invoiceNumber": "0000105",
+      "scenario": "Dịch vụ sửa chữa",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "quocbao.hc@example.com"
+    },
+    {
+      "file": "06-thue-xe.xml",
+      "invoiceNumber": "0000106",
+      "scenario": "Thuê xe (dịch vụ, không phải xe chịu TTĐB)",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "07-nhieu-thue-suat.xml",
+      "invoiceNumber": "0000107",
+      "scenario": "Một hóa đơn hai thuế suất 8% và 10%",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "08-ve-sinh.xml",
+      "invoiceNumber": "0000108",
+      "scenario": "Dịch vụ dưới 5 triệu",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "quocbao.hc@example.com"
+    },
+    {
+      "file": "09-cafe-hop.xml",
+      "invoiceNumber": "0000109",
+      "scenario": "Chi họp nội bộ, không có đồ uống có cồn",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "10-muc-in.xml",
+      "invoiceNumber": "0000110",
+      "scenario": "Văn phòng phẩm",
+      "expected": "Máy đề xuất duyệt",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "11-may-in.xml",
+      "invoiceNumber": "0000111",
+      "scenario": "Chuyển khoản 7,56 triệu: cần xác nhận UNC",
+      "expected": "Chưa rõ thông tin → KTT (nhóm UNC)",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "12-ban-ghe.xml",
+      "invoiceNumber": "0000112",
+      "scenario": "Chuyển khoản 8,64 triệu: cần xác nhận UNC",
+      "expected": "Chưa rõ thông tin → KTT (nhóm UNC)",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "13-dao-tao.xml",
+      "invoiceNumber": "0000113",
+      "scenario": "Chuyển khoản 12,96 triệu: cần xác nhận UNC",
+      "expected": "Chưa rõ thông tin → KTT (nhóm UNC)",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "14-ruou-tiep-khach-a.xml",
+      "invoiceNumber": "0000114",
+      "scenario": "Đồ uống có cồn khi tiếp khách",
+      "expected": "Ngoài quy định → KTT (nhóm tiếp khách)",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "15-ruou-tiep-khach-b.xml",
+      "invoiceNumber": "0000115",
+      "scenario": "Đồ uống có cồn khi tiếp khách",
+      "expected": "Ngoài quy định → KTT (nhóm tiếp khách)",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "16-tien-mat-lon.xml",
+      "invoiceNumber": "0000116",
+      "scenario": "Tiền mặt từ 5 triệu",
+      "expected": "Ngoài quy định → KTT",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "17-thue-van-phong.xml",
+      "invoiceNumber": "0000117",
+      "scenario": "Thuê văn phòng áp 8% (kinh doanh bất động sản không được giảm)",
+      "expected": "Ngoài quy định → KTT",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "18-qua-tang.xml",
+      "invoiceNumber": "0000118",
+      "scenario": "Quà tặng khách hàng",
+      "expected": "Ngoài quy định → KTT",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "19-sai-mst-nguoi-mua.xml",
+      "invoiceNumber": "0000119",
+      "scenario": "Ghi MST người mua của công ty khác",
+      "expected": "Ngoài quy định → KTT",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "20-cum-tien-mat-1.xml",
+      "invoiceNumber": "0000120",
+      "scenario": "Cụm tiền mặt cùng người bán cùng ngày (tờ 1)",
+      "expected": "Tờ 1 ổn; khi có tờ 2 thì cả cụm bị hỏi",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "21-cum-tien-mat-2.xml",
+      "invoiceNumber": "0000121",
+      "scenario": "Cụm tiền mặt: hai tờ cộng lại từ 5 triệu",
+      "expected": "Ngoài quy định → KTT (cụm trong ngày)",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "22-lech-tong.xml",
+      "invoiceNumber": "0000122",
+      "scenario": "Tổng in 480.000₫ lệch tiền hàng + thuế 495.000₫",
+      "expected": "Chưa rõ thông tin → KTT",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "23-laptop.xml",
+      "invoiceNumber": "0000123",
+      "scenario": "330 triệu, vượt hạn mức 200 triệu của KTT",
+      "expected": "Vượt thẩm quyền → CFO",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "24-trung-van-phong-pham.xml",
+      "invoiceNumber": "0000101",
+      "scenario": "Gửi lại đúng hóa đơn số 0000101",
+      "expected": "Không tạo bản trùng",
+      "sender": "minhanh.kd@example.com"
+    },
+    {
+      "file": "not-an-invoice.xml",
+      "scenario": "File không phải hóa đơn",
+      "expected": "Không đọc được, không làm hỏng cả lô",
+      "sender": "nguoi-la@example.net"
+    }
+  ]
+}

@@ -1,13 +1,16 @@
 <div align="center">
 
+<img src="public/brand/tax-referee-logo.png" alt="Logo Tax Referee" width="96" height="96">
+
 # Tax Referee
 
-**Trọng tài thuế GTGT đầu vào cho hóa đơn điện tử Việt Nam**
+**Trọng tài thuế GTGT đầu vào cho hóa đơn điện tử Việt Nam**<br>
 Tự xử lý hóa đơn thường quy · dừng đúng lúc · hỏi đúng người bằng một câu hỏi trả lời được ngay
 
 [![CI](https://github.com/khanhle1406/Tax-Referee/actions/workflows/ci.yml/badge.svg)](https://github.com/khanhle1406/Tax-Referee/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/khanhle1406/Tax-Referee/actions/workflows/codeql.yml/badge.svg)](https://github.com/khanhle1406/Tax-Referee/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A520.19-339933?logo=node.js&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22%20%7C%2024-339933?logo=node.js&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?logo=sqlite&logoColor=white)
@@ -22,7 +25,9 @@ MLAI Hackathon 2026 · Track VNG · Đề A — *The Escalation Referee* · Đ�
 
 </div>
 
-> **Đội / người deploy (Demo Day 17/10):** đọc [docs/handoff/BAN-GIAO-DEMO-DAY-17-10.md](docs/handoff/BAN-GIAO-DEMO-DAY-17-10.md) trước — việc phải làm, kiểm tra sau deploy, chuẩn bị thuyết trình.
+> **Đội / người deploy (Demo Day 17/10):** đọc [docs/handoff/BAN-GIAO-DEMO-DAY-17-10.md](docs/handoff/BAN-GIAO-DEMO-DAY-17-10.md) trước — việc phải làm, kiểm tra sau deploy, chuẩn bị thuyết trình. Demo theo lô trên máy local: [docs/handoff/KICH-BAN-DEMO-LO-17-10.md](docs/handoff/KICH-BAN-DEMO-LO-17-10.md).
+
+<p align="center"><img src="docs/screenshots/inbox.png" alt="Hộp thẩm định: 4 hóa đơn mẫu — 1 đã tự xử lý, 2 chờ Kế toán trưởng, 1 chờ CFO" width="880"></p>
 
 *English summary — Tax Referee is an input-VAT "escalation referee" for Vietnamese e-invoices. A deterministic rule engine (25 published SOP rules, zero LLM calls on the decision path) auto-approves routine invoices and escalates only three kinds of cases — unclear data, out of policy, or beyond the approver's authority — each with a single, answerable question routed to the right person. AI is confined to reading documents through an output allowlist; every action is written to a tamper-evident, HMAC-chained audit log. Security claims are provable live on `/trust` (12 attack probes run against the deployed code).*
 
@@ -32,7 +37,9 @@ MLAI Hackathon 2026 · Track VNG · Đề A — *The Escalation Referee* · Đ�
 
 - [Vấn đề và giải pháp](#vấn-đề-và-giải-pháp)
 - [Dùng thử trong 90 giây](#dùng-thử-trong-90-giây)
+- [Giao diện](#giao-diện)
 - [Tính năng chính](#tính-năng-chính)
+- [Xử lý theo lô và kênh nhận hóa đơn](#xử-lý-theo-lô-và-kênh-nhận-hóa-đơn)
 - [Kiến trúc](#kiến-trúc)
 - [Bảo mật hệ có agent AI](#bảo-mật-hệ-có-agent-ai)
 - [Bắt đầu nhanh](#bắt-đầu-nhanh)
@@ -42,6 +49,7 @@ MLAI Hackathon 2026 · Track VNG · Đề A — *The Escalation Referee* · Đ�
 - [API chính](#api-chính)
 - [Cấu trúc thư mục](#cấu-trúc-thư-mục)
 - [Bằng chứng và giới hạn](#bằng-chứng-và-giới-hạn)
+- [Thuật ngữ](#thuật-ngữ)
 - [Đóng góp, bảo mật, giấy phép](#đóng-góp-bảo-mật-giấy-phép)
 - [Đội ngũ](#đội-ngũ)
 
@@ -83,6 +91,16 @@ Không cần tài khoản — mỗi phiên demo có database riêng.
 Dữ liệu: [`data/verification/challengeCases.ts`](data/verification/challengeCases.ts). Chạy: `/verify` hoặc `npm test`.
 </details>
 
+## Giao diện
+
+Ảnh chụp từ bản live ngày 17/10/2026, lúc live còn chạy commit `e496ab4` (trước khi PR #9–#12 được merge); dữ liệu mẫu tổng hợp của phiên demo. Ảnh các màn hình của vòng cải tiến 17/10 (Lô hóa đơn, phiếu giải trình, Hộp thư vào, Tổng quan, Lịch sử của tôi) chụp trên bản build local, nằm ở [`docs/submission/screens/`](docs/submission/screens).
+
+| Verify một nút: 9/9 ca đúng kỳ vọng, có run ID và commit | Câu hỏi chuyển tiếp "1A, 2A" gửi CFO |
+|---|---|
+| [![Trang Verify: PASS 9/9](docs/screenshots/verify.png)](docs/screenshots/verify.png) | [![Hồ sơ 330 triệu chờ CFO với câu hỏi hai ý](docs/screenshots/handoff.png)](docs/screenshots/handoff.png) |
+| **Trung tâm tin cậy: 12/12 phép thử tấn công trên mã đang deploy** | **Trang chủ cho giám khảo: không cần tài khoản** |
+| [![Trang /trust: 12/12 phép thử đạt](docs/screenshots/trust.png)](docs/screenshots/trust.png) | [![Trang chủ Tax Referee](docs/screenshots/home.png)](docs/screenshots/home.png) |
+
 ## Tính năng chính
 
 - **Đọc đúng hóa đơn điện tử Việt Nam** — XML của Viettel, MISA, VNPT, FPT, Tổng cục Thuế (chặn DOCTYPE/ENTITY chống XXE); PDF có lớp chữ; ảnh và PDF scan qua Gemini Vision.
@@ -95,6 +113,21 @@ Dữ liệu: [`data/verification/challengeCases.ts`](data/verification/challenge
 - **Phát hiện gian lận thường gặp** — hóa đơn trùng kể cả khác cách ghi số, tách nhỏ để né hạn mức, cụm hóa đơn tiền mặt cùng bên bán trong ngày từ 5 triệu.
 
 Chi tiết và cách tự thử: [docs/submission/tinh-nang-noi-bat.md](docs/submission/tinh-nang-noi-bat.md).
+
+## Xử lý theo lô và kênh nhận hóa đơn
+
+Vòng cải tiến 17/10 thêm cách xử lý **theo lô có kiểm soát**: máy vẫn quyết từng hóa đơn bằng cùng engine tất định, nhưng hóa đơn trong lô chỉ vào sổ khi người có thẩm quyền chốt.
+
+- **Lô hóa đơn** ([`services/batchService.ts`](services/batchService.ts), `app/api/batches/**`): tải nhiều file, đọc hết rồi xếp theo MST → ngày → số trước khi kiểm; kết quả chia nhóm (máy đề xuất duyệt, đã duyệt sau khi hỏi người, cần người quyết, tạm giữ, từ chối, không đọc được). File trùng mã băm trong cùng lô không thêm dòng mới. Chỉ gắn vào lô hóa đơn do chính người tạo lô nhập; mỗi lần gắn có sự kiện nhật ký `BATCH_ITEM_ATTACHED`; client không tự đặt nguồn Gmail/Zalo. Nhãn và mã lô theo giờ Việt Nam.
+- **Phiếu giải trình** ([`lib/explainDecision.ts`](lib/explainDecision.ts)): mỗi dòng nói vì sao máy đề xuất duyệt (từng điều kiện kèm số, dùng chính hàm của engine) hoặc vì sao dừng (quy tắc, trường, VAT chờ quyết định); hóa đơn đã có người quyết thì phiếu nói theo kết quả cuối.
+- **Trả lời nhóm** (KTT/CFO): chỉ gộp các câu hỏi cùng nội dung và cùng hệ quả đáp án, ví dụ "đã có ủy nhiệm chi chưa?" hay "mục đích tiếp khách". Câu xác nhận giá trị riêng của từng tờ (số tiền, MST, ngày đọc từ ảnh; ảnh mờ; số liệu lệch) không bao giờ gộp. Thẻ nhóm liệt kê từng hóa đơn; đáp án đi qua bước trả lời của từng hóa đơn (thẩm quyền, bất kiêm nhiệm giữ nguyên) kèm phiên bản hồ sơ người duyệt đã thấy, hồ sơ vừa đổi thì bị chặn (409).
+- **Chốt lô** (KTT/CFO): ghi lý do; người tạo lô và người nhập hóa đơn không tự chốt (bất kiêm nhiệm); lô có hóa đơn từ hạn mức CFO thì CFO chốt. Khi chốt, từng hóa đơn đã duyệt được đánh dấu ghi sổ (`batch_items.posted_at`) và có sự kiện nhật ký riêng. Hóa đơn còn chờ hay tạm giữ lúc chốt, nếu được duyệt sau, phải **chốt bổ sung** trên cùng lô, cùng luật bất kiêm nhiệm và hạn mức CFO.
+- **Sổ sách** (`app/api/ledger/**`): chỉ lấy hóa đơn đã duyệt không thuộc lô nào, hoặc đã được ghi sổ khi chốt lô. Tải XML/CSV sổ cái (`GET /api/ledger/export`) và đẩy chứng từ sang phần mềm kế toán (`POST /api/ledger/sync`) chỉ dành cho KTT/CFO (quyền `ledger.export`); xem trước danh sách (`GET /api/ledger/sync`) mở cho người đã đăng nhập.
+- **Hộp thư vào — Gmail/Zalo** (`services/channels/**`, [`services/staffDirectory.ts`](services/staffDirectory.ts)): chỉ Kế toán viên (người nhập) bấm lấy thư. Thư của nhân viên có trong danh bạ, email qua SPF/DKIM (đọc header `Authentication-Results`, bỏ comment và chuỗi trong ngoặc kép trước khi đọc) hoặc Zalo user id có trong danh bạ, được máy kiểm ngay. Người gửi lạ hay giả địa chỉ chờ KTT/CFO xác nhận; sau khi xác nhận, file được xử lý dưới tên Kế toán viên đã lấy thư, và người xác nhận không được tự duyệt/chốt chính hóa đơn đó (bất kiêm nhiệm). XML đọc tất định; ảnh/PDF được lưu nhưng **chưa tự đọc** (xem [Giới hạn](#bằng-chứng-và-giới-hạn)). Mỗi thư tối đa 5 đính kèm, mỗi lượt tối đa 50 file và 10 file từ người gửi chưa xác thực; phần vượt bị từ chối, chỉ ghi siêu dữ liệu. File trùng trong cùng lượt tính một lần; hóa đơn đã nằm ở lô khác được đánh dấu trùng, không tạo lô rỗng. Mỗi file nhận có sự kiện nhật ký `CHANNEL_FILE_INGESTED` (mã nhân viên gửi, đã xác thực hay chưa, không ghi địa chỉ). Ở danh sách file nhận và tin đã gửi, Kế toán viên chỉ thấy địa chỉ đã che (email chỉ còn tên miền); KTT/CFO thấy đủ. Sau mỗi lượt có lô, KTT nhận tóm tắt và người gửi đã xác thực qua email nhận kết quả hóa đơn của mình; người gửi đã xác thực qua Zalo nhận tin báo đã nhận ảnh.
+- **Phiên demo dùng kênh mô phỏng:** hộp thư và bot giả với hóa đơn mẫu đi đúng đường nhận diện người gửi, lưu file, máy kiểm, vào lô; tin gửi ghi trạng thái `SIMULATED`, không gọi mạng và không bao giờ dùng người nhận thật. Kênh thật chỉ bật có chủ đích trên máy của đội: [docs/handoff/KET-NOI-GMAIL-ZALO.md](docs/handoff/KET-NOI-GMAIL-ZALO.md).
+- **Tổng quan** (chỉ KTT/CFO, [`services/dashboardService.ts`](services/dashboardService.ts)): việc đang chờ, máy tự xử lý bao nhiêu, VAT, lý do dừng, tốc độ trả lời, lô, kênh và người gửi.
+- **Lịch sử của tôi** ([`services/historyService.ts`](services/historyService.ts)): hai thẻ "Tôi đã làm" và "Hóa đơn tôi gửi", chỉ bản ghi của chính người đăng nhập.
+- **Trang [`/privacy`](app/privacy/page.tsx) — "Dữ liệu của bạn đi đâu":** từng loại dữ liệu đi đâu, AI thấy gì (đọc cấu hình đang chạy), ai xem được gì, chế độ không AI.
 
 ## Kiến trúc
 
@@ -129,6 +162,8 @@ flowchart LR
 | Dữ liệu Verify và bộ hồi quy | **Tổng hợp**, nhãn viết theo SOP; không phải đánh giá độc lập |
 | Ngân hàng, đối soát TCT, ERP, báo cáo thuế (nhóm **Mở rộng · beta**) | **Một phần giả lập**, ngoài phạm vi Đề A |
 | Vai trò Kế toán viên / KTT / CFO trong demo | **Mô phỏng**, trong database riêng của phiên |
+| Gmail / Zalo trong phiên demo | **Mô phỏng**: hộp thư và bot giả, hóa đơn mẫu, tin gửi ghi `SIMULATED`, không gọi mạng. Kênh thật chạy khi máy chủ cấu hình biến `GMAIL_*`/`ZALO_*` (ngoài phiên demo), hoặc khi đội bật `TAX_REFEREE_ALLOW_REAL_CHANNELS_IN_DEMO=1` trên máy của mình |
+| Lô dựng sẵn ("Lô cuối tháng 10", "Lô tuần 2") | **Chỉ máy local** khi bật `TAX_REFEREE_DEMO_PRESET_BATCHES=1`; bản live không có |
 
 Kiến trúc, đánh đổi và lộ trình production: [docs/architecture/demo-to-production.md](docs/architecture/demo-to-production.md).
 
@@ -139,7 +174,7 @@ Agent AI **không có quyền quyết định**; rủi ro "agentic" chuyển san
 | Trụ | Cơ chế | Phép thử |
 |---|---|---|
 | **Định danh** | 8 principal (3 vai người, trọng tài tất định, 3 agent AI, webhook pháp lý); trọng tài ghi `SYSTEM_REFEREE` kèm policyHash/inputHash/commit; agent đọc ảnh ghi model + hash prompt | I1, I2 |
-| **Đặc quyền tối thiểu** | Ma trận 20 quyền được test kiểm bằng hàm thật ([`tests/unit/authzMatrix.test.ts`](tests/unit/authzMatrix.test.ts)); KTT không duyệt ca CFO; hạ số tiền không hạ thẩm quyền | L1–L3 |
+| **Đặc quyền tối thiểu** | Ma trận 29 quyền (24 quyền của người) được test kiểm bằng hàm thật ([`tests/unit/authzMatrix.test.ts`](tests/unit/authzMatrix.test.ts)); KTT không duyệt ca CFO; hạ số tiền không hạ thẩm quyền | L1–L3 |
 | **Ranh giới thực thi** | Đầu ra Vision chỉ 14 trường nhìn thấy; thao tác theo danh sách cho phép; ngân sách AI fail-closed (OWASP LLM10) | D1–D4 |
 | **Cách ly** | Mỗi phiên một DB, phép thử chạy DB `:memory:`; chặn XXE; chứng từ tải lên (trừ PDF) phục vụ với CSP sandbox; nhật ký phát hiện sửa | S1–S3 |
 
@@ -147,7 +182,7 @@ Phân tích đầy đủ (mô hình mối đe dọa, STRIDE, lỗi tự phát hi
 
 ## Bắt đầu nhanh
 
-**Yêu cầu:** Node.js ≥ 20.19 (khuyến nghị 22, giống CI) kèm npm. Python 3 với PyMuPDF là tùy chọn (đọc lớp chữ PDF).
+**Yêu cầu:** Node.js 22 (giống CI và production) hoặc 24, kèm npm. Python 3 với PyMuPDF là tùy chọn (đọc lớp chữ PDF).
 
 ```bash
 git clone https://github.com/khanhle1406/Tax-Referee.git
@@ -166,6 +201,9 @@ npm run dev                   # http://localhost:3000
 | `npm run build` · `npm start` | Build và chạy bản production |
 | `npm run test:api` | Smoke test HTTP (`TEST_BASE_URL=…`) |
 | `npm run demo:reset` | Đặt lại dữ liệu demo |
+| `npm run referee:diff` | So quyết định của engine trên mọi fixture với ảnh chụp baseline; báo từng ca đổi |
+| `npm run demo:local` | Chạy bản build standalone trên `127.0.0.1:3060` với lô dựng sẵn (chỉ máy local; cần build trước hoặc thêm `-- --build`) |
+| `npm run channels:check` | Kiểm kết nối Gmail/Zalo thật trước khi demo; không in token |
 
 ## Cấu hình
 
@@ -182,19 +220,30 @@ Sao chép [`.env.example`](.env.example) thành `.env.local`. Không commit file
 | `TAX_REFEREE_*_PASSWORD` | Không | Mật khẩu tài khoản nội bộ (không đặt thì production dùng mật khẩu ngẫu nhiên) |
 | `QGEN_AI` | Không | `1` để bật AI diễn đạt câu hỏi (mặc định tắt) |
 | `LEGAL_WEBHOOK_SECRET` | Không | Bí mật webhook cập nhật pháp lý (≥ 24 ký tự) |
+| `DEV_LLM_ENABLED`, `DEV_LLM_BASE_URL`, `DEV_LLM_API_KEY`, `DEV_LLM_MODEL` | Không | LLM dành cho demo theo chuẩn OpenAI, dùng thay Gemini để đọc ảnh; mặc định tắt, chỉ dùng trên máy local |
+| `GMAIL_IMAP_USER`, `GMAIL_APP_PASSWORD`, `GMAIL_NOTIFY_TO` | Không | Kênh Gmail thật: hộp thư nhận hóa đơn (IMAP), gửi tóm tắt cho KTT (SMTP) |
+| `ZALO_BOT_TOKEN`, `ZALO_NOTIFY_CHAT_ID` | Không | Zalo Bot thật: nhận ảnh hóa đơn, gửi tóm tắt cho KTT |
+| `TAX_REFEREE_ALLOW_REAL_CHANNELS_IN_DEMO` | Không | `1` = phiên demo dùng kênh thật và nạp danh bạ thật; chỉ máy của đội, mặc định tắt |
+| `TAX_REFEREE_DEMO_PRESET_BATCHES` | Không | `1` = mỗi phiên demo mới có sẵn lô mẫu (`npm run demo:local`); chỉ máy local, mặc định tắt |
+| `TAX_REFEREE_STAFF_SEED` | Không | Danh bạ người gửi thật (JSON mảng `{fullName, department, title, email, zaloUserId}`); không nạp vào phiên demo trừ khi bật cờ kênh thật |
+
+Ba cờ chỉ dành cho máy local (`TAX_REFEREE_ALLOW_REAL_CHANNELS_IN_DEMO`, `TAX_REFEREE_DEMO_PRESET_BATCHES`, `DEV_LLM_ENABLED`) nếu bật trên production thì `/api/health` có cảnh báo tương ứng: `real_channels_in_demo`, `demo_preset_batches`, `dev_llm_enabled`. Cờ đăng nhập theo vai không mật khẩu `TAX_REFEREE_ALLOW_INTERNAL_ROLE_LOGIN` cũng được cảnh báo (`internal_role_login`).
 
 ## Kiểm thử và chất lượng
 
-- **`npm test`**: 16 bộ — 103 kiểm tra unit (20 file trong [`tests/unit/`](tests/unit)) và 15 bộ hồi quy, gồm 72 ca red team. Bộ nào in ít kiểm tra hơn ngưỡng `minChecks` bị tính là FAIL.
+- **`npm test`**: 16 bộ — bộ unit (các file trong [`tests/unit/`](tests/unit); ngưỡng số kiểm tra xem `minChecks` trong [`scripts/qa/run-all.ts`](scripts/qa/run-all.ts)) và 15 bộ hồi quy, gồm 72 ca red team. Bộ nào in ít kiểm tra hơn ngưỡng `minChecks` bị tính là FAIL.
+- **`npm run referee:diff`**: chạy lại engine trên 180 ca fixture và so với ảnh chụp quyết định ([`data/verification/decision-snapshot.json`](data/verification/decision-snapshot.json)); nhánh vòng cải tiến 17/10 cho kết quả không đổi so với baseline của `main`.
 - **Kiểm thử thuộc tính** (fast-check, ~1.500 hóa đơn sinh ngẫu nhiên, seed cố định) cho các bất biến của engine.
 - **Ma trận quyền** gọi hàm thực thi với từng vai trò; **12 phép thử bảo mật** của `/trust` chạy cả trong CI.
-- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): Ubuntu và Windows — typecheck, lint, test; build sau khi test đạt.
+- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): Ubuntu (Node 22 và 24) và Windows (Node 22) — typecheck, lint, test; build sau khi test đạt. Action ghim theo SHA, token chỉ quyền đọc.
+- **Bảo mật chuỗi cung ứng:** CodeQL ([`.github/workflows/codeql.yml`](.github/workflows/codeql.yml)) quét JavaScript/TypeScript, Python và workflow khi push lên `main`, khi mở PR vào `main` và hằng tuần; Dependabot ([`.github/dependabot.yml`](.github/dependabot.yml)) đề xuất cập nhật phụ thuộc hằng tuần.
 - **Verify** tất định, không gọi AI: 9/9 trên live, có run ID và commit.
 
 ## Triển khai
 
 - **Production:** Hostinger, ứng dụng Node.js quản lý qua hPanel. hPanel **tự deploy khi `main` thay đổi** (khoảng 1,5 phút sau merge; chờ 2–5 phút rồi kiểm). Commit được ghi lúc build; khóa audit tự sinh nếu chưa cấu hình.
-- **Quy trình:** nhánh riêng → Pull Request → CI xanh → *Create a merge commit* → kiểm `/api/health`, `/verify`, `/trust`.
+- **Phiên bản:** bằng chứng live sau deploy ngày 16/10/2026 là commit `e496ab4` (merge PR #8, đánh dấu `v1.0.0` trong [CHANGELOG](CHANGELOG.md); [bằng chứng](docs/evidence/live-2026-10-16-post-deploy.json)). `v1.1.0` (`package.json`) thêm bản sửa bảo mật đọc XML và hạ tầng repo. Repo đội chưa gắn tag phiên bản. Commit đang chạy trên live: xem [`/api/health`](https://limegreen-salamander-517622.hostingersite.com/api/health).
+- **Quy trình:** nhánh riêng → Pull Request → CI xanh → *Create a merge commit* (không squash, không force-push) → kiểm `/api/health`, `/verify`, `/trust` sau deploy.
 - **Tài liệu:** [RUNBOOK.md](RUNBOOK.md) · [deployment/HOSTINGER.md](deployment/HOSTINGER.md) · [docs/handoff/huong-dan-ban-giao.md](docs/handoff/huong-dan-ban-giao.md). Có sẵn [`Dockerfile`](Dockerfile) và [`compose.yaml`](compose.yaml) cho môi trường container.
 
 ## API chính
@@ -211,27 +260,38 @@ Sao chép [`.env.example`](.env.example) thành `.env.local`. Không commit file
 | `/api/policy` | GET · POST | Policy có phiên bản; soạn, chạy thử, công bố (bốn mắt) |
 | `/api/post-audits` · `/api/post-audits/[id]` | GET · POST | Danh sách hậu kiểm và tỉ lệ đồng thuận (GET); ghi kết quả hậu kiểm một ca (POST) |
 | `/api/system/capabilities` · `/api/security/probes` | GET · POST | Bảng quyền (GET) và chạy phép thử bảo mật của `/trust` (POST) |
+| `/api/batches` · `/api/batches/[id]` | GET · POST | Danh sách và tạo lô (POST); chi tiết lô kèm nhóm kết quả, phiếu giải trình, nhóm câu hỏi (GET) |
+| `/api/batches/[id]/items` · `/api/batches/[id]/answer` · `/api/batches/[id]/signoff` | POST | Gắn hóa đơn vào lô; trả lời nhóm (KTT/CFO); chốt lô và chốt bổ sung (KTT/CFO) |
+| `/api/ledger/export` · `/api/ledger/sync` | GET · POST | Tải XML/CSV sổ cái và đẩy chứng từ (chỉ KTT/CFO); xem trước danh sách (GET `/sync`) |
+| `/api/channels/pull` · `/api/channels/status` | POST · GET | Lấy hóa đơn từ Gmail/Zalo (Kế toán viên); trạng thái kênh (thật, mô phỏng, chưa cấu hình) |
+| `/api/channels/messages` · `/api/channels/messages/[id]/assign` · `/api/channels/notifications` | GET · POST | File đã nhận; xác nhận người gửi lạ (KTT/CFO); tin đã gửi |
+| `/api/staff` | GET · POST | Danh bạ người gửi; thêm người (KTT/CFO) |
+| `/api/dashboard` · `/api/history` | GET | Tổng quan (KTT/CFO); lịch sử của chính người đăng nhập |
 
 Các API ghi kiểm tra phiên đăng nhập hoặc phiên demo ngay trong từng route (trừ đăng nhập/đăng xuất, tạo phiên demo, webhook có khóa bí mật và tải ảnh bằng mã QR). [`middleware.ts`](middleware.ts) chặn yêu cầu ghi từ trang khác (cross-site).
 
 ## Cấu trúc thư mục
 
 ```text
-app/            Trang (Next.js App Router) và 47 route API
+app/            Trang (Next.js App Router) và 60 route API
 components/     Giao diện: workspace, hộp chuyển tiếp, Verify, Trung tâm tin cậy
-services/       Nghiệp vụ: engine quy tắc, workflow, câu hỏi, policy, hậu kiểm, AI
+services/       Nghiệp vụ: engine quy tắc, workflow, câu hỏi, policy, hậu kiểm, lô, kênh Gmail/Zalo, tổng quan, AI
 lib/            Lõi dùng chung: schema (Zod), phân loại rủi ro, căn cứ pháp lý, server (DB, audit, auth)
 data/           Hợp đồng quy tắc/SOP, sổ văn bản pháp luật, fixture kiểm chứng
 tests/unit/     Unit test (node:test)
-scripts/qa/     Bộ hồi quy và runner đa nền tảng; scripts/ops/ vận hành
+scripts/        Bộ hồi quy, runner đa nền tảng, vận hành, benchmark — mục lục: scripts/README.md
 deployment/     Hostinger, Docker, sao lưu
-docs/           Tài liệu nộp thi, kiến trúc, bảo mật, nghiên cứu, bằng chứng, bàn giao
+docs/           Tài liệu nộp thi, kiến trúc, bảo mật, nghiên cứu, bằng chứng, bàn giao, ảnh giao diện
 input-sample/   Chứng từ mẫu (XML, PDF, ảnh)
+public/         Logo, favicon, font Inter
+brainstorming/  Ghi chú nháp do AI hỗ trợ soạn — không phải bằng chứng
+.github/        CI, CodeQL, Dependabot, mẫu issue/PR
+.claude/        Harness cho trợ lý AI: agent chuyên gia, hook chặn đọc bí mật
 ```
 
 ## Bằng chứng và giới hạn
 
-**Bằng chứng chạy được:** Verify 9/9 và 12/12 phép thử bảo mật trên live (lưu tại [`docs/evidence/`](docs/evidence)); CI xanh trên mỗi PR.
+**Bằng chứng chạy được:** Verify 9/9 và 12/12 phép thử bảo mật trên live sau deploy, kèm commit và trạng thái HMAC ([`docs/evidence/live-2026-10-16-post-deploy.json`](docs/evidence/live-2026-10-16-post-deploy.json)); CI xanh trên mỗi PR.
 
 **Giới hạn — nói thẳng:**
 - **Độ chính xác:** Verify và 60 ca phát triển là dữ liệu tổng hợp đội tự gán nhãn; 72 ca red team do agent AI viết từ SOP (không đọc `services/policyEngine.ts`; nhãn do AI gán, chưa được người nghiệp vụ duyệt — [`data/verification/redteam/cases.json`](data/verification/redteam/cases.json)). Tất cả **chưa phải đánh giá độc lập**. Công cụ khóa nhãn và chấm độc lập có sẵn (`npm run labels:lock`, `npm run evaluate:independent`).
@@ -239,8 +299,11 @@ input-sample/   Chứng từ mẫu (XML, PDF, ảnh)
 - **Định danh:** demo dùng **vai trò mô phỏng** — một người đổi được 3 vai trong phiên demo (ngoài sandbox bị chặn); đăng nhập nội bộ là MVP. Production cần SSO/OIDC và MFA.
 - **Phạm vi SOP:** "ngoài phạm vi" nhận diện bằng danh sách từ khóa, nên chi cá nhân ghi tên khác vẫn có thể lọt (ca bẫy U2 của buổi thử đã đóng ở `02b8a24`); đảo sang danh sách trắng hạng mục là việc tiếp theo.
 - **Cô lập:** tiến trình đọc PDF không nhận biến bí mật nhưng chưa chạy trong container/UID riêng; khóa HMAC nằm cùng host với database; điểm neo do `/api/audit/anchor` cấp, người vận hành phải tự lưu ra ngoài.
+- **Đọc XML:** trích theo tên thẻ, chưa theo đường dẫn schema. Từ `v1.1.0`, CDATA, chú thích, processing instruction, tham chiếu ký tự được chuẩn hóa và cấu trúc mơ hồ (phần tử trùng tên, kể cả hai thẻ `<HTTToan>`; dòng hàng lồng) bị từ chối. Thẻ đồng nghĩa ưu tiên cao hơn vẫn có thể được chọn (phép kiểm số học bắt trường hợp số không khớp); bước chuyển chuỗi thành số còn dễ dãi. Phép kiểm trùng tên có thể từ chối nhầm hóa đơn có bảng tổng hợp theo thuế suất dùng `TaxAmount`/`VATAmount`/`TotalAmount` ngoài dòng hàng (khi đó dùng PDF hoặc nhập tay).
 - **Khác:** SQLite một instance; ảnh/PDF scan đi qua proxy AI bên thứ ba; chưa xác thực chữ ký số XML; tách nhỏ hóa đơn mới cộng dồn trong cùng ngày, cùng bên bán; ngày lập ở tương lai gần chưa bị chặn (chỉ chặn khi quá 6 tháng).
 - **Pháp lý:** quy tắc mô tả SOP nội bộ; điều khoản luật được dẫn nguồn nhưng diễn giải cần kế toán xác nhận.
+- **Kênh Gmail/Zalo:** ảnh/PDF nhận qua kênh được lưu nhưng **chưa tự đọc** (trạng thái `QUEUED`, nhãn "Ảnh/PDF đã lưu — chưa tự đọc"); muốn đọc thì tải ảnh lên ở màn Lô hóa đơn hoặc Tiếp nhận. Zalo Bot viết theo tài liệu bot.zaloplatforms.com; ảnh nằm ngoài các tên miền CDN Zalo đã biết bị từ chối (an toàn), cần bổ sung sau khi xem payload thật. Tra cứu MST bên bán khi tải chứng từ có thể gửi MST tới dịch vụ tra cứu bên thứ ba (VietQR; Xinvoice và doanhnghiep.vn nếu cấu hình khóa) và tới công cụ tìm kiếm của nhà cung cấp AI giới hạn nguồn `.gov.vn`.
+- **Lô dựng sẵn:** số trên màn hình (khoảng 10 máy đề xuất duyệt, 12 cần người, 1 tạm giữ, 1 lỗi; lô 24 dòng) phụ thuộc engine hiện tại và không có test khóa số chính xác; khi trình bày đọc theo màn hình.
 
 **Minh bạch quá trình làm:** thư mục [`brainstorming/`](brainstorming/README.md) là ghi chú nháp do AI hỗ trợ soạn, không phải bằng chứng. Lịch sử commit trước 14/10 có một bản nháp AI chứa 3 persona giả định kèm trích dẫn không có thật và một bảng số liệu không có lần chạy tương ứng; đội đã gỡ persona ở commit `3ace396` và gắn đính chính cho bảng số liệu ở commit `997ba93`; xem `brainstorming/opus-evaluation.md` (§6, §7). Lịch sử git không bị viết lại.
 
@@ -259,9 +322,23 @@ input-sample/   Chứng từ mẫu (XML, PDF, ảnh)
 Toàn bộ thay đổi theo mốc: [CHANGELOG.md](CHANGELOG.md).
 </details>
 
+## Thuật ngữ
+
+| Viết tắt | Nghĩa |
+|---|---|
+| GTGT / VAT | Thuế giá trị gia tăng; "VAT đầu vào" là thuế trên hóa đơn mua vào, được khấu trừ nếu đủ điều kiện |
+| MST | Mã số thuế (bên bán, bên mua) |
+| KTT | Kế toán trưởng — duyệt ca dưới hạn mức 200 triệu |
+| CFO | Giám đốc tài chính — duyệt ca từ hạn mức KTT trở lên hoặc vượt thẩm quyền |
+| SOP | Quy chế nội bộ về khấu trừ; 25 quy tắc công khai tại [`/sop`](https://limegreen-salamander-517622.hostingersite.com/sop) |
+| UNC | Ủy nhiệm chi — chứng từ chuyển khoản qua ngân hàng |
+| MCCQT | Mã của cơ quan thuế trên hóa đơn điện tử có mã |
+| Hệ số K | Doanh số / (tồn đầu + mua đã duyệt + mua mới); ngưỡng nội bộ cảnh báo lô hàng lớn |
+| HMAC | Chữ ký khóa bí mật nối vào chuỗi hash của nhật ký, phát hiện sửa đổi |
+
 ## Đóng góp, bảo mật, giấy phép
 
-- **Đóng góp:** [CONTRIBUTING.md](CONTRIBUTING.md) · [Quy tắc ứng xử](CODE_OF_CONDUCT.md) · [Lịch sử thay đổi](CHANGELOG.md)
+- **Đóng góp:** [CONTRIBUTING.md](CONTRIBUTING.md) · [Quy tắc ứng xử](CODE_OF_CONDUCT.md) · [Lịch sử thay đổi](CHANGELOG.md) · [Trích dẫn](CITATION.cff)
 - **Báo lỗ hổng bảo mật:** [SECURITY.md](SECURITY.md) (không mở issue công khai)
 - **Trợ lý AI làm việc trên repo:** [AGENTS.md](AGENTS.md) · [CLAUDE.md](CLAUDE.md)
 - **Giấy phép:** mã nguồn theo [MIT License](LICENSE). Dữ liệu và tài nguyên bên thứ ba (ảnh mẫu MC-OCR chỉ dùng cho nghiên cứu, XML mẫu công khai…) theo giấy phép riêng — xem [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

@@ -1,12 +1,13 @@
 # RUNBOOK — Tax Referee (Đề A · The Escalation Referee)
 
-Tài liệu này liệt kê mọi lệnh từ **clone sạch → chạy được → kiểm chứng**. Chi tiết triển khai VPS/Hostinger,
-backup/restore và đánh giá tập độc lập: [docs/runbook-final.md](docs/runbook-final.md) · [deployment/HOSTINGER.md](deployment/HOSTINGER.md).
+Tài liệu này liệt kê mọi lệnh từ **clone sạch → chạy được → kiểm chứng**. Triển khai Hostinger đang chạy:
+[deployment/HOSTINGER.md](deployment/HOSTINGER.md) · bàn giao và tự deploy: [docs/handoff/huong-dan-ban-giao.md](docs/handoff/huong-dan-ban-giao.md) ·
+backup/restore VPS và đánh giá tập độc lập: [docs/runbook-final.md](docs/runbook-final.md) (lưu trữ, có thể không còn khớp mã).
 
 ## 1. Yêu cầu
-- Node.js 22 hoặc 24 (đã kiểm tra trên 22 và 24), npm 10+.
+- Node.js 22 (giống CI và production) hoặc 24, kèm npm.
 - Windows, macOS hoặc Linux. Các lệnh test chạy được trên cả Windows (không cần WSL).
-- Tùy chọn cho PDF/ảnh: Python 3.11+ với `PyMuPDF Pillow pypdf`.
+- Tùy chọn cho PDF: Python 3 với `PyMuPDF` (đọc lớp chữ PDF); thiếu PyMuPDF thì `pypdf` được dùng làm phương án dự phòng chỉ đọc chữ. `Pillow` chỉ cần cho OCR Apple Vision trên macOS (`scripts/ocr/apple_vision_ocr.py`).
 - Không cần AI key để chạy Verify và bộ test: quy tắc phân luồng là tất định. AI key (Gemini) chỉ cần cho đọc ảnh/PDF scan.
 
 ## 2. Clone sạch → chạy
@@ -16,7 +17,7 @@ git clone https://github.com/khanhle1406/Tax-Referee.git
 cd Tax-Referee
 npm ci
 cp .env.example .env.local          # điền key AI nếu muốn đọc ảnh; để trống vẫn chạy Verify
-python3 -m pip install PyMuPDF Pillow pypdf   # tùy chọn, cho PDF
+python3 -m pip install PyMuPDF      # tùy chọn, cho PDF
 npm run dev                          # http://localhost:3000
 ```
 
@@ -59,4 +60,4 @@ Không có người dùng thật nào được giả lập.
 - **Thật:** quy tắc phân luồng, SQLite (WAL) bền vững qua khởi động lại, audit nối chuỗi hash, revision, chứng từ nội bộ,
   parser XML hóa đơn điện tử (TT78/NĐ123), gọi Gemini Vision khi có key.
 - **Giả lập / chưa chứng minh:** dữ liệu Verify là tổng hợp; tích hợp ERP/ngân hàng/TCT chỉ là xuất payload hoặc màn hình demo
-  (nhóm "Mở rộng"); chưa có đo lường người dùng thật (đang chờ 3 người dùng do BTC điều phối, 16/10/2026).
+  (nhóm "Mở rộng"). Buổi thử với người dùng do BTC điều phối diễn ra 16/10; BTC xác nhận buổi thử ổn, không có phản hồi chi tiết bằng văn bản, nên repo không công bố số liệu người dùng.

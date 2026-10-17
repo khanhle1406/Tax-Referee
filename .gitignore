@@ -85,6 +85,11 @@ deepseek-agent/*.log
 
 # Thư mục gom hồ sơ nộp bài (có video, tải lên Drive)
 /NOP-BAI-*/
+/NOP-BAI-*.zip
+
+# Bộ cài Python cục bộ và bản nháp phản hồi ở thư mục gốc (bản chính thức nằm trong docs/assessment/)
+/Python/
+/Feedback_*.md
 
 # Claude Code: cấu hình cá nhân không commit
 .claude/settings.local.json

@@ -380,6 +380,57 @@ function applyMigrations(db: Database.Database): void {
     record.run(21, now());
   }
 
+  // 22: xử lý theo lô, kênh nhận hóa đơn (Gmail/Zalo), danh bạ người gửi và thông báo gửi đi — chỉ cộng thêm bảng.
+  // Máy vẫn quyết định từng hóa đơn; "chốt lô" là bước người ký trước khi ghi sổ (batches.signed_off_*).
+  if (!applied.has(22)) {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS batches (
+        id TEXT PRIMARY KEY, label TEXT NOT NULL, source TEXT NOT NULL DEFAULT 'UPLOAD',
+        status TEXT NOT NULL DEFAULT 'OPEN', created_by_user_id TEXT, created_at TEXT NOT NULL,
+        signed_off_by_user_id TEXT, signed_off_at TEXT, signoff_note TEXT
+      );
+      CREATE TABLE IF NOT EXISTS batch_items (
+        batch_id TEXT NOT NULL, position INTEGER NOT NULL, invoice_id TEXT, file_name TEXT, file_sha256 TEXT,
+        source_ref TEXT, submitter_staff_id TEXT, error TEXT, created_at TEXT NOT NULL,
+        PRIMARY KEY (batch_id, position)
+      );
+      CREATE INDEX IF NOT EXISTS idx_batch_items_invoice ON batch_items(invoice_id);
+      CREATE TABLE IF NOT EXISTS staff_directory (
+        id TEXT PRIMARY KEY, full_name TEXT NOT NULL, department TEXT, title TEXT, email TEXT, zalo_user_id TEXT,
+        app_user_id TEXT, manager_staff_id TEXT, active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_staff_email ON staff_directory(lower(email)) WHERE email IS NOT NULL;
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_staff_zalo ON staff_directory(zalo_user_id) WHERE zalo_user_id IS NOT NULL;
+      CREATE TABLE IF NOT EXISTS channel_messages (
+        id TEXT PRIMARY KEY, channel TEXT NOT NULL, external_id TEXT NOT NULL, sender_address TEXT, sender_name TEXT,
+        sender_staff_id TEXT, sender_verified INTEGER NOT NULL DEFAULT 0, subject TEXT, received_at TEXT NOT NULL,
+        file_name TEXT, mime TEXT, size INTEGER, sha256 TEXT, storage_path TEXT, status TEXT NOT NULL DEFAULT 'NEW',
+        batch_id TEXT, invoice_id TEXT, note TEXT, created_at TEXT NOT NULL, UNIQUE(channel, external_id)
+      );
+      CREATE TABLE IF NOT EXISTS outbound_notifications (
+        id TEXT PRIMARY KEY, channel TEXT NOT NULL, recipient TEXT, invoice_id TEXT, batch_id TEXT, kind TEXT NOT NULL,
+        body TEXT NOT NULL, status TEXT NOT NULL, error TEXT, created_at TEXT NOT NULL, sent_at TEXT
+      );`);
+    record.run(22, now());
+  }
+
+  // 23: ghi sổ theo TỪNG hóa đơn trong lô (posted_at) — hóa đơn còn chờ lúc chốt, nếu được duyệt sau, phải chốt bổ sung;
+  // người lấy thư (để file từ người gửi lạ được xử lý dưới tên người nhập, không phải người xác nhận); một hóa đơn chỉ một lô.
+  if (!applied.has(23)) {
+    db.exec(`
+      ALTER TABLE batch_items ADD COLUMN posted_at TEXT;
+      ALTER TABLE batch_items ADD COLUMN posted_by_user_id TEXT;
+      ALTER TABLE batch_items ADD COLUMN posted_content_hash TEXT;
+      ALTER TABLE channel_messages ADD COLUMN pulled_by_user_id TEXT;
+      UPDATE batch_items SET posted_at = (SELECT b.signed_off_at FROM batches b WHERE b.id = batch_items.batch_id),
+        posted_by_user_id = (SELECT b.signed_off_by_user_id FROM batches b WHERE b.id = batch_items.batch_id),
+        posted_content_hash = (SELECT i.content_hash FROM invoices i WHERE i.id = batch_items.invoice_id)
+        WHERE invoice_id IS NOT NULL AND batch_id IN (SELECT id FROM batches WHERE status = 'SIGNED_OFF')
+          AND invoice_id IN (SELECT entity_id FROM audit_events WHERE event_type = 'INVOICE_POSTED_BY_BATCH');
+      CREATE UNIQUE INDEX IF NOT EXISTS ux_batch_items_invoice ON batch_items(invoice_id) WHERE invoice_id IS NOT NULL;`);
+    record.run(23, now());
+  }
+
 }
 
 function initializeDatabase(db: Database.Database): void {

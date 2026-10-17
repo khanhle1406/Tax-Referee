@@ -41,6 +41,15 @@ const BOOLEAN_FIELDS=['hasBankSlip','hasItemManifest','isImageBlurry','isAdjustm
 /** Giám khảo có thể gõ số dạng chuỗi ("1.000.000", "1000000", "10%"): chuyển khi không mơ hồ, còn lại bỏ trống để hệ thống hỏi. */
 export function coerceFieldValue(field:string,value:unknown):unknown {
   if(typeof value!=='string')return value;
+  if(value.trim()==='')return undefined;
+  if(field==='paymentMethod'){
+    const t=value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').toUpperCase();
+    return t==='CASH'||t==='TIEN MAT'||t==='TM'?'CASH':t==='BANK_TRANSFER'||t==='CHUYEN KHOAN'||t==='CK'||t==='BANK TRANSFER'?'BANK_TRANSFER':undefined;
+  }
+  if(field==='sellerStatus'){
+    const t=value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').toUpperCase();
+    return ['ACTIVE','SUSPENDED','CLOSED','UNKNOWN'].includes(t)?t:t==='DANG HOAT DONG'?'ACTIVE':t==='TAM NGUNG'||t==='TAM NGUNG HOAT DONG'?'SUSPENDED':t==='DA DONG MST'||t==='NGUNG HOAT DONG'?'CLOSED':undefined;
+  }
   if((NUMERIC_FIELDS as readonly string[]).includes(field)){
     const text=value.replace(/₫|đ|vnd|%/gi,'').replace(/\s+/g,'').trim();
     if(/^-?\d+$/.test(text))return Number(text);
@@ -101,9 +110,20 @@ function undoCandidate(row:WorkflowRecord,user?:AppUser) {
   }
   return {id:latest.id,eventType:latest.event_type,payload};
 }
+/**
+ * Người đã xác nhận người gửi lạ cho hóa đơn (CHANNEL_SENDER_ASSIGNED) là người đưa hóa đơn đó vào quy trình: không được tự trả lời,
+ * tự duyệt hay tự chốt chính hóa đơn đó — giống người nhập (bất kiêm nhiệm).
+ */
+export function senderConfirmedBy(invoiceId: string | null | undefined): string | null {
+  if (!invoiceId) return null;
+  const row = getDatabase().prepare("SELECT actor_id FROM audit_events WHERE entity_id=? AND event_type='CHANNEL_SENDER_ASSIGNED' ORDER BY rowid DESC LIMIT 1").get(invoiceId) as { actor_id: string | null } | undefined;
+  return row?.actor_id ?? null;
+}
+
 export function approvalBlock(row: WorkflowRecord, user: AppUser): string | null {
   if (user.role === 'ACCOUNTANT') return 'Cần Kế toán trưởng hoặc CFO.';
   if (row.created_by_user_id === user.id) return 'Người nhập hồ sơ không được tự phê duyệt.';
+  if (senderConfirmedBy(row.id) === user.id) return 'Người xác nhận người gửi của hóa đơn này không được tự phê duyệt (bất kiêm nhiệm).';
   if (row.status === 'PAUSED' || row.status === 'EVALUATING') return 'Hồ sơ đang dừng hoặc đang được đánh giá.';
   if (!row.decision_json) return 'Chưa có evaluation.';
   const d = RefereeDecisionSchema.parse(JSON.parse(row.decision_json));
@@ -389,6 +409,7 @@ export async function answerHandoff(id: string, user: AppUser, raw: unknown) {
   if(decision.status!=='ESCALATED') throw new WorkflowError('Hồ sơ không có câu hỏi chuyển tiếp.');
   if((decision.requiresCFO || row.status==='FORWARDED') && user.role!=='CFO') throw new WorkflowError('Hồ sơ cần CFO trả lời.',403);
   if(row.created_by_user_id===user.id) throw new WorkflowError('Người nhập hồ sơ không được tự trả lời và duyệt.',403);
+  if(senderConfirmedBy(id)===user.id) throw new WorkflowError('Người xác nhận người gửi của hóa đơn này không được tự trả lời và duyệt (bất kiêm nhiệm).',403);
   const items=decision.handoff?.questionSpec?.items || [];
   if(!items.length || items.some(item=>!item.effects)) throw new WorkflowError('Câu hỏi này chưa hỗ trợ trả lời trực tiếp; dùng phương án A/B.',409);
   const chosen=items.map(item=>{

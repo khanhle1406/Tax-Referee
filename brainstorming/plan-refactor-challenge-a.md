@@ -89,14 +89,14 @@ MỚI (4 Phân hệ Chiến lược chuẩn hóa theo Đề bài A):
 ## 4. KẾ HOẠCH CHỈNH SỬA & NÂNG CẤP CHỨC NĂNG TRỌNG TÂM
 
 ### 4.1. Hạng mục 1: Trải nghiệm Giám khảo không cần mật khẩu (Instant Judge Mode)
-- **Tập tin tác động:** [app/page.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/page.tsx)
+- **Tập tin tác động:** [app/page.tsx](../app/page.tsx)
 - **Công việc:**
   - Ngay trên đầu trang chủ, thêm một nút lớn nổi bật: **"TRẢI NGHIỆM NHANH DÀNH CHO GIÁM KHẢO (1-CLICK KHÔNG CẦN TÀI KHOẢN)"**.
   - Khi Giám khảo bấm vào, hệ thống tự động đăng nhập vai trò Kế toán trưởng / CFO và đưa thẳng vào màn hình làm việc.
   - Thêm nút tắt dẫn trực tiếp sang **`/verify`** với chú thích: *"Chạy bộ kiểm thử tự động 90 giây theo Đề bài A"*.
 
 ### 4.2. Hạng mục 2: Tinh chỉnh Bộ công cụ Verify chuẩn hóa Đề bài A
-- **Tập tin tác động:** [app/api/verify/route.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/api/verify/route.ts), [components/VerifyHarness.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/VerifyHarness.tsx), [data/verification/manifest.json](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/data/verification/manifest.json)
+- **Tập tin tác động:** [app/api/verify/route.ts](../app/api/verify/route.ts), [components/VerifyHarness.tsx](../components/VerifyHarness.tsx), [data/verification/manifest.json](../data/verification/manifest.json)
 - **Công việc:**
   - Tách bạch rõ 2 chế độ kiểm thử:
     1. **Tab 1: Kiểm thử 5 Ca Đề bài A (Benchmark 90 giây):**
@@ -111,7 +111,7 @@ MỚI (4 Phân hệ Chiến lược chuẩn hóa theo Đề bài A):
     - Tỷ lệ xử lý thẳng (STP Rate): 92.3%
 
 ### 4.3. Hạng mục 3: Nâng cấp Màn hình Audit Trail & Nút Can thiệp dừng / Hoàn tác
-- **Tập tin tác động:** [components/AuditTrailTable.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/AuditTrailTable.tsx), [app/api/audit/route.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/api/audit/route.ts)
+- **Tập tin tác động:** [components/AuditTrailTable.tsx](../components/AuditTrailTable.tsx), [app/api/audit/route.ts](../app/api/audit/route.ts)
 - **Công việc:**
   - Đảm bảo phục vụ hoàn hảo cho **phút thứ 6:30 - 7:30** của Giám khảo:
     1. Giám khảo bấm vào một dòng sự kiện bất kỳ -> Mở modal chi tiết hiển thị: *Ai thực hiện, Thời điểm chính xác, Dữ liệu đầu vào, Căn cứ pháp lý, Mã băm SHA-256 liên kết*.
@@ -119,7 +119,7 @@ MỚI (4 Phân hệ Chiến lược chuẩn hóa theo Đề bài A):
     3. Nút **"Giải thích cho người không chuyên" (Plain Explanation)**: Hiển thị giải thích dễ hiểu, không dùng thuật ngữ kỹ thuật phức tạp.
 
 ### 4.4. Hạng mục 4: Đóng gói Bảng Người dùng Thực tế & Bất cập Phát sinh
-- **Tập tin tác động:** [components/ProductionWorkspace.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/ProductionWorkspace.tsx) (Tab Học tiền lệ & Khảo sát thực tế)
+- **Tập tin tác động:** [components/ProductionWorkspace.tsx](../components/ProductionWorkspace.tsx) (Tab Học tiền lệ & Khảo sát thực tế)
 - **Công việc:**
   - Hiển thị trực quan hồ sơ của 3 nhân sự thực tế (Kế toán viên Mai, Kế toán trưởng Đức, CFO Nam) kèm ảnh đại diện/chức danh và trích dẫn nguyên văn phản hồi.
   - Nêu rõ đối chiếu Trước/Sau khi có phản hồi của KTT Đức: Cải tiến quy tắc rượu bia từ cấm đoán cứng sang phân loại dòng hàng.
@@ -157,21 +157,21 @@ Phút 7:30–8:00   Giám khảo chấm điểm                     Tổng kết
 ## 6. LỘ TRÌNH THỰC THI CHI TIẾT TỪNG BƯỚC (SPRINT 2 ROADMAP)
 
 ### Bước 1: Chuẩn hóa Bộ kiểm thử Đề bài A (Tiêu chí 2 & 7)
-- Cập nhật [data/verification/manifest.json](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/data/verification/manifest.json) và [app/api/verify/route.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/api/verify/route.ts) để tách biệt rõ:
+- Cập nhật [data/verification/manifest.json](../data/verification/manifest.json) và [app/api/verify/route.ts](../app/api/verify/route.ts) để tách biệt rõ:
   - 5 ca kiểm thử Đề bài A: Đúng 3 ca `ROUTINE` và 2 ca `ESCALATED` cố định, có câu hỏi A/B rõ ràng.
   - Tích hợp 2 ca kiểm thử mới cho Giám khảo thử nghiệm trực tiếp.
-- Cập nhật [components/VerifyHarness.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/VerifyHarness.tsx) hiển thị các KPI: Tỷ lệ Schema, Thời gian thực thi, False Negative (0%), False Positive (7.7%), STP Rate (92.3%).
+- Cập nhật [components/VerifyHarness.tsx](../components/VerifyHarness.tsx) hiển thị các KPI: Tỷ lệ Schema, Thời gian thực thi, False Negative (0%), False Positive (7.7%), STP Rate (92.3%).
 
 ### Bước 2: Tối ưu Trang chủ & Trải nghiệm Đăng nhập (Tiêu chí 1)
-- Cập nhật [app/page.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/page.tsx): Thêm nút "Vào Workspace Giám khảo (1-Click Không cần mật khẩu)".
+- Cập nhật [app/page.tsx](../app/page.tsx): Thêm nút "Vào Workspace Giám khảo (1-Click Không cần mật khẩu)".
 - Thiết lập đường dẫn nhanh `/verify` trên thanh điều hướng đầu trang.
 
 ### Bước 3: Lược giảm và Tái cấu trúc Giao diện Workspace
-- Tinh giản Sidebar trong [components/ProductionWorkspace.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/ProductionWorkspace.tsx) về 4 phân hệ chính.
+- Tinh giản Sidebar trong [components/ProductionWorkspace.tsx](../components/ProductionWorkspace.tsx) về 4 phân hệ chính.
 - Ẩn các tab phụ gây loãng (`reconciliation`, `banking`, `reports`) vào các thành phần tích hợp trực tiếp trên thẻ hồ sơ.
 
 ### Bước 4: Hoàn thiện tính năng Can thiệp dừng & Hoàn tác trên Audit Trail (Tiêu chí 6)
-- Cập nhật [components/AuditTrailTable.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/AuditTrailTable.tsx): Thêm modal xem bằng chứng kiểm toán chi tiết và nút Ghi đè phán quyết (Override Action).
+- Cập nhật [components/AuditTrailTable.tsx](../components/AuditTrailTable.tsx): Thêm modal xem bằng chứng kiểm toán chi tiết và nút Ghi đè phán quyết (Override Action).
 
 ### Bước 5: Đóng gói Hồ sơ Thuyết trình & Đo lường (Tiêu chí 4 & 5)
 - Chuẩn bị nội dung cho bộ 5 Slide thuyết trình theo đúng khung quy định (nhấn mạnh Slide 2: Human-in-the-loop, Slide 3: Đo lường tác động, Slide 5: Giới hạn & rủi ro).

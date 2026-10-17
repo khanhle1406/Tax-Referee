@@ -1,7 +1,7 @@
 # KẾ HOẠCH TRIỂN KHAI CÁC CẢI THIỆN MỨC ĐỘ ƯU TIÊN CAO (HIGH PRIORITY)
 > **Tài liệu Kế hoạch Kỹ thuật & Nghiệp vụ Chi tiết (Detailed Technical Specification)**  
 > **Dự án:** Tax Referee — Trọng tài Thuế Tiền Hạch toán & Điều phối Chuyển tiếp  
-> **Căn cứ kế hoạch tổng thể:** [improvements.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/improvements.md) (Nhóm III: High Priority)  
+> **Căn cứ kế hoạch tổng thể:** [improvements.md](improvements.md) (Nhóm III: High Priority)  
 > **Phạm vi triển khai:** 3 Hạng mục cốt lõi tăng tốc độ xử lý và mở rộng độ sâu nghiệp vụ:
 > 1. **IMP-08:** Xác thực Chi tiết đến Từng Dòng Hàng & Đa Thuế suất (Line-item Level Validation)
 > 2. **IMP-09:** Xử lý Hàng loạt Ca Thường quy 1-Click (Bulk Confirm Routine Action)
@@ -240,7 +240,7 @@ export interface InboxFilterState {
 ```
 
 ### 4.3 Component Thanh Công cụ Lọc `InboxFilterToolbar`
-Tạo component [components/InboxFilterToolbar.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/InboxFilterToolbar.tsx):
+Tạo component [components/InboxFilterToolbar.tsx](../components/InboxFilterToolbar.tsx):
 - **Hàng 1 (Quick Search & Presets):**
   - Ô tìm kiếm tức thì với icon kính lúp và phím tắt `Ctrl + K`.
   - Các nút preset lọc nhanh:
@@ -283,15 +283,15 @@ Tạo component [components/InboxFilterToolbar.tsx](file:///Users/xuannguyen/Des
 
 Toàn bộ 3 hạng mục đã được lập trình và nghiệm thu thực tế:
 - **IMP-08 (Line-item Validation & Multi-VAT):**
-  - Schema: [lib/schemas.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/lib/schemas.ts) bổ sung `InvoiceLineItemSchema`, `LineItemAnalysisSchema`, `items` trong `InvoiceInputSchema`.
-  - Engine: [services/policyEngine.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/services/policyEngine.ts) với `validateLineItems()` kiểm toán số học dòng hàng, rà soát loại trừ 8% (NQ 204/2025/QH15), chi phí nhạy cảm, dung sai lệch vs Header.
-  - Parser: [app/api/documents/parse/route.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/api/documents/parse/route.ts) tự động bóc tách chi tiết dòng hàng từ file XML chuẩn hóa đơn điện tử (MISA, Viettel, VNPT) và [services/geminiService.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/services/geminiService.ts) từ PDF/ảnh.
-  - UI: [components/DocumentViewer.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/DocumentViewer.tsx) hiển thị bảng hàng hóa chi tiết với badge thuế suất và cảnh báo dòng vi phạm.
+  - Schema: [lib/schemas.ts](../lib/schemas.ts) bổ sung `InvoiceLineItemSchema`, `LineItemAnalysisSchema`, `items` trong `InvoiceInputSchema`.
+  - Engine: [services/policyEngine.ts](../services/policyEngine.ts) với `validateLineItems()` kiểm toán số học dòng hàng, rà soát loại trừ 8% (NQ 204/2025/QH15), chi phí nhạy cảm, dung sai lệch vs Header.
+  - Parser: [app/api/documents/parse/route.ts](../app/api/documents/parse/route.ts) tự động bóc tách chi tiết dòng hàng từ file XML chuẩn hóa đơn điện tử (MISA, Viettel, VNPT) và [services/geminiService.ts](../services/geminiService.ts) từ PDF/ảnh.
+  - UI: [components/DocumentViewer.tsx](../components/DocumentViewer.tsx) hiển thị bảng hàng hóa chi tiết với badge thuế suất và cảnh báo dòng vi phạm.
 - **IMP-09 (Bulk Confirm Routine Action 1-Click):**
-  - API: [app/api/inbox/bulk-confirm/route.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/api/inbox/bulk-confirm/route.ts) phê duyệt hàng loạt ca `ROUTINE_PROPOSED` với guardrails an toàn và ghi Batch Audit Trail.
-  - UI: Floating Bulk Action Bar và hệ thống Checkbox chọn từng dòng / chọn tất cả trong [components/ProductionWorkspace.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/ProductionWorkspace.tsx).
+  - API: [app/api/inbox/bulk-confirm/route.ts](../app/api/inbox/bulk-confirm/route.ts) phê duyệt hàng loạt ca `ROUTINE_PROPOSED` với guardrails an toàn và ghi Batch Audit Trail.
+  - UI: Floating Bulk Action Bar và hệ thống Checkbox chọn từng dòng / chọn tất cả trong [components/ProductionWorkspace.tsx](../components/ProductionWorkspace.tsx).
 - **IMP-10 (Advanced Multi-criteria Filter & Search):**
-  - Component: [components/InboxFilterToolbar.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/InboxFilterToolbar.tsx) hỗ trợ tìm kiếm tức thì tiếng Việt không dấu (`removeAccents`), lọc theo Nhóm rủi ro, lọc theo mức tiền, lọc theo trạng thái duyệt và nút đặt lại.
+  - Component: [components/InboxFilterToolbar.tsx](../components/InboxFilterToolbar.tsx) hỗ trợ tìm kiếm tức thì tiếng Việt không dấu (`removeAccents`), lọc theo Nhóm rủi ro, lọc theo mức tiền, lọc theo trạng thái duyệt và nút đặt lại.
   - Test Suite: Toàn bộ ca kiểm thử TC-HIGH-01 đến TC-HIGH-08 đã vượt qua kiểm chứng thành công.
 
 ---

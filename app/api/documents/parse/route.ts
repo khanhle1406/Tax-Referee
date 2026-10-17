@@ -24,7 +24,8 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 // Stored in the current request database: never reuse another session's artifact/review.
-const extractionVersion = `shopaikey-gemini-vision-identity-resolver-v5:${SHOPAIKEY_GEMINI_API_CONFIG.MODEL}:${process.env.DOCUMENT_IMAGE_MAX_DIM || '1000'}-q${process.env.DOCUMENT_IMAGE_JPEG_QUALITY || '80'}`;
+// `xml-canon-1` + `v6` (đọc thẻ HTTToan): bộ đọc XML chuẩn hóa CDATA/chú thích/PI/tham chiếu ký tự — bỏ kết quả cache trích xuất trước đó.
+const extractionVersion = `shopaikey-gemini-vision-identity-resolver-v6:xml-canon-1:${SHOPAIKEY_GEMINI_API_CONFIG.MODEL}:${process.env.DOCUMENT_IMAGE_MAX_DIM || '1000'}-q${process.env.DOCUMENT_IMAGE_JPEG_QUALITY || '80'}`;
 function getCachedDocumentResult(hash: string) {
   const row = getDatabase().prepare(`SELECT r.payload_json FROM document_artifacts a
     JOIN extraction_reviews r ON r.artifact_id=a.id WHERE a.content_hash=?`).get(hash) as {payload_json:string}|undefined;

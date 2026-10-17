@@ -51,4 +51,4 @@ Docker/Linux, liveHTTPS và nguồn pháp lý thật vẫn BLOCKED do môi trư�
 
 Không còn lỗi P0/P1 đã xác nhận mở trong phạm vi19 lỗi được kiểm tra lại ở đây. Cần hoàn thành các ca local bắt buộc còn NOT_RUN và kiểm tra triển khai trước khi chốt “local đạt toàn bộ”/“live đạt”.
 
-Log, phản hồi HTTP, before/after table counts/hashes và ảnh nằm trong [fix-evidence](fix-evidence). Test chạy lại tại `scripts/qa/test-qa-regressions.ts`, tích hợp trong `test:acceptance`.
+Log, phản hồi HTTP, before/after table counts/hashes và ảnh nằm trong thư mục `fix-evidence/` (bằng chứng thô không commit, xem `.gitignore`). Test chạy lại tại `scripts/qa/test-qa-regressions.ts`, tích hợp trong `test:acceptance`.

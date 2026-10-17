@@ -16,14 +16,13 @@ Vòng Chung kết – Kiểm thử toàn diện (20 điểm): Ban giám khảo �
 
 Yêu cầu nâng cao Đề A (Sprint 2) còn có thể bị hỏi: tự điều chỉnh ngưỡng theo phản hồi; báo tỉ lệ bỏ sót và tỉ lệ chuyển thừa trên **tập kiểm thử độc lập**; thử nghiệm với ít nhất 3 nhân sự thực tế.
 
-## 0. Hiện trạng (kiểm lúc soạn, sáng 17/10)
+## 0. Hiện trạng (cập nhật 17/10, sau khi Khánh merge PR #9–#12)
 
 | Mục | Hiện trạng | Việc cần làm |
 |---|---|---|
-| `origin/main` | `e496ab4`, đang chạy trên live | — |
-| PR #11 `fix/legal-citations` (vá căn cứ pháp lý) | CI xanh (Ubuntu, Windows, build); so 180 ca: 0 quyết định đổi; unit `minChecks` 109 | Merge trước giờ G |
-| `chore/sprint-tooling` | `referee:diff`, `referee:snapshot`, `live:check`, skill `sprint-4h`, workflow `sprint-verify`, playbook và sổ tay này. Không đổi mã chạy trên live | Merge ngay sau PR #11, trước giờ G |
-| PR #9 (bằng chứng), PR #10 (README, **CHANGELOG.md**) | MERGEABLE | Merge sau cùng. PR #10 và #11 cùng sửa `docs/submission/ho-so-ky-thuat.md`; PR #10 và sprint-tooling cùng sửa `package.json`. Có thể phải giải xung đột |
+| `origin/main` | `94d7452` (PR #9–#12 đã merge), đang chạy trên live. `live:check`: HMAC bật, Verify 9/9, `/trust` 12/12, CI trên `main` xanh | — |
+| PR #11 vá căn cứ pháp lý · PR #12 công cụ vòng thi | Đã merge và đã lên live; trên live không còn chuỗi `${…}`, văn bản kèm quyết định chỉ gồm văn bản đã đối chiếu | — |
+| PR #13 `fix/judge-sim-hardening` (lỗi mất điểm tìm được khi mô phỏng kiểm thử chung kết) | CI và phản biện đang chạy; `referee:diff` 0/180; unit 117 | Người dùng quyết định merge trước giờ G hay không |
 | CI | 3,5–4,5 phút (6 lần chạy gần nhất); chạy Ubuntu, Windows rồi build | — |
 | Deploy | Live khởi động lại khoảng 97 giây sau merge | — |
 | `referee:diff` | 180 ca, khoảng 2,4 giây | — |
@@ -37,9 +36,9 @@ Yêu cầu nâng cao Đề A (Sprint 2) còn có thể bị hỏi: tự điều 
 - Ngày lập tương lai chỉ bị chặn khi muộn hơn hôm nay quá 183 ngày (`getDataQualityIssue`, `services/policyEngine.ts`).
 
 ### Trước giờ G (T−45 phút) — checklist
-1. [ ] Merge theo thứ tự **#11 → PR sprint-tooling → #9 → #10**, mỗi PR bằng **Create a merge commit**. Gặp xung đột thì merge `origin/main` vào nhánh đó, không rebase. Nhắn nhóm trước khi merge.
+1. [x] PR #9–#12 đã merge (Khánh, 17/10). PR #13: chỉ merge khi CI xanh và phản biện không còn blocker; nhắn nhóm trước khi merge.
 2. [ ] `npm run live:check -- --expect-commit <sha7 merge cuối>`. Kỳ vọng: `hmac:true`, `warnings:[]`, Verify 9/9, `/trust` 12/12.
-3. [ ] Trên `origin/main` mới, chạy `npm run referee:diff`. Kỳ vọng 0 ca đổi (PR #11 ghi 0/180). Nếu lệch: `npm run referee:snapshot`, commit riêng, ghi rõ lý do.
+3. [x] `npm run referee:diff` trên `main` mới: KHÔNG ĐỔI / 180 ca.
 4. [ ] **Đo thời gian trên máy này** và ghi vào đây: `npx tsc --noEmit` ___ phút; `npm test` ___ phút; `npm run build` ___ phút.
 5. [ ] Lưu số đo "trước" vào scratchpad (không commit): JSON `/api/health` (đặc biệt `audit.events`), Verify 9/9, `/trust` 12/12.
 6. [ ] Soạn sẵn: mẫu CSV (Y1), khoảng 15 file fuzz (Y4), 3 câu hỏi làm rõ (mục 1), JSON hóa đơn demo có `buyerTaxCode:"0102030405"`. Chỉ soạn **dữ liệu và checklist**, không viết sẵn tính năng.

@@ -1,5 +1,7 @@
 # Danh mục nộp bài — Tax Referee (khóa bài 15/10/2026)
 
+> 📌 **Ảnh chụp lịch sử** — danh mục khóa bài 15/10/2026, giữ nguyên để đối chiếu. Ô "[Cập nhật 16/10]" không được điền: buổi thử người dùng 16/10 không có phản hồi chi tiết bằng văn bản nên repo không công bố số liệu người dùng. Số liệu hiện hành: [README](../../README.md), trang `/verify`, `/sop` và `docs/evidence/`.
+
 **Đội:** Fprinciples · **Track:** VNG · **Đề:** A — The Escalation Referee · **Live:** https://limegreen-salamander-517622.hostingersite.com · **GitHub:** https://github.com/khanhle1406/Tax-Referee
 
 ## Cấu trúc thư mục nộp

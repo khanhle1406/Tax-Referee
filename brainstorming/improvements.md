@@ -91,19 +91,19 @@
 ---
 
 ### PHẦN III: NHÓM ĐỘ ƯU TIÊN CAO (HIGH PRIORITY)
-*Nhóm tính năng giải quyết trực tiếp các bài toán thực tế phức tạp và tăng tốc độ xử lý của người dùng. Kế hoạch kỹ thuật & lộ trình triển khai chi tiết xem tại [plan-high-priority.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/plan-high-priority.md).*
+*Nhóm tính năng giải quyết trực tiếp các bài toán thực tế phức tạp và tăng tốc độ xử lý của người dùng. Kế hoạch kỹ thuật & lộ trình triển khai chi tiết xem tại [plan-high-priority.md](plan-high-priority.md).*
 
 #### 8. [IMP-08] Xác thực Chi tiết đến Từng Dòng Hàng & Đa Thuế suất (Line-item Validation) — **[ĐÃ TRIỂN KHAI 100%]**
-*   **Chi tiết kế hoạch & Kết quả nghiệm thu:** Xem [plan-high-priority.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/plan-high-priority.md).
-*   **Hiện trạng:** Đã hoàn thành. Hệ thống bóc tách `items` từ XML và Gemini multimodal OCR, đối soát số học từng dòng (`amount == quantity * unitPrice`), kiểm tra danh mục loại trừ 8% theo NQ 204/2025/QH15, phát hiện chi phí nhạy cảm và đối chiếu tổng dòng hàng vs số tiền trên Header (`mismatchHeader`). Render chi tiết trên Data Grid của [DocumentViewer.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/DocumentViewer.tsx).
+*   **Chi tiết kế hoạch & Kết quả nghiệm thu:** Xem [plan-high-priority.md](plan-high-priority.md).
+*   **Hiện trạng:** Đã hoàn thành. Hệ thống bóc tách `items` từ XML và Gemini multimodal OCR, đối soát số học từng dòng (`amount == quantity * unitPrice`), kiểm tra danh mục loại trừ 8% theo NQ 204/2025/QH15, phát hiện chi phí nhạy cảm và đối chiếu tổng dòng hàng vs số tiền trên Header (`mismatchHeader`). Render chi tiết trên Data Grid của [DocumentViewer.tsx](../components/DocumentViewer.tsx).
 
 #### 9. [IMP-09] Xử lý Hàng loạt Ca Thường quy 1-Click (Bulk Confirm Routine) — **[ĐÃ TRIỂN KHAI 100%]**
-*   **Chi tiết kế hoạch & Kết quả nghiệm thu:** Xem [plan-high-priority.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/plan-high-priority.md).
-*   **Hiện trạng:** Đã hoàn thành. Đã xây dựng API endpoint [app/api/inbox/bulk-confirm/route.ts](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/app/api/inbox/bulk-confirm/route.ts) có guardrails kiểm tra ca `ROUTINE`, hạn mức 200M, ghi Batch Audit Trail. Giao diện [ProductionWorkspace.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/ProductionWorkspace.tsx) tích hợp cột Checkbox và **Floating Bulk Action Bar** trượt lên khi có ca được chọn.
+*   **Chi tiết kế hoạch & Kết quả nghiệm thu:** Xem [plan-high-priority.md](plan-high-priority.md).
+*   **Hiện trạng:** Đã hoàn thành. Đã xây dựng API endpoint [app/api/inbox/bulk-confirm/route.ts](../app/api/inbox/bulk-confirm/route.ts) có guardrails kiểm tra ca `ROUTINE`, hạn mức 200M, ghi Batch Audit Trail. Giao diện [ProductionWorkspace.tsx](../components/ProductionWorkspace.tsx) tích hợp cột Checkbox và **Floating Bulk Action Bar** trượt lên khi có ca được chọn.
 
 #### 10. [IMP-10] Bộ lọc Chuyên sâu & Tìm kiếm Đa tiêu chí trong Inbox — **[ĐÃ TRIỂN KHAI 100%]**
-*   **Chi tiết kế hoạch & Kết quả nghiệm thu:** Xem [plan-high-priority.md](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/brainstorming/plan-high-priority.md).
-*   **Hiện trạng:** Đã hoàn thành. Đã phát triển component [components/InboxFilterToolbar.tsx](file:///Users/xuannguyen/Desktop/Competitions/2026/MLAI%20-%20Track%202/Tax%20Referee/components/InboxFilterToolbar.tsx) cho phép tìm kiếm tức thì không dấu (`removeAccents`), lọc theo Nhóm rủi ro (ROUTINE, Nhóm 1, Nhóm 2, Nhóm 3), lọc theo khoảng tiền (< 5M, 5M-20M, 20M-200M, > 200M), lọc theo trạng thái duyệt và nút Đặt lại bộ lọc.
+*   **Chi tiết kế hoạch & Kết quả nghiệm thu:** Xem [plan-high-priority.md](plan-high-priority.md).
+*   **Hiện trạng:** Đã hoàn thành. Đã phát triển component [components/InboxFilterToolbar.tsx](../components/InboxFilterToolbar.tsx) cho phép tìm kiếm tức thì không dấu (`removeAccents`), lọc theo Nhóm rủi ro (ROUTINE, Nhóm 1, Nhóm 2, Nhóm 3), lọc theo khoảng tiền (< 5M, 5M-20M, 20M-200M, > 200M), lọc theo trạng thái duyệt và nút Đặt lại bộ lọc.
 
 ---
 

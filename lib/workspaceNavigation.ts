@@ -1,8 +1,12 @@
 import type { InboxFilterState } from '@/components/InboxFilterToolbar';
 
 export const workspaceRoutes = {
+  dashboard: { path: '/workspace/dashboard', label: 'Tổng quan' },
   inbox: { path: '/workspace/inbox', label: 'Thẩm định' },
   receive: { path: '/workspace/receive', label: 'Tiếp nhận' },
+  batches: { path: '/workspace/batches', label: 'Lô hóa đơn' },
+  channels: { path: '/workspace/channels', label: 'Hộp thư vào' },
+  history: { path: '/workspace/history', label: 'Lịch sử của tôi' },
   approval: { path: '/workspace/approvals', label: 'Chờ duyệt' },
   dossier: { path: '/workspace/audit', label: 'Nhật ký' },
   suppliers: { path: '/workspace/suppliers', label: 'Nhà cung cấp' },

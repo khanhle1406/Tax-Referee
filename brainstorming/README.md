@@ -10,5 +10,7 @@ Phần lớn được soạn cùng công cụ AI (ChatGPT, Claude, Codex, Gemini
   plan-refactor-challenge-a.md, specification.md) do AI viết, **không có lần chạy tương ứng**. Số liệu chính thức nằm trong `docs/evidence/` và trang `/verify`.
 - Bằng chứng người dùng thật (tên, chức danh, trích dẫn do chính người dùng viết, có đồng ý) chỉ được ghi tại
   `docs/evidence/user-study/` và `docs/evidence/improvement-trace.csv`.
+- Đề bài gốc của BTC (`Challenge_Brief_OrganizationAI_VN.docx`) đã gỡ khỏi bản hiện tại ngày 17/10/2026 vì là tài liệu của Ban tổ chức,
+  không thuộc giấy phép MIT của repo; file vẫn còn trong lịch sử git (lịch sử không bị viết lại). Các ghi chú nháp còn nhắc tên file này.
 
 Tài liệu dành cho giám khảo: [README](../README.md) · [RUNBOOK](../RUNBOOK.md) · [SOP / tài liệu quy định](../app/sop/page.tsx) (trang `/sop`).

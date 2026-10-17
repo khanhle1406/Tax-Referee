@@ -1,8 +1,8 @@
 # Kiến trúc và lộ trình từ demo lên production
 
 > Trả lời câu hỏi Q2 của BTC Track VNG: kiến trúc, đánh đổi và những gì cần để đi từ demo hackathon lên production.
-> Nhánh `docs/demo-day-q1-q2`, dựng trên PR #6 (`feat/demo-day-security`, chưa merge khi viết). Cập nhật 16/10/2026.
-> Quy ước: khẳng định về hệ thống đều kèm file và hàm trên nhánh này. Mục tiêu nào chưa đo được thì ghi **đề xuất**. Các khung OWASP, NIST, SRE chỉ là chuẩn tham chiếu tự nguyện; tài liệu không tuyên bố tuân thủ chuẩn nào.
+> Phạm vi: mã trên `main` từ merge PR #7 (`d882768`, gồm nội dung PR #6); PR #8 (`e496ab4`) bổ sung tự sinh khóa audit và ghi commit vào bản build. Cập nhật 16/10/2026. Những chỗ trong bài ghi live 16/10 còn `hmac:false` và commit `unknown` là trạng thái trước deploy; sau deploy PR #8, live báo commit `e496ab4`, HMAC bật (`keySource: file`) ([`live-2026-10-16-post-deploy.json`](../evidence/live-2026-10-16-post-deploy.json)).
+> Quy ước: khẳng định về hệ thống đều kèm file và hàm trên `main`. Mục tiêu nào chưa đo được thì ghi **đề xuất**. Các khung OWASP, NIST, SRE chỉ là chuẩn tham chiếu tự nguyện; tài liệu không tuyên bố tuân thủ chuẩn nào.
 
 **Tóm tắt.** AI chỉ đọc dữ kiện, luật tất định ra quyết định, con người giữ thẩm quyền, nhật ký làm bằng chứng. Đường quyết định không gọi LLM lần nào. Cho hackathon, đội chủ ý chọn cách đơn giản: SQLite, xử lý đồng bộ, monolith, HMAC đối xứng. Đội biết rõ mỗi lựa chọn sẽ vỡ ở đâu và khi nào phải chuyển sang phương án khác.
 
