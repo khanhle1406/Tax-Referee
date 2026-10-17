@@ -8,11 +8,12 @@ import { BrandMark } from '@/components/BrandMark';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { AppRole } from '@/lib/server/auth';
+import {workspaceHomeForRole} from '@/lib/workspaceNavigation';
 
 const ROLE_LABELS: Record<AppRole, string> = {
-  ACCOUNTANT: 'Kế toán viên (nhập hóa đơn)',
-  CHIEF_ACCOUNTANT: 'Kế toán trưởng (duyệt < 200 triệu)',
-  CFO: 'Giám đốc tài chính (duyệt ≥ 200 triệu)'
+  ACCOUNTANT: 'Kế toán viên',
+  CHIEF_ACCOUNTANT: 'Kế toán trưởng',
+  CFO: 'CFO'
 };
 
 export default function HomePage():ReactElement {
@@ -37,28 +38,30 @@ export default function HomePage():ReactElement {
     try {
       const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       if(!response.ok){const data=await response.json();throw new Error(data.error || 'Không thể đăng nhập.');}
-      router.replace('/workspace/inbox');
+      const data = await response.json();
+      const enteredRole: AppRole = data.user?.role === 'CFO' || data.user?.role === 'CHIEF_ACCOUNTANT' ? data.user.role : 'ACCOUNTANT';
+      router.replace(workspaceHomeForRole(enteredRole));
     } catch(error){toast.error(error instanceof Error?error.message:'Không thể đăng nhập.');setBusy(false);}
   }
   return <main className="flex min-h-[100dvh] items-center justify-center px-4 py-8">
     <section className="w-full max-w-lg space-y-7">
       <div>
         <div className="flex items-center gap-3"><BrandMark size={44}/><h1 className="text-3xl font-semibold tracking-tight">Tax Referee</h1></div>
-        <p className="mt-4 text-base text-muted-foreground">Tự xử lý hóa đơn đầu vào thường quy. Dừng đúng lúc và hỏi đúng người khi hóa đơn có nghi vấn, ngoài quy định hoặc vượt thẩm quyền.</p>
+        <p className="mt-4 text-base text-muted-foreground">Tự duyệt hóa đơn thường quy, chuyển đúng người khi có ngoại lệ.</p>
       </div>
       <p className="rounded-xl border border-lime-300 bg-lime-50 px-4 py-3 text-sm leading-6 text-foreground" data-testid="judge-instruction">
         <strong>Giám khảo:</strong> bấm <strong>①</strong> để chạy 9 ca kiểm chứng có dấu thời gian, sau đó <strong>②</strong> để tự nhập hóa đơn mới. Không cần tài khoản.
       </p>
-      {signedIn&&<Link href="/workspace/inbox" data-testid="continue-workspace" className={cn(buttonVariants({variant:'secondary'}),'h-auto min-h-12 w-full justify-between gap-2 whitespace-normal py-2 text-left')}>
+      {signedIn&&<Link href={workspaceHomeForRole(signedIn.role)} data-testid="continue-workspace" className={cn(buttonVariants({variant:'secondary'}),'h-auto min-h-12 w-full justify-between gap-2 whitespace-normal py-2 text-left')}>
         <span>Tiếp tục vào workspace · {signedIn.displayName} ({ROLE_LABELS[signedIn.role]?.split(' (')[0] || signedIn.role})</span><ArrowRight className="h-4 w-4"/>
       </Link>}
       <div className="grid gap-3">
         <Link href="/verify" className={cn(buttonVariants({size:'lg'}),'h-auto min-h-14 justify-between gap-2 whitespace-normal py-3 text-left text-base')}>
-          <span className="flex items-center gap-2"><FlaskConical className="h-5 w-5"/>① Chạy Verify (90 giây)</span><ArrowRight className="h-4 w-4"/>
+          <span className="flex items-center gap-2"><FlaskConical className="h-5 w-5"/>① Chạy Verify</span><ArrowRight className="h-4 w-4"/>
         </Link>
         <form className="space-y-3 rounded-2xl border bg-card p-4" onSubmit={(event:FormEvent<HTMLFormElement>)=>{event.preventDefault();void enter('/api/demo/session',{role});}}>
           <Button type="submit" size="lg" variant="outline" disabled={busy} className="h-auto min-h-14 w-full justify-between gap-2 whitespace-normal py-3 text-left text-base">
-            <span className="flex items-center gap-2"><Inbox className="h-5 w-5"/>{busy?'Đang mở…':'② Mở hộp chuyển tiếp — demo riêng'}</span><ArrowRight className="h-4 w-4"/>
+            <span className="flex items-center gap-2"><Inbox className="h-5 w-5"/>{busy?'Đang mở…':'② Mở demo'}</span><ArrowRight className="h-4 w-4"/>
           </Button>
           <label htmlFor="demo-role" className="block text-xs font-medium text-muted-foreground">Vào với vai trò mô phỏng (đổi được trong workspace)</label>
           <select id="demo-role" value={role} onChange={event=>{const value=event.target.value;if(value==='ACCOUNTANT'||value==='CHIEF_ACCOUNTANT'||value==='CFO')setRole(value);}} className="h-10 w-full rounded-[10px] border bg-transparent px-3 text-sm">

@@ -38,6 +38,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 
 import { toast } from 'sonner';
+const DashboardView=dynamic(()=>import('@/components/workspace/DashboardView').then(module=>module.DashboardView),{loading:()=> <WorkspaceSkeleton/>});
 
 type AppUser = { id: string; email: string; displayName: string; role: 'ACCOUNTANT' | 'CHIEF_ACCOUNTANT' | 'CFO' };
 type View = WorkspaceView;
@@ -62,13 +63,6 @@ const statusConfig: Record<string, { label: string; variant: 'success' | 'warnin
   REJECTED: { label: 'Từ chối', variant: 'destructive' },
   ON_HOLD: { label: 'Tạm dừng', variant: 'secondary' },
   FORWARDED: { label: 'Đã chuyển cấp trên', variant: 'warning' }
-};
-
-const roleCanApprove = (user: AppUser, item: InboxItem) => {
-  if(item.allowedActions) return item.allowedActions.approve === true;
-  if (item.status === 'WAITING_CFO' || item.status === 'FORWARDED') return user.role === 'CFO';
-  if (item.status === 'WAITING_CHIEF_ACCOUNTANT') return user.role === 'CHIEF_ACCOUNTANT' || user.role === 'CFO';
-  return false;
 };
 
 function formatDate(value: string): string {
@@ -103,7 +97,6 @@ export function ProductionWorkspace({
   const setView=useCallback((next:View):void=>{router.push(workspaceRoutes[next].path);},[router]);
   const {items,counts,isDemo,config,setConfig,policyVersion,setPolicyVersion,macro,duplicateGroups,unreadNotifCount,setUnreadNotifCount,loading,error,revision:workspaceRevision,loadWorkspace}=useWorkspaceData(onLogout);
   const [selected, setSelected] = useState<InboxItem | null>(null);
-  const [policyOpen, setPolicyOpen] = useState(false);
   const [saveAsPrecedent, setSaveAsPrecedent] = useState(false);
   const [filters,setFilterState]=useState<InboxFilterState>(()=>readInboxFilters(new URLSearchParams(searchParams.toString())));
   useEffect(()=>{if(!invoiceId)setFilterState(readInboxFilters(new URLSearchParams(searchParams.toString())));},[searchParams,invoiceId]);
@@ -121,11 +114,7 @@ export function ProductionWorkspace({
     }).catch(()=>{if(!controller.signal.aborted)setDetailError('network');}).finally(()=>{if(!controller.signal.aborted)setDetailLoading(false);});
     return ()=>controller.abort();
   },[invoiceId,detailAttempt,onLogout,workspaceRevision,user.role]);
-  const [selectedRoutineIds, setSelectedRoutineIds] = useState<Set<string>>(new Set());
-  const [isBulkConfirming, setIsBulkConfirming] = useState<boolean>(false);
-  const [ledgerSyncOpen, setLedgerSyncOpen] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [selectedAuditEntry, setSelectedAuditEntry] = useState<AuditEntry | null>(null);
   const provisionalHoldIds=useMemo(()=>new Set(items.filter(item=>item.taxHold).map(item=>item.id)),[items]);
 
@@ -157,7 +146,7 @@ export function ProductionWorkspace({
     </span>;
   };
 
-  const itemStatusLabel=(item:InboxItem)=>item.status==='APPROVED' ? item.decision?.status==='ROUTINE' && !item.resolution ? 'Đã tự xử lý' : 'Đã được phê duyệt' : statusConfig[item.status]?.label || item.status;
+  const itemStatusLabel=(item:InboxItem)=>item.status==='APPROVED' ? 'Đã duyệt' : statusConfig[item.status]?.label || item.status;
 
   const auditEntries: AuditEntry[] = useMemo(() => {
     return items
@@ -201,15 +190,6 @@ export function ProductionWorkspace({
       });
   }, [items]);
 
-  const userInitials = useMemo(() => {
-    const name = user.displayName?.trim() || 'Khánh';
-    const parts = name.split(/\s+/);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return name.slice(0, 2).toUpperCase();
-  }, [user.displayName]);
-
   const showToast = useCallback((message: string, type: 'info' | 'success' | 'error' = 'info') => {
     if (type === 'success') toast.success(message);
     else if (type === 'error') toast.error(message);
@@ -222,9 +202,9 @@ export function ProductionWorkspace({
     return user.role==='CFO'||!cfo;
   }),[items,user.role]);
   const pendingCount=items.filter(item=>!['APPROVED','REJECTED','PAUSED'].includes(item.status)).length;
-  const autoApprovedRoutineCount = items.filter((item) => item.status === 'APPROVED' && item.decision?.status === 'ROUTINE').length;
+  const approvedCount = items.filter((item) => item.status === 'APPROVED').length;
 
-  const handleEvaluateResult = (decision: RefereeDecision, invoice: InvoiceInput) => {
+  const handleEvaluateResult = (decision: RefereeDecision, invoice: InvoiceInput, options?: {stayOnReceive: boolean}): void => {
     const localItem: InboxItem = {
       id: invoice.id,
       invoiceNumber: invoice.invoiceNumber,
@@ -244,7 +224,7 @@ export function ProductionWorkspace({
       resolution: null
     };
     setSelected(localItem);
-    router.push('/workspace/invoices/'+encodeURIComponent(invoice.id));
+    if (!options?.stayOnReceive) router.push('/workspace/invoices/'+encodeURIComponent(invoice.id));
     void loadWorkspace();
   };
 
@@ -287,41 +267,6 @@ export function ProductionWorkspace({
     finally{resolutionLock.current=false;if(active.current)setResolving(false);}
   };
 
-  const confirmRoutine = async () => {
-    if (!selected) return;
-    const response = await fetch(`/api/invoices/${selected.id}/confirm`, { method: 'POST' });
-    const data = await response.json();
-    if (response.ok) {
-      showToast('Đã xác nhận hạch toán thành công.', 'success');
-      setSelected(null);
-      await loadWorkspace();
-    } else {
-      showToast(data.error || 'Không thể xác nhận', 'error');
-    }
-  };
-
-  const handleBulkConfirm = async () => {
-    if (selectedRoutineIds.size === 0) return;
-    setIsBulkConfirming(true);
-    try {
-      showToast(`Đang duyệt ${selectedRoutineIds.size} ca thường quy...`, 'info');
-      const response = await fetch('/api/inbox/bulk-confirm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invoiceIds: Array.from(selectedRoutineIds) })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Không thể duyệt hàng loạt');
-      showToast(`Duyệt thành công ${data.confirmedCount} ca (${formatVND(data.totalAmount)})!`, 'success');
-      setSelectedRoutineIds(new Set());
-      await loadWorkspace();
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : 'Lỗi duyệt hàng loạt', 'error');
-    } finally {
-      setIsBulkConfirming(false);
-    }
-  };
-
   const handleResetWorkspace = async () => {
     if (!window.confirm('Bạn có chắc chắn muốn RESET toàn bộ hóa đơn về trạng thái ban đầu không? Toàn bộ hóa đơn đã gửi lên sẽ được xóa sạch.')) {
       return;
@@ -334,7 +279,6 @@ export function ProductionWorkspace({
       if (!res.ok) throw new Error(data.error || 'Lỗi reset hệ thống');
       showToast('Đã reset hệ thống về trạng thái chưa có hóa đơn nào!', 'success');
       setSelected(null);
-      setSelectedRoutineIds(new Set());
       await loadWorkspace();
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Lỗi reset hệ thống', 'error');
@@ -409,36 +353,6 @@ export function ProductionWorkspace({
     });
   }, [visibleList, filters]);
 
-  const routineItemsInFiltered = useMemo(() => {
-    return filteredList.filter(item => item.status === 'ROUTINE_PROPOSED');
-  }, [filteredList]);
-
-  const allRoutineSelected = routineItemsInFiltered.length > 0 && routineItemsInFiltered.every(item => selectedRoutineIds.has(item.id));
-
-  const toggleSelectAllRoutine = () => {
-    if (allRoutineSelected) {
-      setSelectedRoutineIds(new Set());
-    } else {
-      const next = new Set(selectedRoutineIds);
-      routineItemsInFiltered.forEach(item => next.add(item.id));
-      setSelectedRoutineIds(next);
-    }
-  };
-
-  const toggleSelectRoutine = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const next = new Set(selectedRoutineIds);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setSelectedRoutineIds(next);
-  };
-
-  const totalSelectedAmount = useMemo(() => {
-    return items
-      .filter(item => selectedRoutineIds.has(item.id))
-      .reduce((sum, item) => sum + (item.totalAmount || 0), 0);
-  }, [items, selectedRoutineIds]);
-
   // Review Pane (KẾT LUẬN THẨM TRA - To & Rõ)
   const renderReview = () => {
     if (!selected) {
@@ -504,7 +418,7 @@ export function ProductionWorkspace({
                 <details className="mt-2 text-xs text-emerald-900"><summary className="cursor-pointer font-medium">Chi tiết đánh giá</summary><p className="mt-2 leading-relaxed">{decision.plainExplanation}</p></details>
               </div>
             </div>
-            <p className="text-sm font-semibold">{selected.status==='APPROVED'?'Đã tự xử lý và tạo chứng từ nội bộ.':selected.status==='WAITING_CHIEF_ACCOUNTANT'?'Tự động hóa đang dừng: ca thường quy chờ Kế toán trưởng duyệt tay.':selected.status==='WAITING_CFO'?'Thẩm quyền không hạ theo số tiền: hồ sơ từng cần CFO và dữ liệu đã được người khác sửa, nên CFO phải duyệt tay.':'Hồ sơ đã bị can thiệp; xem trạng thái hiện hành trước khi xuất chứng từ.'}</p>
+            <p className="text-sm font-semibold">{selected.status==='APPROVED'?'Đã duyệt và tạo chứng từ nội bộ.':selected.status==='WAITING_CHIEF_ACCOUNTANT'?'Tự động hóa đang dừng: ca thường quy chờ Kế toán trưởng duyệt tay.':selected.status==='WAITING_CFO'?'Thẩm quyền không hạ theo số tiền: hồ sơ từng cần CFO và dữ liệu đã được người khác sửa, nên CFO phải duyệt tay.':'Hồ sơ đã bị can thiệp; xem trạng thái hiện hành trước khi xuất chứng từ.'}</p>
             {['WAITING_CHIEF_ACCOUNTANT','WAITING_CFO'].includes(selected.status) && <div className="grid gap-2">
               <label htmlFor="manual-approve-reason" className="text-xs">Lý do duyệt tay (ít nhất 8 ký tự)<textarea id="manual-approve-reason" value={actionReason} onChange={e=>setActionReason(e.target.value)} rows={2} className="mt-1 w-full rounded border p-2 text-sm" /></label>
               <Button type="button" disabled={resolving || actionReason.trim().length<8 || !selected.allowedActions?.approve} onClick={async()=>{setResolving(true);try{const response=await fetch(`/api/invoices/${encodeURIComponent(selected.id)}/audit-action`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'OVERRIDE',targetStatus:'APPROVED',reason:actionReason,revision:selected.revision,evaluationId:selected.evaluationId})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Không thể duyệt');setActionReason('');showToast('Đã duyệt tay và ghi nhật ký.','success');await loadWorkspace();}catch(err){showToast(err instanceof Error?err.message:'Không thể duyệt','error');}finally{setResolving(false);}}}>{selected.allowedActions?.approve?'Duyệt tay':(selected.allowedActions?.blockedReason||'Cần Kế toán trưởng hoặc CFO')}</Button>
@@ -709,10 +623,11 @@ export function ProductionWorkspace({
             {loading && <WorkspaceSkeleton/>}
             {!loading&&!error&&!invoiceId&&['inbox','approval'].includes(view)&&<div className="workspace-metrics">
               <button type="button" onClick={()=>setFilters({...DEFAULT_FILTER_STATE,approvalStatus:'PENDING'})}><strong>{pendingCount}</strong><span>Cần xử lý</span></button>
-              <button type="button" onClick={()=>setFilters({...DEFAULT_FILTER_STATE,riskGroup:'ROUTINE',approvalStatus:'APPROVED'})}><strong>{autoApprovedRoutineCount}</strong><span>Đã tự duyệt</span></button>
+              <button type="button" onClick={()=>setFilters({...DEFAULT_FILTER_STATE,approvalStatus:'APPROVED'})}><strong>{approvedCount}</strong><span>Đã duyệt</span></button>
               <Link href="/workspace/approvals" className="flex flex-wrap items-baseline gap-2 rounded-lg px-3 py-2"><strong className="text-[22px] font-semibold">{counts.WAITING_CHIEF_ACCOUNTANT||0}</strong><span className="text-[13px] text-muted-foreground">Chờ KTT</span></Link>
               <Link href="/workspace/approvals" className="flex flex-wrap items-baseline gap-2 rounded-lg px-3 py-2"><strong className="text-[22px] font-semibold">{counts.WAITING_CFO||0}</strong><span className="text-[13px] text-muted-foreground">Chờ CFO</span></Link>
             </div>}
+            {!loading&&!error&&view==='dashboard'&&<DashboardView role={user.role} demo={isDemo} revision={workspaceRevision}/>}
             {/* Reports use server values and an explicit draft period. */}
             {!loading&&!error&&view==='reports'&&<ReportsView macro={macro} items={items} policyVersion={policyVersion}/>}
 
@@ -793,53 +708,6 @@ export function ProductionWorkspace({
           </main>
         )}
       </>}
-
-      {/* Floating Bulk Action Bar (1-Click Approve Routine) */}
-      {selectedRoutineIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-xl bg-slate-950 text-white rounded-2xl p-4 shadow-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <div>
-            <div className="text-xs font-semibold text-slate-400">
-              Đã chọn {selectedRoutineIds.size} ca thường quy
-            </div>
-            <div className="text-lg font-semibold font-numeric text-white mt-0.5">
-              {formatVND(totalSelectedAmount)}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setSelectedRoutineIds(new Set())}
-              disabled={isBulkConfirming}
-              className="text-slate-300 hover:text-white"
-            >
-              Bỏ chọn
-            </Button>
-            <Button
-              size="sm"
-              variant="brand"
-              onClick={() => void handleBulkConfirm()}
-              disabled={isBulkConfirming || user.role === 'ACCOUNTANT'}
-              className="font-semibold"
-            >
-              {isBulkConfirming ? 'Đang duyệt...' : user.role === 'ACCOUNTANT' ? 'CHỜ KTT DUYỆT' : 'DUYỆT HÀNG LOẠT'}
-            </Button>
-          </div>
-        </div>
-      )}
-
-      <LedgerSyncModal
-        open={ledgerSyncOpen}
-        onOpenChange={setLedgerSyncOpen}
-      />
-
-      <PolicyViewerModal
-        isOpen={policyOpen}
-        onClose={() => setPolicyOpen(false)}
-        onPolicyUpdated={(next) => setPolicyVersion(next)}
-        onConfigUpdated={(next) => setConfig(next)}
-      />
 
       <TaxDefenseModal
         entry={selectedAuditEntry}

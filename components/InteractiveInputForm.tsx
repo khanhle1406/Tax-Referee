@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { Loader2, Eye, RotateCcw, ShieldCheck, FileCheck2 } from 'lucide-react';
-import { DocumentExtraction, InvoiceInput, RefereeDecision, SystemPolicyConfig, OcrHighlight, FieldEvidence, SupplierIdentity } from '@/lib/schemas';
+import { DocumentExtraction, DocumentExtractionSchema, InvoiceInput, RefereeDecision, SystemPolicyConfig, OcrHighlight, FieldEvidence, SupplierIdentity } from '@/lib/schemas';
 import { normalizeTaxCodeFormat, validateTaxCode } from '@/lib/taxCode';
 import { formatVND, formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,10 @@ import { InvoiceImageViewer } from '@/components/InvoiceImageViewer';
 import { ReceptionUpload } from '@/components/reception/ReceptionUpload';
 import { ReceptionSubmitBar } from '@/components/reception/ReceptionSubmitBar';
 import { ReceptionLayout } from '@/components/reception/ReceptionLayout';
-import { requiredDecisionFields, paymentThreshold } from '@/lib/refereeRequirements';
+import { requiredDecisionFields } from '@/lib/refereeRequirements';
+import { DOCUMENT_BATCH_LIMIT, documentFileError, runDocumentBatch } from '@/lib/documentBatch';
+import { ReceptionBatchQueue, type ReceptionBatchItem } from '@/components/reception/ReceptionBatchQueue';
+import {isNeutralDemoSupplierField} from '@/lib/demoSupplierPresentation';
 
 function hasDetectedInvoice(invoice: Partial<InvoiceInput> | null | undefined): boolean {
   if (!invoice) return false;
@@ -47,6 +50,8 @@ function notifyExtractionQuality(data: DocumentExtraction): boolean {
   const identity = data.supplierIdentity;
   if (data.documentType === 'UNCERTAIN') {
     toast.warning('Ảnh chưa rõ có phải hóa đơn; hãy kiểm tra lại chứng từ.');
+  } else if (identity?.status === 'DEMO_MATCH') {
+    toast.info('Đã điền thông tin nhà cung cấp.');
   } else if (identity && identity.status !== 'VERIFIED') {
     const message = identity.status === 'CONFLICT'
       ? 'MST trên hóa đơn chưa khớp tên nhà cung cấp; đã giữ nguyên để kiểm tra.'
@@ -64,10 +69,19 @@ function notifyExtractionQuality(data: DocumentExtraction): boolean {
 
 interface InteractiveInputFormProps {
   onDirtyChange?: (dirty:boolean)=>void;
-  onEvaluateResult: (decision: RefereeDecision, invoice: InvoiceInput) => void;
+  onEvaluateResult: (decision: RefereeDecision, invoice: InvoiceInput, options?: {stayOnReceive: boolean}) => void;
   dynamicConfig?: Partial<SystemPolicyConfig>;
   demoMode?: boolean;
 }
+
+interface ReceptionResult {status: 'ROUTINE' | 'ESCALATED'; message: string; approvedTax?: number; riskGroup?: string; held?: boolean}
+interface ReceptionDraft {
+  formData: InvoiceInput; documentWarnings: string[]; uncertainFields: string[];
+  fieldWarnings: Record<string, string>; fieldEvidence: Record<string, FieldEvidence>;
+  supplierIdentity?: SupplierIdentity; ocrHighlights: OcrHighlight[]; evaluationRevision?: number;
+  lastResult: ReceptionResult | null; lastEngine: string | null; savedFingerprint: string | null;
+}
+interface BatchJob extends ReceptionBatchItem {result?: DocumentExtraction}
 
 export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
   onEvaluateResult,
@@ -79,6 +93,14 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pastedText, setPastedText] = useState<string>('');
   const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
+  const [batchJobs, setBatchJobs] = useState<BatchJob[]>([]);
+  const batchJobsRef = useRef<BatchJob[]>([]);
+  const [activeBatchId, setActiveBatchId] = useState<string | null>(null);
+  const activeBatchIdRef = useRef<string | null>(null);
+  const batchDraftsRef = useRef(new Map<string, ReceptionDraft>());
+  const batchAbortRef = useRef<AbortController | null>(null);
+  const batchGenerationRef = useRef(0);
+  useEffect(() => () => {batchGenerationRef.current++; batchAbortRef.current?.abort();}, []);
 
   // Trạng thái xem trước chứng từ gốc (Left Column Preview)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -110,6 +132,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
   });
 
   const [isEvaluating, setIsEvaluating] = useState(false);
+  const evaluationLockRef = useRef(false);
   const [lastEngine, setLastEngine] = useState<string | null>(null);
   const [isParsingDocument, setIsParsingDocument] = useState(false);
   const parseRequestIdRef = useRef(0);
@@ -139,24 +162,30 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [ocrHighlights, setOcrHighlights] = useState<OcrHighlight[]>([]);
   const [showOcrHighlights, setShowOcrHighlights] = useState<boolean>(true);
-  const [activeHighlightField, setActiveHighlightField] = useState<string | null>(null);
   const [evaluationRevision, setEvaluationRevision] = useState<number | undefined>(undefined);
-  const [lastResult, setLastResult] = useState<{
-    status: 'ROUTINE' | 'ESCALATED';
-    message: string;
-    approvedTax?: number;
-    riskGroup?: string;
-    held?: boolean;
-  } | null>(null);
+  const [lastResult, setLastResult] = useState<ReceptionResult | null>(null);
+  const currentDraftRef = useRef<ReceptionDraft | null>(null);
+  currentDraftRef.current = {formData, documentWarnings, uncertainFields, fieldWarnings, fieldEvidence,
+    supplierIdentity, ocrHighlights, evaluationRevision, lastResult, lastEngine, savedFingerprint: savedFingerprintRef.current};
 
   const fingerprint=JSON.stringify(formData);
   const hasDraft=Boolean(previewUrl||pastedText||formData.invoiceNumber||formData.invoiceDate||formData.supplierName||formData.supplierTaxCode||formData.itemName||formData.totalAmount||formData.paymentMethod||formData.taxRate!==undefined);
-  const dirty=isParsingDocument||isEvaluating||(hasDraft&&fingerprint!==savedFingerprintRef.current);
+  const dirty=isParsingDocument||isEvaluating||batchJobs.some(job=>job.status==='QUEUED'||job.status==='PROCESSING'||(job.status==='READY'&&!job.evaluated))||(hasDraft&&fingerprint!==savedFingerprintRef.current);
   useEffect(()=>{onDirtyChange?.(dirty);},[dirty,onDirtyChange]);
   useEffect(()=>{if(!dirty)return;const leaving=(event:BeforeUnloadEvent):void=>{event.preventDefault();event.returnValue='';};window.addEventListener('beforeunload',leaving);return ()=>window.removeEventListener('beforeunload',leaving);},[dirty]);
   useEffect(()=>{const field=Object.keys(formErrors)[0];if(field)document.getElementById(field)?.focus();},[formErrors]);
   const requiredFields=requiredDecisionFields(formData,dynamicConfig);
-  const showEvidence=requiredFields.has('hasBankSlip')||requiredFields.has('hasItemManifest')||formData.isAdjustment||formData.isStaffReimbursed||['hasBankSlip','hasItemManifest'].some(field=>uncertainFields.includes(field)||formErrors[field]);
+  const supplementalFields = ['sellerStatus', 'hasBankSlip', 'hasItemManifest'] as const;
+  const demoSupplierPairMatches = supplierIdentity?.status === 'DEMO_MATCH'
+    && supplierIdentity.legalName === formData.supplierName
+    && normalizeTaxCodeFormat(supplierIdentity.supplierTaxCode || '') === normalizeTaxCodeFormat(formData.supplierTaxCode || '')
+    && validateTaxCode(formData.supplierTaxCode || '').isValid;
+  const neutralSupplierField = (field: string): boolean => Boolean(demoSupplierPairMatches
+    && isNeutralDemoSupplierField(field, supplierIdentity, fieldWarnings[field], fieldEvidence[field]));
+  const showSupplement = formData.isAdjustment || formData.isStaffReimbursed
+    || formData.sellerStatus === 'SUSPENDED' || formData.sellerStatus === 'CLOSED'
+    || supplementalFields.some(field => uncertainFields.includes(field) || formErrors[field] || fieldWarnings[field]
+      || (requiredFields.has(field) && (formData[field] === undefined || formData[field] === 'UNKNOWN' || formData[field] === false)));
 
   const applyCaptureExtraction = useCallback((data: DocumentExtraction): boolean => {
     if(data.artifactId!==captureArtifactRef.current)return false;
@@ -227,165 +256,10 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
 
   const finishCaptureProcessing = useCallback(() => {if(captureArtifactRef.current)setIsParsingDocument(false);}, []);
 
-  // Trợ lý Robot AI thân thiện (Có thể Drag di chuyển khắp màn hình)
-  const [isRobotSpeechOpen, setIsRobotSpeechOpen] = useState<boolean>(false);
-  const [robotPos, setRobotPos] = useState<{ x: number; y: number } | null>(null);
-  const [isDraggingRobot, setIsDraggingRobot] = useState<boolean>(false);
-  const isDraggingRobotRef = useRef(false);
-  const robotDragStartRef = useRef<{ startX: number; startY: number; initialX: number; initialY: number }>({
-    startX: 0,
-    startY: 0,
-    initialX: 0,
-    initialY: 0
-  });
-  const hasMovedRobotRef = useRef(false);
-
-  const handleRobotPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0) return;
-    const el = e.currentTarget;
-    const rect = el.getBoundingClientRect();
-    const currentX = robotPos ? robotPos.x : rect.left;
-    const currentY = robotPos ? robotPos.y : rect.top;
-
-    isDraggingRobotRef.current = true;
-    hasMovedRobotRef.current = false;
-    setIsDraggingRobot(true);
-    robotDragStartRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      initialX: currentX,
-      initialY: currentY
-    };
-    try {
-      el.setPointerCapture(e.pointerId);
-    } catch {
-      // Fallback
-    }
-  };
-
-  const handleRobotPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingRobotRef.current) return;
-    const dx = e.clientX - robotDragStartRef.current.startX;
-    const dy = e.clientY - robotDragStartRef.current.startY;
-
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
-      hasMovedRobotRef.current = true;
-    }
-
-    if (hasMovedRobotRef.current) {
-      const rawX = robotDragStartRef.current.initialX + dx;
-      const rawY = robotDragStartRef.current.initialY + dy;
-      const maxX = typeof window !== 'undefined' ? Math.max(10, window.innerWidth - 76) : 800;
-      const maxY = typeof window !== 'undefined' ? Math.max(10, window.innerHeight - 76) : 600;
-      const boundedX = Math.max(10, Math.min(maxX, rawX));
-      const boundedY = Math.max(10, Math.min(maxY, rawY));
-      setRobotPos({ x: boundedX, y: boundedY });
-    }
-  };
-
-  const handleRobotPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingRobotRef.current) return;
-    isDraggingRobotRef.current = false;
-    setIsDraggingRobot(false);
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      // Fallback
-    }
-    // Nếu chỉ nhấp chuột (không di chuyển) thì mở/đóng hộp thoại
-    if (!hasMovedRobotRef.current) {
-      setIsRobotSpeechOpen((prev) => !prev);
-    }
-  };
-
-  const [robotMessage, setRobotMessage] = useState<{
-    title: string;
-    items: string[];
-    isError: boolean;
-  } | null>(null);
-  const hasFieldNoticeRef = useRef(false);
-
-  // Kích hoạt robot thông báo khi AI thẩm định trả về rủi ro (ESCALATED)
-  useEffect(() => {
-    if (lastResult?.status === 'ESCALATED') {
-      const items = [lastResult.message];
-      if (lastResult.riskGroup) {
-        items.push(`Phân nhóm rủi ro: ${lastResult.riskGroup}`);
-      }
-      setRobotMessage({
-        title: 'Phát Hiện Rủi Ro Hồ Sơ (Escalation)',
-        items,
-        isError: true,
-      });
-      setIsRobotSpeechOpen(true);
-    } else if (lastResult?.status === 'ROUTINE') {
-      setRobotMessage({ title: lastResult.held ? 'Thường quy — chờ duyệt tay' : 'Hồ sơ đạt chuẩn thường quy', items: [lastResult.message || 'Hồ sơ đạt chuẩn thường quy'], isError: false });
-      setIsRobotSpeechOpen(true);
-    }
-  }, [lastResult]);
-
   // Trạng thái tra cứu tự động 2 chiều (MST <-> Tên Nhà Cung Cấp)
   const [taxLookupLoading, setTaxLookupLoading] = useState<boolean>(false);
-  const [taxLookupFeedback, setTaxLookupFeedback] = useState<{
-    type: 'MST' | 'NAME';
-    status: 'SUCCESS' | 'WARNING';
-    message: string;
-  } | null>(null);
   const autoLookupAbortRef = useRef<AbortController | null>(null);
   const supplierIdentityUserEditedRef = useRef(false);
-
-  useEffect(() => {
-    const fieldLabels: Record<string, string> = {
-      invoiceNumber: 'Số hóa đơn', invoiceDate: 'Ngày lập hóa đơn', supplierTaxCode: 'Mã số thuế',
-      supplierName: 'Nhà cung cấp', itemName: 'Hàng hóa / dịch vụ', preTaxAmount: 'Tiền trước thuế',
-      taxRate: 'Thuế suất', paymentMethod: 'Hình thức thanh toán', hasBankSlip: 'Chứng từ thanh toán',
-      hasItemManifest: 'Bảng kê hàng hóa', sellerStatus: 'Trạng thái mã số thuế', totalAmount: 'Tổng thanh toán',
-      taxAmount: 'Tiền thuế'
-    };
-    const summarizeFields = (fields: string[]) => {
-      const labels = [...new Set(fields.map((field) => fieldLabels[field] || field))];
-      const visible = labels.slice(0, 5);
-      if (labels.length > visible.length) visible.push(`và ${labels.length - visible.length} trường khác`);
-      return visible.join(', ');
-    };
-    const items: string[] = [];
-    const errorFields = Object.keys(formErrors);
-    const uncertainSet = new Set([...uncertainFields, ...Object.keys(fieldWarnings)].filter((field) => !formErrors[field]));
-
-    if (errorFields.length) {
-      items.push(`Hoàn thiện ${errorFields.length} trường trước khi thẩm định: ${summarizeFields(errorFields)}.`);
-    }
-    if (uncertainSet.size) {
-      items.push(`Đối chiếu với hóa đơn gốc: ${summarizeFields([...uncertainSet])}.`);
-    }
-
-    const coveredTaxCode = [...uncertainSet, ...errorFields].includes('supplierTaxCode');
-    const coveredAmount = [...uncertainSet, ...errorFields].some((field) => ['preTaxAmount', 'totalAmount', 'taxAmount'].includes(field));
-    const remainingWarnings = [...new Set(documentWarnings)].filter((warning) => {
-      const text = warning.toLowerCase();
-      if (text.startsWith('đã bóc tách tự động')) return false;
-      if (coveredTaxCode && (text.includes('mst') || text.includes('mã số thuế'))) return false;
-      if (coveredAmount && (text.includes('tổng tiền') || text.includes('tổng thanh toán') || text.includes('số tiền'))) return false;
-      return true;
-    });
-    if (remainingWarnings.length && !errorFields.length && !uncertainSet.size) {
-      items.push(remainingWarnings[0]);
-    }
-    const lookupIssueCovered = errorFields.includes('sellerStatus') || uncertainSet.has('supplierTaxCode') || uncertainSet.has('sellerStatus');
-    if (taxLookupFeedback?.status === 'WARNING' && !lookupIssueCovered) items.push(taxLookupFeedback.message);
-
-    if (items.length > 0) {
-      hasFieldNoticeRef.current = true;
-      setRobotMessage({
-        title: errorFields.length ? 'Cần hoàn thiện hồ sơ' : 'Cần đối soát chứng từ',
-        items: [...new Set(items)],
-        isError: errorFields.length > 0 || remainingWarnings.some((w) => w.includes('⚠️') || w.toLowerCase().includes('lỗi')) || taxLookupFeedback?.status === 'WARNING',
-      });
-    } else if (hasFieldNoticeRef.current) {
-      hasFieldNoticeRef.current = false;
-      setRobotMessage(null);
-    }
-  }, [documentWarnings, uncertainFields, fieldWarnings, formErrors, taxLookupFeedback]);
 
   // Chiều 1: Tự động tra Tên & Địa chỉ từ MST doanh nghiệp hoặc mã 12 số của hộ kinh doanh
   useEffect(() => {
@@ -405,25 +279,23 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
           });
           if (res.ok) {
             const data = await res.json();
-            if (data?.found && data?.data?.isVerified && data?.data?.legalName) {
+            if (controller.signal.aborted) return;
+            if (data?.found && (data?.data?.isVerified || data?.data?.isDemo) && data?.data?.legalName) {
               if (data.supplierIdentity) setSupplierIdentity(data.supplierIdentity);
               supplierIdentityUserEditedRef.current = false;
               setFormData((prev) => ({
                 ...prev,
-                supplierName: data.data.legalName,
-                sellerStatus: data.data.status?.includes('hoạt động') || data.data.status === 'ACTIVE' ? 'ACTIVE' : prev.sellerStatus
+                supplierName: normalizeTaxCodeFormat(prev.supplierTaxCode || '') === cleanMst && !prev.supplierName?.trim() ? data.data.legalName : prev.supplierName
               }));
-              setTaxLookupFeedback({
-                type: 'MST',
-                status: 'SUCCESS',
-                message: `Đã đối chiếu tên pháp nhân theo MST: ${data.data.legalName}`
-              });
+              if (data.data.isDemo) setUncertainFields(previous => [...new Set([...previous, 'supplierName', 'supplierTaxCode'])]);
+              if (data.data.isDemo) toast.info('Đã điền từ danh mục demo.');
+              else toast.success('Đã đối chiếu tên nhà cung cấp theo MST.');
             }
           }
         } catch (err: any) {
           if (err?.name !== 'AbortError') console.warn('Auto lookup MST error:', err);
         } finally {
-          setTaxLookupLoading(false);
+          if (!controller.signal.aborted) setTaxLookupLoading(false);
         }
       }, 400);
 
@@ -432,7 +304,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
         controller.abort();
       };
     }
-  }, [formData.supplierTaxCode, formData.supplierName]);
+  }, [formData.supplierTaxCode, formData.supplierName, activeBatchId]);
 
   // Chiều 2: Tự tra MST nếu thiếu/sai định dạng; sau khi người dùng sửa tên,
   // đối chiếu lại cả cặp tên-MST để tự sửa lỗi OCR có đủ bằng chứng.
@@ -461,11 +333,12 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
             const data = await res.json();
             if (controller.signal.aborted) return;
             if (data?.supplierIdentity) setSupplierIdentity(data.supplierIdentity);
-            if (data?.found && data?.data?.taxCode && data?.data?.isVerified) {
+            if (data?.found && data?.data?.taxCode && (data?.data?.isVerified || data?.data?.isDemo)) {
               const resolvedTaxCode = String(data.data.taxCode);
               const resolvedName = String(data.data.supplierName || data.data.legalName || name);
               const identityChanged = resolvedTaxCode !== mst || resolvedName !== name;
               supplierIdentityUserEditedRef.current = false;
+              if (data.data.isDemo) setUncertainFields(previous => [...new Set([...previous, 'supplierName', 'supplierTaxCode'])]);
               if (identityChanged) {
                 setFormData((prev) => {
                   if (prev.supplierName?.trim() !== name
@@ -477,14 +350,8 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                     supplierName: resolvedName
                   };
                 });
-                setTaxLookupFeedback({
-                  type: 'NAME',
-                  status: 'SUCCESS',
-                  message: mst
-                    ? 'Đã tự đối chiếu và sửa thông tin nhà cung cấp theo hồ sơ thuế.'
-                    : `Đã đối chiếu tên pháp nhân: MST ${resolvedTaxCode}`
-                });
-                toast.success(mst ? 'Đã tự đối chiếu tên và MST.' : 'Đã tự điền MST nhà cung cấp.');
+                if (data.data.isDemo) toast.info('Đã điền từ danh mục demo.');
+                else toast.success(mst ? 'Đã tự đối chiếu tên và MST.' : 'Đã tự điền MST nhà cung cấp.');
               }
             } else if (data?.lookupStatus === 'CONFLICT') {
               supplierIdentityUserEditedRef.current = false;
@@ -501,7 +368,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
         } catch (err: any) {
           if (err?.name !== 'AbortError') console.warn('Auto lookup Name error:', err);
         } finally {
-          setTaxLookupLoading(false);
+          if (!controller.signal.aborted) setTaxLookupLoading(false);
         }
       }, 700);
 
@@ -510,7 +377,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
         controller.abort();
       };
     }
-  }, [formData.supplierName, formData.supplierTaxCode, formData.supplierAddress]);
+  }, [formData.supplierName, formData.supplierTaxCode, formData.supplierAddress, activeBatchId]);
 
   // Kiểm tra xem đã có hóa đơn/file nạp vào chưa
   const hasDocument = Boolean(
@@ -591,6 +458,8 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
   };
 
   const handleDocumentUpload = async (file: File) => {
+    const fileError = documentFileError(file);
+    if (fileError) {toast.error(fileError); return;}
     const fileNameLower = file.name.toLowerCase();
     const supported = file.type === 'application/pdf' || file.type.includes('xml')
       || ['image/png', 'image/jpeg', 'image/webp'].includes(file.type)
@@ -689,6 +558,118 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
     }
   };
 
+  const showBatchJob = (job: BatchJob): void => {
+    parseAbortRef.current?.abort();
+    autoLookupAbortRef.current?.abort();
+    captureArtifactRef.current = null;
+    const requestId = ++parseRequestIdRef.current;
+    setActiveBatchId(job.id); activeBatchIdRef.current = job.id;
+    setUploadedFile(job.file); setExtractionTiming(null); extractionStartRef.current = null;
+    setPreviewUrl(null); setXmlContent(null); setPastedText('');
+    const isXml = /\.xml$/i.test(job.file.name);
+    setPreviewFileType(isXml ? 'XML' : /\.pdf$/i.test(job.file.name) ? 'PDF' : 'IMAGE');
+    if (isXml) void job.file.text().then(text => {if (requestId === parseRequestIdRef.current) setXmlContent(text);})
+      .catch(() => {if (requestId === parseRequestIdRef.current) toast.error('Không mở được bản xem trước XML.');});
+    else setPreviewUrl(URL.createObjectURL(job.file));
+    const data = job.result;
+    const draft = batchDraftsRef.current.get(job.id);
+    setFormData(draft?.formData || {...emptyInvoiceInput(), ...data?.invoice, id: job.id,
+      sourceArtifactId: data?.artifactId, sourceHash: data?.sourceHash});
+    setDocumentWarnings(draft?.documentWarnings || data?.warnings || []);
+    setUncertainFields(draft?.uncertainFields || data?.uncertainFields || []);
+    setFieldWarnings(draft?.fieldWarnings || data?.fieldWarnings || {});
+    setFieldEvidence(draft?.fieldEvidence || data?.fieldEvidence || {});
+    setSupplierIdentity(draft ? draft.supplierIdentity : data?.supplierIdentity);
+    setOcrHighlights(draft?.ocrHighlights || data?.ocrHighlights || []);
+    setEvaluationRevision(draft?.evaluationRevision); setLastResult(draft?.lastResult || null);
+    setLastEngine(draft?.lastEngine || null); savedFingerprintRef.current = draft?.savedFingerprint || null;
+    supplierIdentityUserEditedRef.current = false;
+    setFormErrors({}); setTaxLookupLoading(false);
+    setIsParsingDocument(job.status === 'QUEUED' || job.status === 'PROCESSING');
+  };
+
+  const selectBatchJob = (id: string): void => {
+    if (isEvaluating || id === activeBatchIdRef.current) return;
+    const job = batchJobsRef.current.find(item => item.id === id);
+    if (!job) return;
+    if (activeBatchIdRef.current && currentDraftRef.current && batchJobsRef.current.find(item => item.id === activeBatchIdRef.current)?.status === 'READY') {
+      batchDraftsRef.current.set(activeBatchIdRef.current, currentDraftRef.current);
+    }
+    showBatchJob(job);
+    if (job.error) toast.error(job.error);
+  };
+
+  const runBatch = async (jobs: BatchJob[]): Promise<void> => {
+    const controller = new AbortController();
+    batchAbortRef.current = controller;
+    const generation = ++batchGenerationRef.current;
+    const update = (id: string, changes: Partial<BatchJob>): void => {
+      if (generation !== batchGenerationRef.current) return;
+      batchJobsRef.current = batchJobsRef.current.map(job => job.id === id ? {...job, ...changes} : job);
+      setBatchJobs(batchJobsRef.current);
+      const job = batchJobsRef.current.find(item => item.id === id)!;
+      if (activeBatchIdRef.current === id) showBatchJob(job);
+      if (activeBatchIdRef.current === id && changes.error) toast.error(changes.error);
+    };
+    await runDocumentBatch(jobs, {
+      signal: controller.signal,
+      started: job => update(job.id, {status: 'PROCESSING', error: undefined}),
+      process: async (job, signal) => {
+        const fileError = documentFileError(job.file);
+        if (fileError) throw new Error(fileError);
+        const file = await compressImageClientSide(job.file);
+        signal.throwIfAborted();
+        const form = new FormData(); form.append('file', file);
+        const response = await fetch('/api/documents/parse', {method: 'POST', body: form, signal});
+        const payload = await response.json();
+        if (!response.ok) throw new Error(typeof payload.error === 'string' ? payload.error : 'Không đọc được chứng từ.');
+        const result = DocumentExtractionSchema.parse(payload);
+        if (result.documentType === 'NOT_INVOICE' || !hasDetectedInvoice(result.invoice)) throw new Error('Không nhận diện được hóa đơn. Hãy kiểm tra ảnh.');
+        return result;
+      },
+      settled: (job, result) => {
+        if ('value' in result) update(job.id, {status: 'READY', result: result.value});
+        else update(job.id, {status: 'ERROR', error: result.error});
+      }
+    });
+    if (generation === batchGenerationRef.current && !controller.signal.aborted) {
+      const failed = batchJobsRef.current.filter(job => job.status === 'ERROR').length;
+      if (failed) toast.warning(`Đã đọc xong lô; ${failed} tệp cần thử lại.`);
+      else toast.success(`Đã đọc ${batchJobsRef.current.length} chứng từ.`);
+    }
+  };
+
+  const handleFilesUpload = async (files: File[]): Promise<void> => {
+    if (evaluationLockRef.current) return;
+    if (files.length === 1) return handleDocumentUpload(files[0]);
+    if (!files.length) return;
+    if (files.length > DOCUMENT_BATCH_LIMIT) {toast.error('Mỗi lượt tối đa 20 chứng từ.'); return;}
+    const jobs: BatchJob[] = files.map(file => {
+      const error = documentFileError(file);
+      return {id: `BATCH-${crypto.randomUUID()}`, file, status: error ? 'ERROR' : 'QUEUED', error: error || undefined};
+    });
+    batchDraftsRef.current.clear(); batchJobsRef.current = jobs; setBatchJobs(jobs);
+    showBatchJob(jobs[0]);
+    await runBatch(jobs.filter(job => job.status === 'QUEUED'));
+  };
+
+  const stopBatch = (): void => {
+    batchGenerationRef.current++; batchAbortRef.current?.abort();
+    batchJobsRef.current = batchJobsRef.current.map(job => job.status === 'QUEUED' || job.status === 'PROCESSING'
+      ? {...job, status: 'CANCELLED', error: 'Đã dừng đọc; có thể thử lại.'} : job);
+    setBatchJobs(batchJobsRef.current);
+    const active = batchJobsRef.current.find(job => job.id === activeBatchIdRef.current);
+    if (active?.status === 'CANCELLED') setIsParsingDocument(false);
+  };
+
+  const retryBatch = (): void => {
+    const retry = batchJobsRef.current.filter(job => job.status === 'ERROR' || job.status === 'CANCELLED');
+    for (const job of retry) batchDraftsRef.current.delete(job.id);
+    batchJobsRef.current = batchJobsRef.current.map(job => retry.some(item => item.id === job.id) ? {...job, status: 'QUEUED', error: undefined} : job);
+    setBatchJobs(batchJobsRef.current);
+    void runBatch(retry);
+  };
+
   const handleRawTextParse = async () => {
     if (!pastedText.trim()) {
       toast.error('Vui lòng dán nội dung hóa đơn hoặc văn bản trước.');
@@ -751,11 +732,16 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
 
   // Nút: Hóa đơn tiếp theo -> Dọn sạch hóa đơn cũ và đưa khung upload quay trở lại
   const handleNextInvoice = () => {
+    if (evaluationLockRef.current) return;
+    if (batchJobsRef.current.length) {
+      const index = batchJobsRef.current.findIndex(job => job.id === activeBatchIdRef.current);
+      selectBatchJob(batchJobsRef.current[(index + 1) % batchJobsRef.current.length].id);
+      return;
+    }
     captureArtifactRef.current=null;
     savedFingerprintRef.current=null;
     setExtractionTiming(null);
     extractionStartRef.current=null;
-    hasFieldNoticeRef.current = false;
     parseRequestIdRef.current += 1;
     parseAbortRef.current?.abort();
     parseAbortRef.current = null;
@@ -764,7 +750,6 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
     supplierIdentityUserEditedRef.current = false;
     setIsParsingDocument(false);
     setTaxLookupLoading(false);
-    setTaxLookupFeedback(null);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
@@ -780,7 +765,6 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
     setSupplierIdentity(undefined);
     setFormErrors({});
     setOcrHighlights([]);
-    setActiveHighlightField(null);
     setLastResult(null);
     setEvaluationRevision(undefined);
     setFormData({
@@ -802,12 +786,19 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
       isAdjustment: false,
       isStaffReimbursed: false
     } as InvoiceInput);
-    setRobotMessage({ title: 'Sẵn sàng tiếp nhận chứng từ', items: ['Bạn có thể tải lên hóa đơn tiếp theo.'], isError: false });
-    setIsRobotSpeechOpen(true);
+  };
+
+  const closeBatch = (): void => {
+    if (batchJobsRef.current.some(job => !job.evaluated) && !window.confirm('Đóng lô sẽ bỏ các bản nháp chưa thẩm định. Tiếp tục?')) return;
+    stopBatch(); batchJobsRef.current = []; setBatchJobs([]);
+    activeBatchIdRef.current = null; setActiveBatchId(null); batchDraftsRef.current.clear();
+    handleNextInvoice();
   };
 
   const changeInputMode = (nextMode: 'FILE' | 'PASTE') => {
+    if (evaluationLockRef.current) return;
     if (inputMode === nextMode) return;
+    if (batchJobsRef.current.length) {toast.info('Đóng lô chứng từ trước khi đổi cách tiếp nhận.'); return;}
     const hasUnsavedData = hasDocument || Boolean(
       pastedText.trim() || formData.invoiceNumber || formData.invoiceDate || formData.supplierTaxCode
       || formData.supplierName || formData.itemName || formData.totalAmount > 0
@@ -833,10 +824,13 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
 
   const handleInputChange = (field: keyof InvoiceInput, value: any) => {
     setLastResult(null);
+    if (activeBatchIdRef.current) {
+      batchJobsRef.current = batchJobsRef.current.map(job => job.id === activeBatchIdRef.current ? {...job, evaluated: false} : job);
+      setBatchJobs(batchJobsRef.current);
+    }
     if (field === 'supplierName' || field === 'supplierTaxCode' || field === 'supplierAddress') {
       supplierIdentityUserEditedRef.current = true;
       setSupplierIdentity(undefined);
-      setTaxLookupFeedback(null);
     }
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
@@ -858,6 +852,9 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (evaluationLockRef.current || isEvaluating || isParsingDocument) return;
+    const currentJob = batchJobsRef.current.find(job => job.id === activeBatchIdRef.current);
+    if (currentJob && currentJob.status !== 'READY') {toast.warning('Chứng từ chưa đọc xong; hãy thử lại hoặc chọn tệp khác.'); return;}
     const errors: Record<string, string> = {};
     if (formData.invoiceDate && !/^\d{4}-\d{2}-\d{2}$/.test(formData.invoiceDate)) errors.invoiceDate='Ngày sai định dạng.';
     for(const field of ['preTaxAmount','taxAmount','totalAmount'] as const) if(!Number.isFinite(formData[field])) errors[field]='Số tiền sai định dạng.';
@@ -868,6 +865,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
     }
 
     setFormErrors({});
+    evaluationLockRef.current = true;
     setIsEvaluating(true);
     try {
       const submitted:Record<string,unknown>={...formData,sourceUncertainFields:uncertainFields};
@@ -919,14 +917,22 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
       }
 
       savedFingerprintRef.current=JSON.stringify({...formData,id:decision.invoiceId});
-      onEvaluateResult(decision, {...formData, id: decision.invoiceId});
+      if (activeBatchIdRef.current) {
+        batchJobsRef.current = batchJobsRef.current.map(job => job.id === activeBatchIdRef.current ? {...job, evaluated: true} : job);
+        setBatchJobs(batchJobsRef.current);
+      }
+      onEvaluateResult(decision, {...formData, id: decision.invoiceId}, {stayOnReceive: Boolean(activeBatchIdRef.current)});
+      if (activeBatchIdRef.current) toast.success(`Đã thẩm định hóa đơn ${formData.invoiceNumber || 'trong lô'}.`);
     } catch (err) {
       toast.error(err instanceof Error&&err.message.length<=100?err.message:'Không thể thẩm định. Hãy thử lại.');
     } finally {
+      evaluationLockRef.current = false;
       setIsEvaluating(false);
     }
   };
 
+  const batchInputLocked = Boolean(activeBatchId && batchJobs.find(job => job.id === activeBatchId)?.status !== 'READY');
+  const inputLocked = isEvaluating || isParsingDocument || batchInputLocked;
   const Heading=demoMode?'h2':'h1';
   return (
     <div className="h-full min-h-0 flex flex-col gap-2">
@@ -964,6 +970,9 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
         </div>
       </div>
 
+      {batchJobs.length > 0 && <ReceptionBatchQueue items={batchJobs} activeId={activeBatchId} evaluating={isEvaluating}
+        onSelect={selectBatchJob} onRetry={retryBatch} onStop={stopBatch} onClose={closeBatch}/>}
+
       {/* ================= 2 CỘT SONG SONG: CHIỀU CAO ĐỒNG BỘ 100% GIỮA UPLOAD VÀ XEM FILE ================= */}
       <ReceptionLayout>
 
@@ -973,7 +982,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
         <div className="reception-pane">
           
           {/* TRƯỜNG HỢP 1: CHƯA UPLOAD -> KHUNG UPLOAD CHIẾM TRỌN CHIỀU CAO BẰNG CỘT PHẢI */}
-          {!hasDocument ? <ReceptionUpload mode={inputMode} busy={isParsingDocument} fileRef={fileInputRef} upload={handleDocumentUpload} onCapture={()=>setCaptureDialogOpen(true)} text={pastedText} onText={setPastedText} onParse={handleRawTextParse} onSample={applySampleText}/> : (
+          {!hasDocument ? <ReceptionUpload mode={inputMode} busy={isParsingDocument||isEvaluating} fileRef={fileInputRef} upload={handleDocumentUpload} uploadMany={handleFilesUpload} onCapture={()=>setCaptureDialogOpen(true)} text={pastedText} onText={setPastedText} onParse={handleRawTextParse} onSample={applySampleText}/> : (
             /* TRƯỜNG HỢP 2: ĐÃ UPLOAD -> KHUNG UPLOAD BIẾN MẤT, HIỂN THỊ FILE CHIẾM TRỌN CHIỀU CAO */
             <Card className="w-full h-full min-h-0 flex flex-col overflow-hidden border border-slate-200 shadow-none bg-white">
               
@@ -1022,7 +1031,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                 
                 {/* Shared image viewport: fits both dimensions without upscaling. */}
                 {previewFileType==='IMAGE'&&previewUrl&&<InvoiceImageViewer src={previewUrl} busy={isParsingDocument}>
-                  {showOcrHighlights&&ocrHighlights.filter(hl=>hl.field&&hl.bbox).map((hl,index)=>hl.bbox&&<button type="button" key={index} title="Đối chiếu trường trên chứng từ" aria-label={'Đối chiếu '+(hl.field||'trường dữ liệu')} className="absolute min-h-0 rounded border border-amber-500 bg-amber-300/20" style={{left:hl.bbox.x*100+'%',top:hl.bbox.y*100+'%',width:hl.bbox.w*100+'%',height:hl.bbox.h*100+'%'}} onClick={()=>{if(!hl.field)return;setActiveHighlightField(hl.field);document.getElementsByName(hl.field)[0]?.focus();}}/>)}
+                  {showOcrHighlights&&ocrHighlights.filter(hl=>hl.field&&hl.bbox).map((hl,index)=>hl.bbox&&<button type="button" key={index} title="Đối chiếu trường trên chứng từ" aria-label={'Đối chiếu '+(hl.field||'trường dữ liệu')} className="absolute min-h-0 rounded border border-amber-500 bg-amber-300/20" style={{left:hl.bbox.x*100+'%',top:hl.bbox.y*100+'%',width:hl.bbox.w*100+'%',height:hl.bbox.h*100+'%'}} onClick={()=>{if(!hl.field)return;document.getElementsByName(hl.field)[0]?.focus();}}/>)}
                 </InvoiceImageViewer>}
 
                 {/* 2. Nếu là PDF */}
@@ -1140,7 +1149,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                   variant="outline"
                   size="sm"
                   onClick={handleNextInvoice}
-                  disabled={isParsingDocument}
+                  disabled={isParsingDocument||isEvaluating}
                   className="gap-1.5 font-medium text-xs h-8 text-slate-900 border-slate-300 hover:bg-slate-100 cursor-pointer shadow-none shrink-0 ml-2"
                 >
                   <RotateCcw className="h-3.5 w-3.5 text-blue-600" />
@@ -1170,7 +1179,8 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
 
             </div>
             {/* Form Fields: Liền mạch, nút thẩm định nằm ngay bên dưới Tổng thanh toán */}
-            <form id="extraction-form" onSubmit={handleSubmit} className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 text-sm text-foreground">
+            <form id="extraction-form" onSubmit={handleSubmit} aria-busy={isParsingDocument || isEvaluating} className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 text-sm text-foreground">
+              <fieldset disabled={inputLocked} className="min-w-0 space-y-4 border-0 p-0">
               
               {/* Nhóm 1: Số HĐ & Ngày Lập */}
               <div className="grid grid-cols-2 gap-3">
@@ -1186,10 +1196,6 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                     type="text"
                     value={formData.invoiceNumber}
                     aria-invalid={Boolean(formErrors.invoiceNumber)}
-                    onFocus={() => setActiveHighlightField('invoiceNumber')}
-                    onBlur={() => setActiveHighlightField(null)}
-                    onMouseEnter={() => setActiveHighlightField('invoiceNumber')}
-                    onMouseLeave={() => setActiveHighlightField(null)}
                     onChange={(e) => handleInputChange('invoiceNumber', e.target.value)}
                     placeholder="VD: 0048123"
                     className={`w-full px-3 py-2 rounded-lg font-numeric font-medium text-xs outline-none transition-colors ${
@@ -1214,10 +1220,6 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                     type="date"
                     value={formData.invoiceDate}
                     aria-invalid={Boolean(formErrors.invoiceDate)}
-                    onFocus={() => setActiveHighlightField('invoiceDate')}
-                    onBlur={() => setActiveHighlightField(null)}
-                    onMouseEnter={() => setActiveHighlightField('invoiceDate')}
-                    onMouseLeave={() => setActiveHighlightField(null)}
                     onChange={(e) => handleInputChange('invoiceDate', e.target.value)}
                     onInput={(e) => handleInputChange('invoiceDate', e.currentTarget.value)}
                     className={`w-full px-3 py-2 rounded-lg font-numeric font-medium text-xs outline-none transition-colors ${
@@ -1252,16 +1254,12 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                         type="text"
                         value={formData.supplierTaxCode}
                         aria-invalid={Boolean(formErrors.supplierTaxCode)}
-                        onFocus={() => setActiveHighlightField('supplierTaxCode')}
-                        onBlur={() => setActiveHighlightField(null)}
-                        onMouseEnter={() => setActiveHighlightField('supplierTaxCode')}
-                        onMouseLeave={() => setActiveHighlightField(null)}
                         onChange={(e) => handleInputChange('supplierTaxCode', e.target.value)}
                         placeholder="MST 10-13 số"
                         className={`w-full px-3 py-2 rounded-lg font-numeric font-medium text-xs outline-none transition-colors ${
                           formErrors.supplierTaxCode
                             ? 'bg-rose-50 border-2 border-rose-400 ring-2 ring-rose-200 text-rose-950 focus:border-rose-600 focus:ring-rose-500'
-                            : uncertainFields.includes('supplierTaxCode') || supplierIdentity?.status === 'CONFLICT'
+                            : (uncertainFields.includes('supplierTaxCode') && !neutralSupplierField('supplierTaxCode')) || supplierIdentity?.status === 'CONFLICT'
                             ? 'bg-amber-50/90 border-2 border-amber-400 ring-2 ring-amber-300/40 text-amber-950 focus:border-amber-600 focus:ring-amber-500'
                             : 'bg-white border border-slate-200 text-slate-950 focus:border-slate-950 focus:ring-1 focus:ring-slate-950'
                         }`}
@@ -1274,6 +1272,7 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                         Nhà cung cấp
                       </label>
                       <div className="flex items-center gap-1.5">
+                        {supplierIdentity?.status === 'DEMO_MATCH' && <span title={supplierIdentity.message} className="text-[10px] font-medium text-muted-foreground">Danh mục demo</span>}
                         {supplierIdentity?.status === 'VERIFIED' && supplierIdentity.sources[0] && (
                           <a
                             href={supplierIdentity.sources[0].url}
@@ -1297,16 +1296,12 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                         type="text"
                         value={formData.supplierName}
                         aria-invalid={Boolean(formErrors.supplierName)}
-                        onFocus={() => setActiveHighlightField('supplierName')}
-                        onBlur={() => setActiveHighlightField(null)}
-                        onMouseEnter={() => setActiveHighlightField('supplierName')}
-                        onMouseLeave={() => setActiveHighlightField(null)}
                         onChange={(e) => handleInputChange('supplierName', e.target.value)}
                         placeholder="Tên pháp nhân bên bán"
                         className={`w-full px-3 py-2 rounded-lg font-medium text-xs outline-none transition-colors ${
                           formErrors.supplierName
                             ? 'bg-rose-50 border-2 border-rose-400 ring-2 ring-rose-200 text-rose-950 focus:border-rose-600 focus:ring-rose-500'
-                            : uncertainFields.includes('supplierName')
+                            : uncertainFields.includes('supplierName') && !neutralSupplierField('supplierName')
                             ? 'bg-amber-50/90 border-2 border-amber-400 ring-2 ring-amber-300/40 text-amber-950 focus:border-amber-600 focus:ring-amber-500'
                             : 'bg-white border border-slate-200 text-slate-950 focus:border-slate-950 focus:ring-1 focus:ring-slate-950'
                         }`}
@@ -1330,10 +1325,6 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                   type="text"
                   value={formData.itemName}
                   aria-invalid={Boolean(formErrors.itemName)}
-                  onFocus={() => setActiveHighlightField('itemName')}
-                  onBlur={() => setActiveHighlightField(null)}
-                  onMouseEnter={() => setActiveHighlightField('itemName')}
-                  onMouseLeave={() => setActiveHighlightField(null)}
                   onChange={(e) => handleInputChange('itemName', e.target.value)}
                   placeholder="Diễn giải tên hàng hóa, dịch vụ cung cấp"
                   className={`w-full px-3 py-2 rounded-lg font-medium text-xs outline-none transition-colors ${
@@ -1360,10 +1351,6 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                     type="number"
                     value={formData.preTaxAmount}
                     aria-invalid={Boolean(formErrors.preTaxAmount)}
-                    onFocus={() => setActiveHighlightField('totalAmount')}
-                    onBlur={() => setActiveHighlightField(null)}
-                    onMouseEnter={() => setActiveHighlightField('totalAmount')}
-                    onMouseLeave={() => setActiveHighlightField(null)}
                     onChange={(e) => handleInputChange('preTaxAmount', Number(e.target.value))}
                     className={`w-full px-3 py-2 rounded-lg font-numeric font-medium text-xs outline-none transition-colors ${
                       formErrors.preTaxAmount
@@ -1412,79 +1399,82 @@ export const InteractiveInputForm: React.FC<InteractiveInputFormProps> = ({
                 </div>
               </div>
 
-              {/* Additional evidence expands only when required or requested. */}
-              <details open={showEvidence||undefined} className="rounded-xl border p-3"><summary className="cursor-pointer text-sm font-medium">Chứng từ bổ trợ</summary>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px]">
-                <label htmlFor="hasBankSlip" className="flex items-center gap-2 text-slate-900 font-medium">
-                  <span>Chứng từ thanh toán</span>
-                  <select
-                    id="hasBankSlip"
-                    value={formData.hasBankSlip === undefined ? '' : formData.hasBankSlip ? 'yes' : 'no'}
-                    aria-invalid={Boolean(formErrors.hasBankSlip)}
-                    onChange={(e) => handleInputChange('hasBankSlip', e.target.value === '' ? undefined : e.target.value === 'yes')}
-                    className={`rounded-md border bg-white px-2 py-1.5 text-[11px] font-medium ${formErrors.hasBankSlip ? 'border-rose-400' : 'border-slate-200'}`}
-                  >
-                    <option value="">Chưa xác nhận</option>
-                    <option value="yes">Có</option>
-                    <option value="no">Không</option>
-                  </select>
-                </label>
-                <label htmlFor="hasItemManifest" className="flex items-center gap-2 text-slate-900 font-medium">
-                  <span>Bảng kê hàng hóa</span>
-                  <select
-                    id="hasItemManifest"
-                    value={formData.hasItemManifest === undefined ? '' : formData.hasItemManifest ? 'yes' : 'no'}
-                    aria-invalid={Boolean(formErrors.hasItemManifest)}
-                    onChange={(e) => handleInputChange('hasItemManifest', e.target.value === '' ? undefined : e.target.value === 'yes')}
-                    className={`rounded-md border bg-white px-2 py-1.5 text-[11px] font-medium ${formErrors.hasItemManifest ? 'border-rose-400' : 'border-slate-200'}`}
-                  >
-                    <option value="">Chưa xác nhận</option>
-                    <option value="yes">Có</option>
-                    <option value="no">Không</option>
-                  </select>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer text-slate-900 font-medium">
-                  <input
-                    type="checkbox"
-                    checked={!!formData.isStaffReimbursed}
-                    onChange={(e) => handleInputChange('isStaffReimbursed', e.target.checked)}
-                    className="rounded border-slate-300 text-slate-950 focus:ring-slate-950 w-3.5 h-3.5 cursor-pointer"
-                  />
-                  <span>Hoàn ứng nhân viên</span>
-                </label>
+              {/* Required or flagged facts remain visible without crowding routine intake. */}
+              <details open={showSupplement || undefined} className="rounded-xl border px-3 py-2.5">
+                <summary className="cursor-pointer text-xs font-medium">Bổ sung khi cần</summary>
+                <div className="mt-3 space-y-3">
+                  <div className="grid gap-3 sm:grid-cols-2 text-xs">
+                    <label htmlFor="hasBankSlip" className="flex flex-col items-start gap-1.5 text-muted-foreground">
+                      <span>Chứng từ thanh toán</span>
+                      <select
+                        id="hasBankSlip"
+                        value={formData.hasBankSlip === undefined ? '' : formData.hasBankSlip ? 'yes' : 'no'}
+                        aria-invalid={Boolean(formErrors.hasBankSlip)}
+                        onChange={(e) => handleInputChange('hasBankSlip', e.target.value === '' ? undefined : e.target.value === 'yes')}
+                        className={`w-full rounded-lg border bg-card px-2.5 py-2 text-xs font-medium text-foreground ${formErrors.hasBankSlip ? 'border-rose-400' : 'border-slate-200'}`}
+                      >
+                        <option value="">Chưa xác nhận</option>
+                        <option value="yes">Có</option>
+                        <option value="no">Không</option>
+                      </select>
+                    </label>
+                    <label htmlFor="hasItemManifest" className="flex flex-col items-start gap-1.5 text-muted-foreground">
+                      <span>Bảng kê hàng hóa</span>
+                      <select
+                        id="hasItemManifest"
+                        value={formData.hasItemManifest === undefined ? '' : formData.hasItemManifest ? 'yes' : 'no'}
+                        aria-invalid={Boolean(formErrors.hasItemManifest)}
+                        onChange={(e) => handleInputChange('hasItemManifest', e.target.value === '' ? undefined : e.target.value === 'yes')}
+                        className={`w-full rounded-lg border bg-card px-2.5 py-2 text-xs font-medium text-foreground ${formErrors.hasItemManifest ? 'border-rose-400' : 'border-slate-200'}`}
+                      >
+                        <option value="">Chưa xác nhận</option>
+                        <option value="yes">Có</option>
+                        <option value="no">Không</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
+                    <label className="flex items-center gap-1.5 cursor-pointer text-foreground">
+                      <input
+                        type="checkbox"
+                        checked={!!formData.isStaffReimbursed}
+                        onChange={(e) => handleInputChange('isStaffReimbursed', e.target.checked)}
+                        className="rounded border-slate-300 text-slate-950 focus:ring-slate-950 w-3.5 h-3.5 cursor-pointer"
+                      />
+                      <span>Hoàn ứng nhân viên</span>
+                    </label>
 
-                <label className="flex items-center gap-1.5 cursor-pointer text-slate-900 font-medium">
-                  <input
-                    type="checkbox"
-                    checked={!!formData.isAdjustment}
-                    onChange={(e) => handleInputChange('isAdjustment', e.target.checked)}
-                    className="rounded border-slate-300 text-slate-950 focus:ring-slate-950 w-3.5 h-3.5 cursor-pointer"
-                  />
-                  <span>HĐ Điều chỉnh / Thay thế</span>
-                </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer text-foreground">
+                      <input
+                        type="checkbox"
+                        checked={!!formData.isAdjustment}
+                        onChange={(e) => handleInputChange('isAdjustment', e.target.checked)}
+                        className="rounded border-slate-300 text-slate-950 focus:ring-slate-950 w-3.5 h-3.5 cursor-pointer"
+                      />
+                      <span>Hóa đơn điều chỉnh / thay thế</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label htmlFor="sellerStatus" className="mb-1 block text-xs font-medium text-slate-500">Trạng thái bên bán</label>
+                    <select
+                      id="sellerStatus"
+                      value={formData.sellerStatus}
+                      aria-invalid={Boolean(formErrors.sellerStatus)}
+                      onChange={(e) => handleInputChange('sellerStatus', e.target.value)}
+                      className={`w-full rounded-lg border bg-white px-3 py-2 text-xs font-medium text-slate-950 outline-none ${formErrors.sellerStatus ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'}`}
+                    >
+                      <option value="UNKNOWN">Chưa xác minh</option>
+                      <option value="ACTIVE">Đang hoạt động</option>
+                      <option value="SUSPENDED">Tạm ngừng</option>
+                      <option value="CLOSED">Đã đóng mã số thuế</option>
+                    </select>
+                  </div>
+                </div>
+              </details>
 
-                <span className="ml-auto font-numeric text-slate-500">
-                  Ngưỡng TM: {formatVND(paymentThreshold(formData,dynamicConfig))}
-                </span>
-              </div></details>
-              <div>
-                <label htmlFor="sellerStatus" className="mb-1 block text-xs font-medium text-slate-500">Trạng thái bên bán</label>
-                <select
-                  id="sellerStatus"
-                  value={formData.sellerStatus}
-                  aria-invalid={Boolean(formErrors.sellerStatus)}
-                  onChange={(e) => handleInputChange('sellerStatus', e.target.value)}
-                  className={`w-full rounded-lg border bg-white px-3 py-2 text-xs font-medium text-slate-950 outline-none ${formErrors.sellerStatus ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'}`}
-                >
-                  <option value="UNKNOWN">Chưa xác minh</option>
-                  <option value="ACTIVE">Đang hoạt động</option>
-                  <option value="SUSPENDED">Tạm ngừng</option>
-                  <option value="CLOSED">Đã đóng mã số thuế</option>
-                </select>
-              </div>
-
+              </fieldset>
             </form>
-            <ReceptionSubmitBar taxRate={formData.taxRate} taxAmount={formData.taxAmount} totalAmount={formData.totalAmount} uncertain={uncertainFields.includes('totalAmount')||uncertainFields.includes('preTaxAmount')} busy={isEvaluating||isParsingDocument}/>
+            <ReceptionSubmitBar taxRate={formData.taxRate} taxAmount={formData.taxAmount} totalAmount={formData.totalAmount} uncertain={uncertainFields.includes('totalAmount')||uncertainFields.includes('preTaxAmount')} busy={isEvaluating} disabled={inputLocked}/>
 
           </Card>
         </div>

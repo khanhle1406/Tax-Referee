@@ -27,9 +27,9 @@ export function AutomationSwitch({ canControl }: { canControl: boolean }): React
       toast.success(data.paused ? 'Đã dừng tự động hóa: ca thường quy sẽ chờ duyệt tay. Đã ghi nhật ký.' : 'Đã bật lại tự động hóa. Đã ghi nhật ký.');
     } catch (error) { toast.error(error instanceof Error ? error.message : 'Không thể cập nhật'); } finally { setBusy(false); }
   }
-  return <button type="button" disabled={busy} onClick={() => void toggle()} title="Dừng/bật tự động duyệt toàn hệ thống"
-    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${paused ? 'border-rose-300 bg-rose-50 text-rose-800' : 'border-emerald-300 bg-emerald-50 text-emerald-800'}`}>
+  return <button type="button" disabled={busy} onClick={() => void toggle()} title={paused ? 'Tự động duyệt đang dừng. Bấm để bật lại.' : 'Tự động duyệt đang bật. Bấm để dừng.'} aria-label={paused ? 'Tự động duyệt đang dừng' : 'Tự động duyệt đang bật'}
+    className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[10px] border px-2.5 py-1.5 text-xs font-medium ${paused ? 'border-rose-300 bg-rose-50 text-rose-800' : 'border-emerald-300 bg-emerald-50 text-emerald-800'}`}>
     {paused ? <PauseCircle className="h-3.5 w-3.5" /> : <PlayCircle className="h-3.5 w-3.5" />}
-    {paused ? 'Tự động hóa: ĐÃ DỪNG' : 'Tự động hóa: đang chạy'}
+    {paused ? 'Đã dừng' : 'Tự duyệt'}
   </button>;
 }
